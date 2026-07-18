@@ -20,5 +20,31 @@ export const useRecruitment = () => {
             }),
         );
 
-    return { useOffboard };
+    const useCreateVacancy = () =>
+        useMutation(
+            client.vacancies.post.mutationOptions({
+                onSuccess: () => router.refresh(),
+            }),
+        );
+
+    const useRegenerateToken = (id: string) =>
+        useMutation(
+            client.vacancies({ id })["regenerate-token"].post.mutationOptions({
+                onSuccess: () => router.refresh(),
+            }),
+        );
+
+    const useCloseVacancy = (id: string) =>
+        useMutation(
+            client.vacancies({ id }).close.post.mutationOptions({
+                onSuccess: () => router.refresh(),
+            }),
+        );
+
+    return {
+        useOffboard,
+        useCreateVacancy,
+        useRegenerateToken,
+        useCloseVacancy,
+    };
 };
