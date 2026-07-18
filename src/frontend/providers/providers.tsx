@@ -8,8 +8,8 @@ import type { PropsWithChildren } from "react";
 import { authClient } from "@/frontend/auth/auth";
 import { AuthProvider } from "@/frontend/components/auth/auth-provider";
 import { Toaster } from "@/frontend/components/ui/sonner";
-import { apiClient, EdenProvider } from "@/frontend/lib/eden";
 import { organizationPlugin } from "@/frontend/lib/auth/organization-plugin";
+import { apiClient, EdenProvider } from "@/frontend/lib/eden";
 import { getQueryClient } from "@/frontend/lib/query-client";
 import { ThemeProvider } from "./theme-provider";
 
