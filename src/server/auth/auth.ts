@@ -21,6 +21,20 @@ export const auth = betterAuth({
         // Starter keeps verification off so sign-up works with no email provider.
         requireEmailVerification: false,
     },
+    databaseHooks: {
+        user: {
+            create: {
+                // No email provider to actually verify against, so treat every
+                // sign-up as verified. Without this, `emailVerified` stays
+                // false forever and the organization plugin's
+                // `listUserInvitations` (which requires a verified session
+                // email) 403s for every user.
+                before: async (user) => ({
+                    data: { ...user, emailVerified: true },
+                }),
+            },
+        },
+    },
     plugins: [
         openAPI({ disableDefaultReference: !ServerConfig.isDevelopment }),
         organization({
