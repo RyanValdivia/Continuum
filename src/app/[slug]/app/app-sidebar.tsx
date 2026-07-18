@@ -1,7 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { FolderKanban, LogOut, Sparkles } from "lucide-react";
+import { ClipboardCheck, FolderKanban, LogOut, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/frontend/auth/auth";
@@ -19,11 +19,24 @@ import {
     SidebarRail,
 } from "@/frontend/components/ui/sidebar";
 
-type NavItem = { title: string; segment: string; icon: LucideIcon };
+const ADMIN_ROLES = new Set(["owner", "admin"]);
+
+type NavItem = {
+    title: string;
+    segment: string;
+    icon: LucideIcon;
+    adminOnly?: boolean;
+};
 
 const NAV: NavItem[] = [
     { title: "Proyectos", segment: "projects", icon: FolderKanban },
     { title: "Conocimiento", segment: "knowledge", icon: Sparkles },
+    {
+        title: "Documentos",
+        segment: "documents",
+        icon: ClipboardCheck,
+        adminOnly: true,
+    },
 ];
 
 function useActiveTitle(): string {
@@ -40,12 +53,15 @@ export function AppHeaderTitle() {
 export function AppSidebar({
     slug,
     userEmail,
+    role,
 }: {
     slug: string;
     userEmail: string;
+    role: string;
 }) {
     const pathname = usePathname();
     const router = useRouter();
+    const isAdmin = ADMIN_ROLES.has(role);
 
     const signOut = async () => {
         await authClient.signOut();
@@ -64,7 +80,9 @@ export function AppSidebar({
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {NAV.map((item) => {
+                            {NAV.filter(
+                                (item) => !item.adminOnly || isAdmin,
+                            ).map((item) => {
                                 const href = `/${slug}/app/${item.segment}`;
                                 const active =
                                     pathname === href ||

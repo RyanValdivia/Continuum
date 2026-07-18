@@ -1,8 +1,9 @@
 import { Elysia } from "elysia";
+import { z } from "zod";
 import {
-    searchKnowledgeSchema,
-    searchResultSchema,
-} from "@/core/knowledge/domain/schemas";
+    documentReviewSchema,
+    reviewDocumentSchema,
+} from "@/core/document-review/domain/schemas";
 import { authed } from "@/server/auth/middleware/authed";
 import { requireActiveOrg } from "@/server/auth/require-active-org";
 import {
@@ -11,18 +12,23 @@ import {
     errorToResponse,
     successResponseSchema,
 } from "@/server/common/responses";
-import { searchKnowledgeService } from "../../services/search-knowledge-service";
+import { reviewDocumentService } from "../../services/review-document-service";
 
-export const searchKnowledgeRoute = new Elysia().use(authed).post(
-    "/search",
-    async ({ session, body, status }) => {
+export const reviewDocumentRoute = new Elysia().use(authed).patch(
+    "/:id/review",
+    async ({ user, session, params, body, status }) => {
         const org = requireActiveOrg(session);
         if (!org.ok) return status(403, errorToResponse(org.error));
 
-        const result = await searchKnowledgeService(org.data, body);
+        const result = await reviewDocumentService(
+            user.id,
+            org.data,
+            params.id,
+            body,
+        );
         if (!result.ok)
             return status(
-                result.error.status as 500,
+                result.error.status as 400 | 403 | 404 | 500,
                 errorToResponse(result.error),
             );
         return status(
@@ -32,18 +38,18 @@ export const searchKnowledgeRoute = new Elysia().use(authed).post(
     },
     {
         authed: true,
-        body: searchKnowledgeSchema,
+        params: z.object({ id: z.string() }),
+        body: reviewDocumentSchema,
         response: {
-            200: successResponseSchema(searchResultSchema, "SearchResult"),
+            200: successResponseSchema(documentReviewSchema, "DocumentReview"),
             400: errorResponseSchema(400),
             403: errorResponseSchema(403),
+            404: errorResponseSchema(404),
             500: errorResponseSchema(500),
         },
         detail: {
-            tags: ["Knowledge"],
-            summary: "Hybrid search over the knowledge graph",
-            description:
-                "Embeds the query, retrieves top chunks + nodes by cosine similarity, then expands matched nodes through the graph. Optionally scoped to one person.",
+            tags: ["Document Reviews"],
+            summary: "Set a document's review status",
         },
     },
 );

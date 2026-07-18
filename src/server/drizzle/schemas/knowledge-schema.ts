@@ -11,6 +11,7 @@ import {
     uniqueIndex,
     vector,
 } from "drizzle-orm/pg-core";
+import { user } from "./auth-schema";
 import { organization } from "./organization-schema";
 
 /**
@@ -43,6 +44,12 @@ export const knowledgeEdgeType = pgEnum("knowledge_edge_type", [
     "depends_on",
     "caused_by",
 ]);
+export const documentReviewStatus = pgEnum("document_review_status", [
+    "pending",
+    "approved",
+    "rejected",
+    "flagged",
+]);
 
 /**
  * One ingested source (e.g. a Notion page). Owned by an org, attributed to a
@@ -65,6 +72,17 @@ export const sourceDocuments = pgTable(
         title: text("title").notNull(),
         contentHash: text("content_hash").notNull(),
         lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),
+        // Review workflow (owner/admin-only) — one status per document, no
+        // history. `upsertSourceDocument`'s re-sync `set` deliberately leaves
+        // these out so a re-sync never clobbers an existing review decision.
+        reviewStatus: documentReviewStatus("review_status")
+            .default("pending")
+            .notNull(),
+        reviewedBy: text("reviewed_by").references(() => user.id, {
+            onDelete: "set null",
+        }),
+        reviewedAt: timestamp("reviewed_at"),
+        reviewNote: text("review_note"),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at")
             .defaultNow()
@@ -79,6 +97,10 @@ export const sourceDocuments = pgTable(
             table.organizationId,
             table.connector,
             table.externalId,
+        ),
+        index("source_documents_org_review_status_idx").on(
+            table.organizationId,
+            table.reviewStatus,
         ),
     ],
 );
