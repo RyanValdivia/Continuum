@@ -1,10 +1,7 @@
 import "server-only";
 import type { EmbedFn } from "@/core/knowledge/server/embeddings/embed";
 import { searchKnowledgeService } from "@/core/knowledge/server/services/search-knowledge-service";
-import type {
-    Analysis,
-    AnalysisOutput,
-} from "@/core/recruitment/domain/types";
+import type { Analysis, AnalysisOutput } from "@/core/recruitment/domain/types";
 import {
     AppErrors,
     type AppResult,
