@@ -1,83 +1,13 @@
 {
-	"version": "7",
-	"dialect": "postgresql",
-	"entries": [
-		{
-			"idx": 0,
-			"version": "7",
-			"when": 1783831892665,
-			"tag": "0000_eminent_pete_wisdom",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "7",
-			"when": 1784385047893,
-			"tag": "0001_careful_liz_osborn",
-			"breakpoints": true
-		},
-		{
-			"idx": 2,
-			"version": "7",
-			"when": 1784389218166,
-			"tag": "0002_knowledge_graph",
-			"breakpoints": true
-		},
-		{
-			"idx": 3,
-			"version": "7",
-			"when": 1784394045118,
-			"tag": "0003_notion_connection",
-			"breakpoints": true
-		},
-		{
-			"idx": 4,
-			"version": "7",
-			"when": 1784397495603,
-			"tag": "0004_reflective_chimera",
-			"breakpoints": true
-		},
-		{
-			"idx": 5,
-			"version": "7",
-			"when": 1784397803598,
-			"tag": "0005_sleepy_william_stryker",
-			"breakpoints": true
-		},
-		{
-			"idx": 6,
-			"version": "7",
-			"when": 1784399494057,
-			"tag": "0006_tidy_cloak",
-			"breakpoints": true
-		},
-		{
-			"idx": 7,
-			"version": "7",
-			"when": 1784400182828,
-			"tag": "0007_serious_the_fury",
-			"breakpoints": true
-		},
-		{
-			"idx": 8,
-			"version": "7",
-			"when": 1784400183828,
-			"tag": "0008_microsoft_connection",
-			"breakpoints": true
-		},
-		{
-			"idx": 9,
-			"version": "7",
-			"when": 1784400184828,
-			"tag": "0009_recruitment_node_types",
-			"breakpoints": true
-		},
-		{
-			"idx": 10,
-			"version": "7",
-			"when": 1784400185828,
-			"tag": "0010_recruitment_tables",
-			"breakpoints": true
-		}
-	]
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1784411270901,
+      "tag": "0000_quiet_mandarin",
+      "breakpoints": true
+    }
+  ]
 }
