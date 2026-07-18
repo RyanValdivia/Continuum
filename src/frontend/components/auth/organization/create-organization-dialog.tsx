@@ -33,11 +33,24 @@ export type CreateOrganizationDialogProps = {
   onOpenChange: (open: boolean) => void
 }
 
+/** Safely reads the created organization's slug out of the mutation result. */
+function createdOrgSlug(data: unknown): string | undefined {
+  if (data && typeof data === "object") {
+    if ("slug" in data && typeof (data as { slug?: unknown }).slug === "string") {
+      return (data as { slug: string }).slug
+    }
+    if ("data" in data) {
+      return createdOrgSlug((data as { data: unknown }).data)
+    }
+  }
+  return undefined
+}
+
 export function CreateOrganizationDialog({
   open,
   onOpenChange
 }: CreateOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization, navigate } = useAuth()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
@@ -48,7 +61,12 @@ export function CreateOrganizationDialog({
 
   const { mutate: createOrganization, isPending: isCreating } =
     useCreateOrganization(authClient as OrganizationAuthClient, {
-      onSuccess: () => onOpenChange(false)
+      onSuccess: (data) => {
+        onOpenChange(false)
+        // Take the new owner straight to their organization's dashboard.
+        const targetSlug = createdOrgSlug(data) ?? slug
+        if (targetSlug) navigate({ to: `/${targetSlug}/app/projects` })
+      }
     })
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {

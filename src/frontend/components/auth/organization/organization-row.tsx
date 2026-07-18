@@ -7,7 +7,7 @@ import {
   useSetActiveOrganization
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
-import { Settings as SettingsIcon } from "lucide-react"
+import { LayoutDashboard, Settings as SettingsIcon } from "lucide-react"
 
 import { Button } from "@/frontend/components/ui/button"
 import { Spinner } from "@/frontend/components/ui/spinner"
@@ -49,22 +49,32 @@ export function OrganizationRow({ organization }: OrganizationRowProps) {
     }
   }
 
+  function openDashboard() {
+    navigate({ to: `/${organization.slug}/app/projects` })
+  }
+
   return (
     <div className="flex items-center gap-3">
       <OrganizationView organization={organization} />
 
-      <Button
-        className="ml-auto shrink-0"
-        variant="outline"
-        size="sm"
-        disabled={setActivePending}
-        onClick={manageOrganization}
-        aria-label={organizationLocalization.manage}
-      >
-        {setActivePending ? <Spinner /> : <SettingsIcon />}
+      <div className="ml-auto flex shrink-0 items-center gap-2">
+        <Button size="sm" onClick={openDashboard}>
+          <LayoutDashboard />
+          Abrir
+        </Button>
 
-        {organizationLocalization.manage}
-      </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={setActivePending}
+          onClick={manageOrganization}
+          aria-label={organizationLocalization.manage}
+        >
+          {setActivePending ? <Spinner /> : <SettingsIcon />}
+
+          {organizationLocalization.manage}
+        </Button>
+      </div>
     </div>
   )
 }
