@@ -42,7 +42,7 @@ export async function applyToVacancyService(
 
     try {
         // Honeypot: pretend success, store nothing.
-        if (input.website !== undefined) return ok({ received: true });
+        if (input.website) return ok({ received: true });
 
         if (input.cv.data.byteLength > MAX_CV_BYTES) {
             return err(AppErrors.unprocessableEntity({ targets: ["cv"] }));

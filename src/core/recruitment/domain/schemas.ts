@@ -117,6 +117,6 @@ export const applyInputSchema = z.object({
         filename: z.string().trim().min(1).max(300),
         mediaType: z.literal("application/pdf"),
     }),
-    /** Honeypot — real users never fill this. */
-    website: z.string().max(0).optional(),
+    /** Honeypot — real users never fill this; a filled value means bot. */
+    website: z.string().max(300).optional(),
 });
