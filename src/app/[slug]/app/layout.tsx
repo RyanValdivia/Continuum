@@ -1,9 +1,14 @@
 import type { PropsWithChildren } from "react";
-import { OrganizationSwitcher } from "@/frontend/components/auth/organization/organization-switcher";
 import { OrganizationProvider } from "@/frontend/components/auth/organization-provider";
+import { Separator } from "@/frontend/components/ui/separator";
+import {
+    SidebarInset,
+    SidebarProvider,
+    SidebarTrigger,
+} from "@/frontend/components/ui/sidebar";
 import { requireAuth } from "@/server/auth/require-auth";
 import { requireOrganization } from "@/server/auth/require-organization";
-import { SignOutButton } from "./sign-out-button";
+import { AppHeaderTitle, AppSidebar } from "./app-sidebar";
 
 export default async function AppLayout({
     children,
@@ -15,16 +20,17 @@ export default async function AppLayout({
 
     return (
         <OrganizationProvider slug={slug}>
-            <div className="min-h-svh">
-                <header className="flex items-center justify-between border-b px-6 py-3">
-                    <OrganizationSwitcher hidePersonal />
-                    <div className="flex items-center gap-3 text-muted-foreground text-sm">
-                        <span>{user.email}</span>
-                        <SignOutButton />
-                    </div>
-                </header>
-                <main>{children}</main>
-            </div>
+            <SidebarProvider>
+                <AppSidebar slug={slug} userEmail={user.email} />
+                <SidebarInset>
+                    <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+                        <SidebarTrigger className="-ml-1" />
+                        <Separator orientation="vertical" className="h-5" />
+                        <AppHeaderTitle />
+                    </header>
+                    <div className="flex flex-1 flex-col">{children}</div>
+                </SidebarInset>
+            </SidebarProvider>
         </OrganizationProvider>
     );
 }
