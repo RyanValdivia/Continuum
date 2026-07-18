@@ -3,11 +3,7 @@ import { z } from "zod";
 // ── Enums (mirror the Drizzle pg enums) ───────────────────────────────────────
 export const benchmarkTypeSchema = z.enum(["person", "manual"]);
 export const vacancyStatusSchema = z.enum(["open", "filled", "closed"]);
-export const candidateStatusSchema = z.enum([
-    "pending",
-    "analyzed",
-    "failed",
-]);
+export const candidateStatusSchema = z.enum(["pending", "analyzed", "failed"]);
 
 // ── Wire shapes ───────────────────────────────────────────────────────────────
 export const vacancySchema = z.object({

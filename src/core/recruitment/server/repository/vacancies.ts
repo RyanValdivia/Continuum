@@ -7,8 +7,8 @@ import { organization } from "@/server/drizzle/schemas/organization-schema";
 import {
     candidate,
     type NewVacancyRow,
-    vacancy,
     type VacancyRow,
+    vacancy,
 } from "@/server/drizzle/schemas/recruitment-schema";
 
 /**

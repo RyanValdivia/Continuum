@@ -51,7 +51,8 @@ describe("offboardPersonService", () => {
         ]);
         vi.mocked(findVacancyById).mockResolvedValue(null);
         vi.mocked(insertVacancy).mockImplementation(
-            async (row) => vacancyRow({ ...row, id: row.id ?? MEMBER }) as VacancyRow,
+            async (row) =>
+                vacancyRow({ ...row, id: row.id ?? MEMBER }) as VacancyRow,
         );
     });
 
