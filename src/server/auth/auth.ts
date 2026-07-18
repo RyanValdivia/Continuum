@@ -1,12 +1,13 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { getLogger } from "@logtape/logtape";
 import { APIError, betterAuth } from "better-auth";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, organization } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { ServerConfig } from "@/config/server-config";
 import { db } from "@/server/drizzle/db";
 import * as authSchema from "@/server/drizzle/schemas/auth-schema";
+import * as organizationSchema from "@/server/drizzle/schemas/organization-schema";
 
 const logger = getLogger(["server", "auth"]);
 
@@ -22,8 +23,21 @@ export const auth = betterAuth({
     },
     plugins: [
         openAPI({ disableDefaultReference: !ServerConfig.isDevelopment }),
+        organization({
+            // No email provider wired up yet — log the invite link instead.
+            async sendInvitationEmail(data) {
+                const inviteLink = `${ServerConfig.baseUrl}/accept-invitation/${data.id}`;
+                logger.info("Organization invitation for {email}: {link}", {
+                    email: data.email,
+                    link: inviteLink,
+                });
+            },
+        }),
     ],
-    database: drizzleAdapter(db, { provider: "pg", schema: authSchema }),
+    database: drizzleAdapter(db, {
+        provider: "pg",
+        schema: { ...authSchema, ...organizationSchema },
+    }),
 });
 
 /**
