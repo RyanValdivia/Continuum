@@ -29,7 +29,7 @@ describe("ingestDocumentSchema", () => {
         ).toBe(false);
         expect(
             ingestDocumentSchema.safeParse({
-                connector: "slack",
+                connector: "discord",
                 externalId: "e",
                 title: "t",
                 content: "hi",

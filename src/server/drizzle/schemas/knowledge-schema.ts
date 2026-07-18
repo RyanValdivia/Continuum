@@ -23,6 +23,7 @@ export const EMBEDDING_DIM = 768;
 
 export const knowledgeConnector = pgEnum("knowledge_connector", [
     "notion",
+    "slack",
     "manual",
 ]);
 export const knowledgeNodeType = pgEnum("knowledge_node_type", [

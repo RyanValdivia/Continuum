@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // ── Enums (mirror the Drizzle pg enums) ───────────────────────────────────────
-export const connectorSchema = z.enum(["notion", "manual"]);
+export const connectorSchema = z.enum(["notion", "slack", "manual"]);
 export const nodeTypeSchema = z.enum([
     "decision",
     "process",

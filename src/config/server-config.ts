@@ -15,6 +15,22 @@ export const ServerConfig = {
                 env.TOKEN_ENCRYPTION_KEY,
         ),
     },
+    slack: {
+        clientId: env.SLACK_CLIENT_ID,
+        clientSecret: env.SLACK_CLIENT_SECRET,
+        signingSecret: env.SLACK_SIGNING_SECRET,
+        // Personal "Sign in with Slack" linking — just needs the app credentials.
+        isIdentityConfigured: Boolean(
+            env.SLACK_CLIENT_ID && env.SLACK_CLIENT_SECRET,
+        ),
+        // Org-wide bot install (channel monitoring + Events API webhook) —
+        // also needs the signing secret to verify incoming webhook requests.
+        isWorkspaceConfigured: Boolean(
+            env.SLACK_CLIENT_ID &&
+                env.SLACK_CLIENT_SECRET &&
+                env.SLACK_SIGNING_SECRET,
+        ),
+    },
     info: {
         name: "Hackaton Starter API",
         version: "1.0.0",

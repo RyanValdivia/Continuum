@@ -15,7 +15,8 @@ function getKey(): Buffer {
     return key;
 }
 
-/** Encrypts a secret (e.g. an OAuth token) for storage. Output is `iv:authTag:ciphertext`, all base64. */
+/** Encrypts a secret (e.g. an OAuth token) for storage. Output is `iv:authTag:ciphertext`, all base64.
+ *  Shared by every integration that persists a third-party token (Notion, Slack, …). */
 export function encryptSecret(plaintext: string): string {
     const iv = randomBytes(IV_LENGTH);
     const cipher = createCipheriv(ALGORITHM, getKey(), iv);

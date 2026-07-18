@@ -9,23 +9,23 @@ import {
 } from "@/server/common/responses";
 import { db } from "@/server/drizzle/db";
 import { organization } from "@/server/drizzle/schemas/organization-schema";
-import { exchangeNotionCode } from "@/server/notion/notion-api";
-import { verifyNotionOAuthState } from "@/server/notion/oauth-state";
 import { encryptSecret } from "@/server/security/token-cipher";
-import { upsertNotionConnection } from "../repository/upsert-notion-connection";
+import { verifySlackOAuthState } from "@/server/slack/oauth-state";
+import { exchangeSlackBotCode } from "@/server/slack/slack-api";
+import { upsertSlackConnection } from "../repository/upsert-slack-connection";
 
 /** Resolves the org's slug so the route can redirect the browser back into
- *  `/{slug}/app/...` once the connection is saved. */
-export async function handleNotionCallbackService(params: {
+ *  `/{slug}/app/integrations` once the bot install is saved. */
+export async function handleSlackWorkspaceCallbackService(params: {
     code?: string;
     state: string;
     oauthError?: string;
 }): AsyncAppResult<{ organizationSlug: string }> {
-    if (!ServerConfig.notion.isConfigured) {
-        return err(AppErrors.unprocessableEntity({ targets: ["notion"] }));
+    if (!ServerConfig.slack.isWorkspaceConfigured) {
+        return err(AppErrors.unprocessableEntity({ targets: ["slack"] }));
     }
 
-    const decoded = verifyNotionOAuthState(params.state);
+    const decoded = verifySlackOAuthState(params.state);
     if (!decoded) return err(AppErrors.forbidden());
 
     const [org] = await db
@@ -36,27 +36,25 @@ export async function handleNotionCallbackService(params: {
     if (!org) return err(AppErrors.notFound({ targets: ["organization"] }));
 
     if (params.oauthError || !params.code) {
-        // User cancelled the Notion picker — not a server error.
+        // Admin cancelled the Slack consent screen — not a server error.
         return ok({ organizationSlug: org.slug });
     }
 
     try {
-        const token = await exchangeNotionCode({
+        const token = await exchangeSlackBotCode({
             code: params.code,
-            redirectUri: `${ServerConfig.baseUrl}/api/v1/notion/callback`,
-            clientId: ServerConfig.notion.clientId as string,
-            clientSecret: ServerConfig.notion.clientSecret as string,
+            redirectUri: `${ServerConfig.baseUrl}/api/v1/slack/workspace/callback`,
+            clientId: ServerConfig.slack.clientId as string,
+            clientSecret: ServerConfig.slack.clientSecret as string,
         });
 
-        await upsertNotionConnection({
+        await upsertSlackConnection({
             organizationId: decoded.organizationId,
             connectedByUserId: decoded.userId,
-            workspaceId: token.workspace_id,
-            workspaceName: token.workspace_name,
-            workspaceIcon: token.workspace_icon,
-            botId: token.bot_id,
-            accessToken: encryptSecret(token.access_token),
-            refreshToken: encryptSecret(token.refresh_token),
+            teamId: token.team.id,
+            teamName: token.team.name,
+            botUserId: token.bot_user_id,
+            botToken: encryptSecret(token.access_token),
         });
 
         return ok({ organizationSlug: org.slug });

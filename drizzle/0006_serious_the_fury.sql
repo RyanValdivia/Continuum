@@ -1,0 +1,1 @@
+ALTER TYPE "public"."knowledge_connector" ADD VALUE 'slack' BEFORE 'manual';

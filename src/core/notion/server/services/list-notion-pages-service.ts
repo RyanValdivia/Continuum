@@ -14,7 +14,7 @@ import {
     resolveMissingParents,
     searchNotionAll,
 } from "@/server/notion/notion-api";
-import { decryptSecret, encryptSecret } from "@/server/notion/token-cipher";
+import { decryptSecret, encryptSecret } from "@/server/security/token-cipher";
 import { findNotionConnectionByOrg } from "../repository/find-notion-connection";
 import { upsertNotionConnection } from "../repository/upsert-notion-connection";
 
