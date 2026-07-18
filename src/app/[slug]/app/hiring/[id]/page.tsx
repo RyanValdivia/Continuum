@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation";
+import { CandidateList } from "@/core/recruitment/client/ui/candidate-list";
 import { VacancyAdminPanel } from "@/core/recruitment/client/ui/vacancy-admin-panel";
 import { getVacancyService } from "@/core/recruitment/server/services/get-vacancy-service";
+import { listCandidatesService } from "@/core/recruitment/server/services/list-candidates-service";
 import { resolveResult } from "@/frontend/lib/result";
 import { requireAuth } from "@/server/auth/require-auth";
 import { requireOrganization } from "@/server/auth/require-organization";
 
 const ADMIN_ROLES = new Set(["owner", "admin"]);
 
-/** Vacancy detail shell — the ranked candidate list lands with the analysis task. */
+/** Vacancy detail: admin tools + the ranked candidate list. */
 export default async function VacancyDetailPage({
     params,
 }: {
@@ -20,6 +22,9 @@ export default async function VacancyDetailPage({
 
     const vacancy = await resolveResult(
         getVacancyService(user.id, organization.id, id),
+    );
+    const candidates = await resolveResult(
+        listCandidatesService(user.id, organization.id, id),
     );
 
     return (
@@ -35,6 +40,10 @@ export default async function VacancyDetailPage({
                 </p>
             </div>
             <VacancyAdminPanel vacancy={vacancy} />
+            <div className="space-y-3">
+                <h2 className="font-medium">Candidatos</h2>
+                <CandidateList items={candidates} />
+            </div>
         </div>
     );
 }

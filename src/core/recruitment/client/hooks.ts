@@ -41,10 +41,32 @@ export const useRecruitment = () => {
             }),
         );
 
+    const useRetryAnalysis = () =>
+        useMutation({
+            mutationFn: (id: string) =>
+                client
+                    .candidates({ id })
+                    ["retry-analysis"].post.mutationOptions()
+                    .mutationFn(undefined),
+            onSuccess: () => router.refresh(),
+        });
+
+    const useDeleteCandidate = () =>
+        useMutation({
+            mutationFn: (id: string) =>
+                client
+                    .candidates({ id })
+                    .delete.mutationOptions()
+                    .mutationFn(undefined),
+            onSuccess: () => router.refresh(),
+        });
+
     return {
         useOffboard,
         useCreateVacancy,
         useRegenerateToken,
         useCloseVacancy,
+        useRetryAnalysis,
+        useDeleteCandidate,
     };
 };
