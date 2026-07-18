@@ -129,10 +129,16 @@ export function CandidateList({ items }: { items: RankedCandidate[] }) {
                                             <div className="mb-1 font-medium text-sm">
                                                 Preguntas para la entrevista
                                             </div>
-                                            <ol className="list-inside list-decimal text-sm">
+                                            <ol className="list-inside list-decimal space-y-1 text-sm">
                                                 {analysis.interviewQuestions.map(
                                                     (q) => (
-                                                        <li key={q}>{q}</li>
+                                                        <li key={q.question}>
+                                                            {q.question}
+                                                            <span className="ml-1 text-muted-foreground text-xs">
+                                                                · mide:{" "}
+                                                                {q.measures}
+                                                            </span>
+                                                        </li>
                                                     ),
                                                 )}
                                             </ol>

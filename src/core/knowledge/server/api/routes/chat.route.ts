@@ -1,6 +1,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import {
     convertToModelMessages,
+    createUIMessageStream,
     createUIMessageStreamResponse,
     streamText,
     toUIMessageStream,
@@ -13,6 +14,8 @@ import { authed } from "@/server/auth/middleware/authed";
 import { requireActiveOrg } from "@/server/auth/require-active-org";
 import { AppErrors, errorToResponse } from "@/server/common/responses";
 import { buildSystemPrompt, latestUserText } from "../../chat/build-context";
+import { collectSources } from "../../chat/sources";
+import { findDocumentsByIds } from "../../repository/source-documents";
 import { searchKnowledgeService } from "../../services/search-knowledge-service";
 
 const google = createGoogleGenerativeAI({ apiKey: ServerConfig.googleApiKey });
@@ -60,18 +63,32 @@ export const chatRoute = new Elysia().use(authed).post(
             limit: 8,
             hops: 1,
         });
+        const searchResult = search.ok ? search.data : emptyResult(query);
+
+        // Resolve the cited documents so the client can render clickable sources.
+        const docIds = [
+            ...new Set(searchResult.chunks.map((c) => c.documentId)),
+        ];
+        const docs = await findDocumentsByIds(org.data, docIds);
+        const docsById = new Map(docs.map((d) => [d.id, d]));
+        const sources = collectSources(searchResult.chunks, docsById);
 
         const result = streamText({
             model: google(CHAT_MODEL),
-            system: buildSystemPrompt(
-                search.ok ? search.data : emptyResult(query),
-            ),
+            system: buildSystemPrompt(searchResult, docsById),
             messages: await convertToModelMessages(messages),
         });
 
-        return createUIMessageStreamResponse({
-            stream: toUIMessageStream({ stream: result.stream }),
+        const stream = createUIMessageStream({
+            execute: ({ writer }) => {
+                if (sources.length > 0) {
+                    writer.write({ type: "data-sources", data: sources });
+                }
+                writer.merge(toUIMessageStream({ stream: result.stream }));
+            },
         });
+
+        return createUIMessageStreamResponse({ stream });
     },
     {
         authed: true,

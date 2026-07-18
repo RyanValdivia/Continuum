@@ -49,7 +49,11 @@ describe("recruitment domain schemas", () => {
                 { name: "Criterio", score: 85, strengths: ["c"], gaps: [] },
             ],
             summary: "Buen fit",
-            interviewQuestions: ["q1", "q2", "q3"],
+            interviewQuestions: [
+                { question: "q1", measures: "Procesos" },
+                { question: "q2", measures: "Dominio" },
+                { question: "q3", measures: "Criterio" },
+            ],
         };
         expect(analysisOutputSchema.parse(base).score).toBe(82);
         expect(
@@ -57,6 +61,37 @@ describe("recruitment domain schemas", () => {
         ).toBe(false);
         expect(
             analysisOutputSchema.safeParse({ ...base, dimensions: [] }).success,
+        ).toBe(false);
+    });
+
+    it("ties each interview question to what it measures", () => {
+        const base = {
+            score: 50,
+            dimensions: [
+                { name: "A", score: 50, strengths: [], gaps: [] },
+                { name: "B", score: 50, strengths: [], gaps: [] },
+                { name: "C", score: 50, strengths: [], gaps: [] },
+            ],
+            summary: "ok",
+        };
+        const parsed = analysisOutputSchema.parse({
+            ...base,
+            interviewQuestions: [
+                { question: "¿Cómo escalas Postgres?", measures: "Dominio" },
+                { question: "q2", measures: "Procesos" },
+                { question: "q3", measures: "Criterio" },
+            ],
+        });
+        expect(parsed.interviewQuestions[0]).toEqual({
+            question: "¿Cómo escalas Postgres?",
+            measures: "Dominio",
+        });
+        // bare strings are no longer valid
+        expect(
+            analysisOutputSchema.safeParse({
+                ...base,
+                interviewQuestions: ["q1", "q2", "q3"],
+            }).success,
         ).toBe(false);
     });
 

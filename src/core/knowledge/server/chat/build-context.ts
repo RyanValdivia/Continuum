@@ -1,4 +1,5 @@
 import type { SearchResult } from "@/core/knowledge/domain/types";
+import type { SourceDoc } from "./sources";
 
 /**
  * Minimal shape of an AI SDK UI message we read on the server: a role plus text
@@ -29,9 +30,16 @@ export function latestUserText(messages: UiMessageLike[]): string {
  * "what this person decided / how they work" digest. Pure + deterministic so it
  * is unit-tested without a model.
  */
-export function buildSystemPrompt(result: SearchResult): string {
+export function buildSystemPrompt(
+    result: SearchResult,
+    docsById?: Map<string, SourceDoc>,
+): string {
     const sources = result.chunks
-        .map((c, i) => `[${i + 1}] (doc ${c.documentId}) ${c.content}`)
+        .map((c, i) => {
+            const label =
+                docsById?.get(c.documentId)?.title ?? `doc ${c.documentId}`;
+            return `[${i + 1}] (${label}) ${c.content}`;
+        })
         .join("\n\n");
 
     const knowledge = result.nodes

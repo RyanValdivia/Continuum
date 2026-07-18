@@ -11,6 +11,7 @@ import {
 import type {
     AnalysisDimension,
     CandidateProfile,
+    InterviewQuestion,
 } from "@/core/recruitment/domain/types";
 import { organization } from "./organization-schema";
 
@@ -93,7 +94,7 @@ export const analysis = pgTable("analysis", {
     dimensions: jsonb("dimensions").$type<AnalysisDimension[]>().notNull(),
     summary: text("summary").notNull(),
     interviewQuestions: jsonb("interview_questions")
-        .$type<string[]>()
+        .$type<InterviewQuestion[]>()
         .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });

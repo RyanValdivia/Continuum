@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { Brain, Send } from "lucide-react";
+import { Brain, FileText, Send } from "lucide-react";
 import { type KeyboardEvent, useMemo, useState } from "react";
 import { Button } from "@/frontend/components/ui/button";
 import { Textarea } from "@/frontend/components/ui/textarea";
@@ -14,6 +14,16 @@ function messageText(parts: { type: string; text?: string }[]): string {
         .filter((p) => p.type === "text" && p.text)
         .map((p) => p.text)
         .join("");
+}
+
+type ChatSource = { title: string; url: string | null };
+
+/** The cited-source cards streamed as a `data-sources` part, if any. */
+function messageSources(
+    parts: { type: string; data?: unknown }[],
+): ChatSource[] {
+    const part = parts.find((p) => p.type === "data-sources");
+    return part && Array.isArray(part.data) ? (part.data as ChatSource[]) : [];
 }
 
 /**
@@ -87,29 +97,68 @@ export function KnowledgeChat({
                         </div>
                     </div>
                 ) : (
-                    messages.map((message) => (
-                        <div
-                            key={message.id}
-                            className={cn(
-                                "flex",
-                                message.role === "user"
-                                    ? "justify-end"
-                                    : "justify-start",
-                            )}
-                        >
+                    messages.map((message) => {
+                        const sources =
+                            message.role === "user"
+                                ? []
+                                : messageSources(message.parts);
+                        return (
                             <div
+                                key={message.id}
                                 className={cn(
-                                    "max-w-[80%] whitespace-pre-wrap rounded-lg px-4 py-2 text-sm",
+                                    "flex",
                                     message.role === "user"
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-muted text-foreground",
+                                        ? "justify-end"
+                                        : "justify-start",
                                 )}
                             >
-                                {messageText(message.parts) ||
-                                    (busy ? "…" : "")}
+                                <div className="flex max-w-[80%] flex-col gap-1.5">
+                                    <div
+                                        className={cn(
+                                            "whitespace-pre-wrap rounded-lg px-4 py-2 text-sm",
+                                            message.role === "user"
+                                                ? "bg-primary text-primary-foreground"
+                                                : "bg-muted text-foreground",
+                                        )}
+                                    >
+                                        {messageText(message.parts) ||
+                                            (busy ? "…" : "")}
+                                    </div>
+                                    {sources.length > 0 && (
+                                        <div className="rounded-lg border bg-muted/30 px-3 py-2 text-xs">
+                                            <p className="mb-1 font-medium text-muted-foreground">
+                                                Fuentes
+                                            </p>
+                                            <ul className="space-y-0.5">
+                                                {sources.map((s, i) => (
+                                                    <li
+                                                        key={`${s.title}-${i}`}
+                                                        className="flex items-center gap-1.5"
+                                                    >
+                                                        <FileText className="size-3 shrink-0 text-muted-foreground" />
+                                                        {s.url ? (
+                                                            <a
+                                                                href={s.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="truncate hover:underline"
+                                                            >
+                                                                {s.title}
+                                                            </a>
+                                                        ) : (
+                                                            <span className="truncate">
+                                                                {s.title}
+                                                            </span>
+                                                        )}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
 

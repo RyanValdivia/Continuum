@@ -66,6 +66,19 @@ describe("buildSystemPrompt", () => {
         expect(prompt).toContain("Cite sources inline");
     });
 
+    it("uses document titles for citations when provided", () => {
+        const prompt = buildSystemPrompt(
+            result(),
+            new Map([
+                [
+                    "doc1",
+                    { id: "doc1", title: "Why Postgres", url: "http://x" },
+                ],
+            ]),
+        );
+        expect(prompt).toContain("[1] (Why Postgres) We chose Postgres");
+    });
+
     it("degrades gracefully with no retrieval hits", () => {
         const prompt = buildSystemPrompt(result({ chunks: [], nodes: [] }));
         expect(prompt).toContain("Retrieved sources: (none)");
