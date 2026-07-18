@@ -3,12 +3,10 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Brain, Send } from "lucide-react";
-import { type KeyboardEvent, useState } from "react";
+import { type KeyboardEvent, useMemo, useState } from "react";
 import { Button } from "@/frontend/components/ui/button";
 import { Textarea } from "@/frontend/components/ui/textarea";
 import { cn } from "@/frontend/lib/utils";
-
-const transport = new DefaultChatTransport({ api: "/api/v1/knowledge/chat" });
 
 /** Text of a message, joining its text parts. */
 function messageText(parts: { type: string; text?: string }[]): string {
@@ -20,14 +18,30 @@ function messageText(parts: { type: string; text?: string }[]): string {
 
 /**
  * Streaming chat with the organization's knowledge agent. Answers are grounded
- * on retrieved knowledge (server-side) and cite their sources. No history is
- * persisted — the conversation lives in the client for the session.
+ * on retrieved knowledge (server-side) and cite their sources. When `personId`
+ * is set, retrieval is scoped to that person — "the agent of {personName}".
+ * No history is persisted — the conversation lives in the client for the session.
  */
-export function KnowledgeChat() {
+export function KnowledgeChat({
+    personId,
+    personName,
+}: {
+    personId?: string;
+    personName?: string;
+} = {}) {
     const [input, setInput] = useState("");
+    const transport = useMemo(
+        () =>
+            new DefaultChatTransport({
+                api: "/api/v1/knowledge/chat",
+                body: personId ? { personId } : undefined,
+            }),
+        [personId],
+    );
     const { messages, sendMessage, status } = useChat({ transport });
 
     const busy = status === "submitted" || status === "streaming";
+    const scoped = Boolean(personId && personName);
 
     const send = () => {
         const text = input.trim();
@@ -45,13 +59,26 @@ export function KnowledgeChat() {
 
     return (
         <div className="mx-auto flex h-[calc(100svh-4rem)] w-full max-w-3xl flex-col p-6">
+            {scoped && (
+                <div className="mb-3 flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2 text-sm">
+                    <Brain className="size-4 text-primary" />
+                    <span>
+                        Hablando con el agente de{" "}
+                        <span className="font-medium">{personName}</span> — las
+                        respuestas se basan solo en su conocimiento.
+                    </span>
+                </div>
+            )}
+
             <div className="flex-1 space-y-4 overflow-y-auto pb-4">
                 {messages.length === 0 ? (
                     <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-muted-foreground">
                         <Brain className="size-10" />
                         <div>
                             <p className="font-medium text-foreground">
-                                Pregúntale a la memoria de la organización
+                                {scoped
+                                    ? `Pregúntale al agente de ${personName}`
+                                    : "Pregúntale a la memoria de la organización"}
                             </p>
                             <p className="text-sm">
                                 Ej: «¿Cómo se decidió migrar de Firebase?» ·
