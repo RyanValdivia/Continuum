@@ -11,9 +11,7 @@ export default async function HomePage() {
             session.user.id,
         );
         redirect(
-            organization
-                ? `/${organization.slug}/app/projects`
-                : "/settings/organizations",
+            organization ? `/${organization.slug}/app/projects` : "/onboarding",
         );
     }
 
