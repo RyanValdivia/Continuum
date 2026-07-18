@@ -4,6 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import {
     ClipboardCheck,
     FolderKanban,
+    LayoutDashboard,
     LogOut,
     Plug,
     Sparkles,
@@ -36,6 +37,7 @@ type NavItem = {
 };
 
 const NAV: NavItem[] = [
+    { title: "Inicio", segment: "", icon: LayoutDashboard, adminOnly: true },
     { title: "Proyectos", segment: "projects", icon: FolderKanban },
     { title: "Conocimiento", segment: "knowledge", icon: Sparkles },
     { title: "Grafo", segment: "graph", icon: Waypoints },
@@ -50,7 +52,11 @@ const NAV: NavItem[] = [
 
 function useActiveTitle(): string {
     const pathname = usePathname();
-    const match = NAV.find((item) => pathname.includes(`/app/${item.segment}`));
+    const match = NAV.find((item) =>
+        item.segment
+            ? pathname.includes(`/app/${item.segment}`)
+            : /\/app\/?$/.test(pathname),
+    );
     return match?.title ?? "App";
 }
 
@@ -92,10 +98,13 @@ export function AppSidebar({
                             {NAV.filter(
                                 (item) => !item.adminOnly || isAdmin,
                             ).map((item) => {
-                                const href = `/${slug}/app/${item.segment}`;
-                                const active =
-                                    pathname === href ||
-                                    pathname.startsWith(`${href}/`);
+                                const href = item.segment
+                                    ? `/${slug}/app/${item.segment}`
+                                    : `/${slug}/app`;
+                                const active = item.segment
+                                    ? pathname === href ||
+                                      pathname.startsWith(`${href}/`)
+                                    : pathname === href;
                                 return (
                                     <SidebarMenuItem key={item.segment}>
                                         <SidebarMenuButton
