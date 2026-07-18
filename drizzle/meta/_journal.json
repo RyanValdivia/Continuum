@@ -15,6 +15,13 @@
       "when": 1784385047893,
       "tag": "0001_careful_liz_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784389092551,
+      "tag": "0002_cloudy_the_enforcers",
+      "breakpoints": true
     }
   ]
 }

@@ -59,7 +59,8 @@ function parseSortParam(value: unknown): unknown {
 
 export const projectSearchSchema = z.object({
     page: z.coerce.number().int().min(1).default(1),
-    perPage: z.coerce.number().int().min(1).max(100).default(20),
+    // 999 is the data table's "Todos" (show all) sentinel — must stay >= it.
+    perPage: z.coerce.number().int().min(1).max(999).default(20),
     sort: z
         .preprocess(parseSortParam, z.array(projectSortItemSchema))
         .catch([]),

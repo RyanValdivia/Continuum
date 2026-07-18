@@ -53,7 +53,9 @@ Vitest · Biome.
 |------|--------|
 | `/` | Landing pública (marketing). Redirige a la app si hay sesión + organización. |
 | `/{slug}/app/...` | App multi-tenant, scoped por organización. |
+| `/{slug}/app/integrations` | Conectar/desconectar el Notion de la organización. |
 | `/auth/[path]` | Sign in / sign up (Better Auth UI). |
+| `/organization/[path]`, `/settings/[path]` | Gestión de organizaciones (Better Auth UI). |
 | `/api/v1/*` | API Elysia. OpenAPI (Scalar) dev-only en `/api/v1/openapi`. |
 
 ### Arquitectura
@@ -72,6 +74,26 @@ Los dominios viven en `src/core/<domain>/`:
 esperados son valores `err(AppErrors.x)`, no throws; las rutas autenticadas
 llevan `.use(authed)` **y** `authed: true`. Un router no está vivo hasta que se
 `.use()`a en `src/server/router.ts`.
+
+### Integración con Notion
+
+`src/core/notion/` — OAuth público (una conexión por organización, no por
+usuario: el token queda en `notion_connection`, cifrado con
+`TOKEN_ENCRYPTION_KEY`). Flujo:
+
+1. `GET /api/v1/notion/{organizationId}/connect` (solo owner/admin) redirige a
+   Notion. El picker de Notion es manual — ahí es donde se elige qué páginas
+   compartir con la integración.
+2. `GET /api/v1/notion/callback` intercambia el `code`, guarda el token y
+   redirige de vuelta a `/{slug}/app/integrations`. El `state` va firmado
+   (HMAC con `BETTER_AUTH_SECRET`, sin tabla de estado) en vez de pasar por
+   `genericOAuth` de Better Auth, porque ese plugin liga la cuenta al usuario
+   logueado — acá el token es de la organización.
+3. `GET /api/v1/notion/{organizationId}/pages` lista lo compartido (refresca
+   el token una vez si Notion devuelve 401).
+
+Falta la ingesta real a un grafo de conocimiento — hoy solo trae la lista de
+páginas/databases compartidas.
 
 ### Landing page
 
@@ -93,6 +115,12 @@ pnpm dev                  # http://localhost:3000
 
 `BETTER_AUTH_SECRET`: `openssl rand -base64 32`. `DATABASE_URL`: cualquier
 Postgres (Supabase, Neon, local).
+
+Integración con Notion (opcional — sin esto, la ruta de conectar Notion
+devuelve "no configurado" y el resto de la app sigue andando igual):
+`NOTION_CLIENT_ID` / `NOTION_CLIENT_SECRET` de una [Public integration](https://www.notion.so/my-integrations)
+con redirect URI `<NEXT_PUBLIC_APP_URL>/api/v1/notion/callback`, y
+`TOKEN_ENCRYPTION_KEY` (`openssl rand -base64 32`) para cifrar los tokens guardados.
 
 ## Scripts
 

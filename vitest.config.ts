@@ -18,6 +18,7 @@ export default defineConfig({
             DATABASE_URL: "postgres://user:pass@localhost:5432/app",
             BETTER_AUTH_SECRET: "test-secret-least-thirty-two-chars-long",
             NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+            TOKEN_ENCRYPTION_KEY: "Isnyla5i0RU0s/sMerKmcoHm8pdPn9tiuemcXpCWKsU=",
         },
     },
 });

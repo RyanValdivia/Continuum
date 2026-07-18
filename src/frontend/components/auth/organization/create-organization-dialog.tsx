@@ -37,7 +37,7 @@ export function CreateOrganizationDialog({
   open,
   onOpenChange
 }: CreateOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization, navigate } = useAuth()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
@@ -48,7 +48,12 @@ export function CreateOrganizationDialog({
 
   const { mutate: createOrganization, isPending: isCreating } =
     useCreateOrganization(authClient as OrganizationAuthClient, {
-      onSuccess: () => onOpenChange(false)
+      // New org, no external sources connected yet — send the creator
+      // straight to "connect Notion" instead of back to wherever they were.
+      onSuccess: (data) => {
+        onOpenChange(false)
+        navigate({ to: `/${data.slug}/app/integrations` })
+      }
     })
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
