@@ -16,12 +16,12 @@ export default async function AppLayout({
 }: PropsWithChildren<{ params: Promise<{ slug: string }> }>) {
     const { user } = await requireAuth();
     const { slug } = await params;
-    await requireOrganization(slug, user.id);
+    const { role } = await requireOrganization(slug, user.id);
 
     return (
         <OrganizationProvider slug={slug}>
             <SidebarProvider>
-                <AppSidebar slug={slug} userEmail={user.email} />
+                <AppSidebar slug={slug} userEmail={user.email} role={role} />
                 <SidebarInset>
                     <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
                         <SidebarTrigger className="-ml-1" />

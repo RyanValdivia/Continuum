@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
-import { graphQuerySchema, graphSchema } from "@/core/knowledge/domain/schemas";
+import { z } from "zod";
+import { documentDetailSchema } from "@/core/document-review/domain/schemas";
 import { authed } from "@/server/auth/middleware/authed";
 import { requireActiveOrg } from "@/server/auth/require-active-org";
 import {
@@ -8,18 +9,18 @@ import {
     errorToResponse,
     successResponseSchema,
 } from "@/server/common/responses";
-import { getGraphService } from "../../services/get-graph-service";
+import { getDocumentService } from "../../services/get-document-service";
 
-export const getGraphRoute = new Elysia().use(authed).get(
-    "/graph",
-    async ({ session, query, status }) => {
+export const getDocumentRoute = new Elysia().use(authed).get(
+    "/:id",
+    async ({ user, session, params, status }) => {
         const org = requireActiveOrg(session);
         if (!org.ok) return status(403, errorToResponse(org.error));
 
-        const result = await getGraphService(org.data, query);
+        const result = await getDocumentService(user.id, org.data, params.id);
         if (!result.ok)
             return status(
-                result.error.status as 500,
+                result.error.status as 403 | 404 | 500,
                 errorToResponse(result.error),
             );
         return status(
@@ -29,17 +30,16 @@ export const getGraphRoute = new Elysia().use(authed).get(
     },
     {
         authed: true,
-        query: graphQuerySchema,
+        params: z.object({ id: z.string() }),
         response: {
-            200: successResponseSchema(graphSchema, "Graph"),
+            200: successResponseSchema(documentDetailSchema, "DocumentDetail"),
             403: errorResponseSchema(403),
+            404: errorResponseSchema(404),
             500: errorResponseSchema(500),
         },
         detail: {
-            tags: ["Knowledge"],
-            summary: "Read a slice of the knowledge graph",
-            description:
-                "Returns newest nodes (optionally one person's) plus the edges among them, for visualization.",
+            tags: ["Document Reviews"],
+            summary: "Get an ingested document by id",
         },
     },
 );

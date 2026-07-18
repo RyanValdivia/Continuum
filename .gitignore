@@ -28,3 +28,6 @@ drizzle/**/*.sql.bak
 
 # agent worktrees (local, transient)
 .claude/worktrees/
+
+# Playwright MCP e2e snapshots
+.playwright-mcp/

@@ -4,6 +4,7 @@ import {
     ingestResultSchema,
 } from "@/core/knowledge/domain/schemas";
 import { authed } from "@/server/auth/middleware/authed";
+import { requireActiveOrg } from "@/server/auth/require-active-org";
 import {
     CommonResponse,
     createdResponseSchema,
@@ -11,7 +12,6 @@ import {
     errorToResponse,
 } from "@/server/common/responses";
 import { ingestDocumentService } from "../../services/ingest-document-service";
-import { requireActiveOrg } from "../require-active-org";
 
 export const ingestDocumentRoute = new Elysia().use(authed).post(
     "/ingest",
