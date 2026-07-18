@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
+    connectorSchema,
     documentReviewSchema,
     documentReviewSearchSchema,
     reviewDocumentSchema,
 } from "../schemas";
+
+describe("connectorSchema", () => {
+    it("accepts the microsoft connector", () => {
+        expect(connectorSchema.safeParse("microsoft").success).toBe(true);
+    });
+});
 
 describe("reviewDocumentSchema", () => {
     it("accepts a status with an optional note", () => {

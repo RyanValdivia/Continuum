@@ -5,7 +5,7 @@ import { handleNotionCallbackService } from "../../services/handle-notion-callba
 
 /**
  * Notion redirects the browser here after the user grants/denies access.
- * No `authed` guard — the signed `state` param (see `oauth-state.ts`) is the
+ * No `authed` guard — the signed `state` param (see `server/common/oauth-state.ts`) is the
  * authentication for this leg, and it must match exactly what was registered
  * as the integration's redirect URI in Notion's dashboard.
  */

@@ -17,7 +17,7 @@ export const reviewActionStatusSchema = z.enum([
 
 /** Mirrors the Drizzle `knowledgeConnector` enum — kept local so this domain
  *  owns its own wire schema instead of importing a `knowledge` type. */
-export const connectorSchema = z.enum(["notion", "manual"]);
+export const connectorSchema = z.enum(["notion", "manual", "microsoft"]);
 
 /** Wire shape (Date → ISO string at the repo boundary). */
 export const documentReviewSchema = z.object({

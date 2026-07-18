@@ -4,13 +4,13 @@ import {
     getOrgMembership,
     ORG_ADMIN_ROLES,
 } from "@/server/auth/get-org-membership";
+import { createOAuthState } from "@/server/common/oauth-state";
 import {
     AppErrors,
     type AsyncAppResult,
     err,
     ok,
 } from "@/server/common/responses";
-import { createNotionOAuthState } from "@/server/notion/oauth-state";
 
 export async function getNotionConnectUrlService(
     organizationId: string,
@@ -25,7 +25,7 @@ export async function getNotionConnectUrlService(
         return err(AppErrors.forbidden());
     }
 
-    const state = createNotionOAuthState(organizationId, userId);
+    const state = createOAuthState(organizationId, userId);
     const redirectUri = `${ServerConfig.baseUrl}/api/v1/notion/callback`;
     const url = new URL("https://api.notion.com/v1/oauth/authorize");
     url.searchParams.set("client_id", ServerConfig.notion.clientId as string);

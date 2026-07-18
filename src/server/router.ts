@@ -8,6 +8,7 @@ import { z } from "zod";
 import { ServerConfig } from "@/config/server-config";
 import { documentReviewRouter } from "@/core/document-review/server/api/router";
 import { knowledgeRouter } from "@/core/knowledge/server/api/router";
+import { microsoftRouter } from "@/core/microsoft/server/api/router";
 import { notionRouter } from "@/core/notion/server/api/router";
 import { projectRouter } from "@/core/project/server/api/router";
 import { auth } from "./auth/auth";
@@ -74,6 +75,7 @@ const app = new Elysia({ prefix: "/api/v1" })
     .use(projectRouter)
     .use(knowledgeRouter)
     .use(notionRouter)
+    .use(microsoftRouter)
     .use(documentReviewRouter);
 
 export default app;

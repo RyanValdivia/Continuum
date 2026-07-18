@@ -15,6 +15,17 @@ export const ServerConfig = {
                 env.TOKEN_ENCRYPTION_KEY,
         ),
     },
+    microsoft: {
+        clientId: env.MICROSOFT_CLIENT_ID,
+        clientSecret: env.MICROSOFT_CLIENT_SECRET,
+        tenantId: env.MICROSOFT_TENANT_ID,
+        isConfigured: Boolean(
+            env.MICROSOFT_CLIENT_ID &&
+                env.MICROSOFT_CLIENT_SECRET &&
+                env.MICROSOFT_TENANT_ID &&
+                env.TOKEN_ENCRYPTION_KEY,
+        ),
+    },
     info: {
         name: "Hackaton Starter API",
         version: "1.0.0",

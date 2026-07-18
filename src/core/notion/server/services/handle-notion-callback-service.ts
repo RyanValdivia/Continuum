@@ -1,17 +1,17 @@
 import "server-only";
 import { eq } from "drizzle-orm";
 import { ServerConfig } from "@/config/server-config";
+import { verifyOAuthState } from "@/server/common/oauth-state";
 import {
     AppErrors,
     type AsyncAppResult,
     err,
     ok,
 } from "@/server/common/responses";
+import { encryptSecret } from "@/server/common/token-cipher";
 import { db } from "@/server/drizzle/db";
 import { organization } from "@/server/drizzle/schemas/organization-schema";
 import { exchangeNotionCode } from "@/server/notion/notion-api";
-import { verifyNotionOAuthState } from "@/server/notion/oauth-state";
-import { encryptSecret } from "@/server/notion/token-cipher";
 import { upsertNotionConnection } from "../repository/upsert-notion-connection";
 
 /** Resolves the org's slug so the route can redirect the browser back into
@@ -25,7 +25,7 @@ export async function handleNotionCallbackService(params: {
         return err(AppErrors.unprocessableEntity({ targets: ["notion"] }));
     }
 
-    const decoded = verifyNotionOAuthState(params.state);
+    const decoded = verifyOAuthState(params.state);
     if (!decoded) return err(AppErrors.forbidden());
 
     const [org] = await db

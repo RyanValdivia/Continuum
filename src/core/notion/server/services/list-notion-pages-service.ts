@@ -8,13 +8,13 @@ import {
     err,
     ok,
 } from "@/server/common/responses";
+import { decryptSecret, encryptSecret } from "@/server/common/token-cipher";
 import {
     NotionUnauthorizedError,
     refreshNotionToken,
     resolveMissingParents,
     searchNotionAll,
 } from "@/server/notion/notion-api";
-import { decryptSecret, encryptSecret } from "@/server/notion/token-cipher";
 import { findNotionConnectionByOrg } from "../repository/find-notion-connection";
 import { upsertNotionConnection } from "../repository/upsert-notion-connection";
 

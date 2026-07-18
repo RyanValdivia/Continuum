@@ -261,6 +261,18 @@ Vitest, tests in local `__tests__/` folders:
 - Manual smoke in the browser at `http://localhost:3000` against a real tenant
   (requires the env vars and an Entra app registration with the scopes above).
 
+## Implementation notes (post-build deviations)
+
+- Scope set gained `User.ReadBasic.All` (resolving message authors' emails via
+  `/users/{id}` requires it; `chatMessage.from` carries no email).
+- Testability is achieved with the codebase's established `vi.mock` module
+  mocks (project-services pattern) instead of a literal `GraphClient` deps
+  object; `graph-api.ts` still exports the functions as a flat surface.
+- Org slug lookup for the callback lives in a small repository helper
+  (`find-org-slug.ts`) rather than hitting drizzle from the service, to keep
+  services mockable like the rest of the layer.
+- `unpdf` added as the only new runtime dependency.
+
 ## Out of scope (YAGNI)
 
 - Automatic/delta sync, webhooks/subscriptions, cron.

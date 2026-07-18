@@ -18,6 +18,16 @@ describe("ingestDocumentSchema", () => {
         expect(parsed.title).toBe("Runbook");
     });
 
+    it("accepts the microsoft connector", () => {
+        const parsed = ingestDocumentSchema.parse({
+            connector: "microsoft",
+            externalId: "sp:drive:item",
+            title: "Doc",
+            content: "Some knowledge.",
+        });
+        expect(parsed.connector).toBe("microsoft");
+    });
+
     it("rejects empty content and an unknown connector", () => {
         expect(
             ingestDocumentSchema.safeParse({

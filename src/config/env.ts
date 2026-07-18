@@ -12,6 +12,12 @@ export const env = createEnv({
         // config error) until all three of these are set.
         NOTION_CLIENT_ID: z.string().optional(),
         NOTION_CLIENT_SECRET: z.string().optional(),
+        // Optional: the Microsoft 365 integration is disabled (routes return a
+        // config error) until all three of these are set. TENANT_ID may be a
+        // tenant GUID or "common"/"organizations" for multi-tenant apps.
+        MICROSOFT_CLIENT_ID: z.string().optional(),
+        MICROSOFT_CLIENT_SECRET: z.string().optional(),
+        MICROSOFT_TENANT_ID: z.string().optional(),
         TOKEN_ENCRYPTION_KEY: z.string().optional(),
     },
     client: {
@@ -23,6 +29,9 @@ export const env = createEnv({
         GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
         NOTION_CLIENT_ID: process.env.NOTION_CLIENT_ID,
         NOTION_CLIENT_SECRET: process.env.NOTION_CLIENT_SECRET,
+        MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
+        MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
+        MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
         TOKEN_ENCRYPTION_KEY: process.env.TOKEN_ENCRYPTION_KEY,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     },

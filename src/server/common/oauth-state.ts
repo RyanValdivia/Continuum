@@ -15,9 +15,10 @@ function sign(payload: string): string {
 /**
  * Signs `{organizationId, userId, ts}` into the OAuth `state` param — avoids a
  * server-side state table. The callback re-derives the signature and rejects
- * anything tampered with or older than 10 minutes.
+ * anything tampered with or older than 10 minutes. Shared by every external
+ * provider integration (Notion, Microsoft 365, …).
  */
-export function createNotionOAuthState(
+export function createOAuthState(
     organizationId: string,
     userId: string,
 ): string {
@@ -27,7 +28,7 @@ export function createNotionOAuthState(
     return `${payload}.${sign(payload)}`;
 }
 
-export function verifyNotionOAuthState(state: string): StatePayload | null {
+export function verifyOAuthState(state: string): StatePayload | null {
     const [payload, signature] = state.split(".");
     if (!payload || !signature) return null;
 
