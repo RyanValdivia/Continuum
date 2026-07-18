@@ -4,6 +4,7 @@ import { Button } from "@/frontend/components/ui/button";
 const LINKS = [
     { href: "#problema", label: "El problema" },
     { href: "#como-funciona", label: "Cómo funciona" },
+    { href: "#demo", label: "Demo" },
     { href: "#competencia", label: "Competencia" },
 ];
 

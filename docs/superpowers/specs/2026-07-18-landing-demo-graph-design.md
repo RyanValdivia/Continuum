@@ -1,109 +1,92 @@
-# Continuum Landing — Interactive Demo (Knowledge Graph)
+# Continuum Landing — Interactive Demo (Knowledge Graph + Roadmap)
 
 **Date:** 2026-07-18
-**Status:** Approved
+**Status:** Shipped
 
 ## Goal
 
-Add an interactive demo section to the landing that plots Continuum's
-**knowledge graph**: a central hub, several **puesto** (role) nodes each with
-its agent, connected to the **tools** (Gmail, Notion, Slack, Drive, Calendar,
-HubSpot) where their work lives. Hovering/clicking a puesto highlights its
-connections. A subtle WebGL "video effect" backdrop sits behind the canvas.
+An interactive demo section on the landing that plots each person's **living
+knowledge** as a graph and turns it into Continuum's output: an onboarding
+**roadmap**. Each **puesto** (role) has an agent holding **documentos**,
+**decisiones** and **criterios**; hovering a puesto reveals that knowledge as
+connections, and clicking it shows a roadmap table — "qué dominar para ocupar
+ese puesto". A subtle WebGL shader sits behind the canvas.
 
 ## SDK decisions
 
-- **Graph:** `@xyflow/react` (React Flow) v12 — DOM nodes make brand logos +
-  role labels crisp and easy to style to tokens; built-in drag/pan/hover/click.
-- **Backdrop:** `@paper-design/shaders-react` Dithering shader (brand `#0088f7`,
-  low opacity), loaded via `next/dynamic` `ssr:false` (WebGL, hydration-safe).
-- **Logos:** LobeHub static mono SVGs via jsDelivr CDN `<img>` (no new dep),
-  same approach as the myworkin reference landing.
+- **Graph:** `@xyflow/react` (React Flow) v12 — DOM nodes for crisp, token-styled
+  knowledge cards; built-in drag/pan/hover/click.
+- **Backdrop:** `@paper-design/shaders-react` Dithering shader (brand `#0088f7`),
+  `next/dynamic` `ssr:false`. Visible in both themes (higher opacity + screen
+  blend in dark).
+- Brand tool logos were explored first (Simple Icons CDN) but the concept moved
+  from "tools" to **knowledge artifacts** per the product's value prop.
 
 ## Placement
 
-New section between **Cómo funciona** and **Competencia**:
+Between **Cómo funciona** and **Competencia**:
 `Hero → Problema → Cómo funciona → Demo → Competencia → CTA → Footer`.
 
-## Graph content
+## Graph model
 
-| Node type | Nodes |
-|-----------|-------|
-| Hub | `Continuum · Memoria` (center, filled primary) |
-| Puestos | Head of Sales · Product Manager · Data Analyst · Marketing Lead |
-| Tools | Gmail · Notion · Slack · Google Drive · Calendar · HubSpot |
+- **Hub:** `Continuum · Memoria viva` (center, filled primary).
+- **Puestos (4):** Head of Sales · Product Manager · Data Analyst · Marketing
+  Lead — role cards with initial + "Agente".
+- **Knowledge (5 reused slots):** each puesto has 5 knowledge items rendered in
+  fixed scatter positions. Types: `documento` (FileText), `decision`
+  (GitBranch), `criterio` (Compass), each with a type tag + invented label
+  (e.g. "PRD · Roadmap 2026", "Descuento máx. 15% sin aprobar", "Impacto sobre
+  esfuerzo"). Only the active puesto's 5 knowledge nodes are shown; the slots
+  are reused (10 nodes total, not 20+).
 
-Edges: each puesto → hub; each puesto → its tools. Mapping:
-
-- Head of Sales → Gmail, Slack, HubSpot, Calendar
-- Product Manager → Notion, Slack, Calendar
-- Data Analyst → Notion, Google Drive, Slack
-- Marketing Lead → Gmail, Notion, HubSpot
-
-LobeHub slugs: `gmail`, `notion`, `slack`, `googledrive`, `googlecalendar`,
-`hubspot`.
+Content (documents/decisions/criterios + the roadmap) is invented but realistic,
+defined in `graph-data.ts`.
 
 ## Interactivity
 
-- Nodes draggable; pan enabled. **Scroll-zoom disabled** so page scroll is not
-  trapped; zoom via on-canvas buttons only. `fitView` on mount.
-- Curated fixed node positions (not auto-layout) for an intentional, minimal
-  composition.
-- Hover or click a puesto → its edges + connected tool nodes glow `primary`,
-  everything else dims. A caption below the canvas updates:
-  *"El agente de {puesto} conecta: {tools}."* Default caption prompts
-  interaction.
-- React Flow attribution hidden (`proOptions={{ hideAttribution: true }}`).
+- **Hover** a puesto → its knowledge nodes appear, edges puesto→knowledge and
+  puesto→hub animate in `primary`, other puestos dim.
+- **Click** a puesto → selects it (persists after mouse-out) and renders the
+  **roadmap panel** below. Click again / click the canvas → deselect.
+- `active = hovered ?? selected` drives the graph; `selected` drives the roadmap.
+- View framed with a fixed `fitBounds` so revealed knowledge never clips.
+  Scroll-zoom disabled (`preventScrolling={false}`) so the page still scrolls.
+  Attribution hidden.
 
-## Look
+## Roadmap output (the point of the demo)
 
-- Section heading: eyebrow "Demo" · H2 "El grafo de conocimiento de tu
-  empresa." · sub explaining puesto→agente→tools · hint line "Arrastra los
-  nodos · pasa el cursor sobre un puesto."
-- Canvas in a bordered `card` container, ~460px tall, `relative
-  overflow-hidden`; dithering shader absolutely positioned behind (`z-0`,
-  low opacity), React Flow above (`z-10`).
-- Nodes styled to tokens: puesto = `card`/`border` with avatar initial + role +
-  small "Agente" tag; tool = circular `card` with logo; hub = filled `primary`.
-- Edges use `primary`; dimmed state uses `muted-foreground`/opacity. Theme-aware
-  (light/dark) via tokens; shader color is a fixed brand hex.
+Below the graph, a table appears for the selected puesto:
+**Roadmap de onboarding · {puesto}** / "El output de Continuum: qué dominar para
+ocupar este puesto." Columns: **Etapa · Qué dominar · Basado en · Resultado**,
+~4 rows, each traced back to one of the person's documents/decisions/criterios.
+Animated in/out with `motion` + `AnimatePresence` (honors reduced-motion).
 
 ## Component structure
 
 `src/frontend/components/landing/demo/`:
 
-- `demo-section.tsx` — server section shell: heading, hint, backdrop, mounts the graph.
-- `knowledge-graph.tsx` — `"use client"` React Flow instance + highlight state + caption.
-- `nodes.tsx` — `PuestoNode`, `ToolNode`, `HubNode` custom node components.
-- `graph-data.ts` — typed nodes, edges, tool metadata (slug + label), puesto→tools map.
-- `shader-backdrop.tsx` — `"use client"` dynamic dithering shader wrapper.
+- `demo-section.tsx` — server shell: heading + `<DemoExperience/>`.
+- `demo-experience.tsx` — `"use client"` boundary: owns `hovered`/`selected`,
+  composes the graph card (shader + graph) and the roadmap panel.
+- `knowledge-graph.tsx` — React Flow instance; reacts to the `active` prop.
+- `nodes.tsx` — `PuestoNode`, `KnowledgeNode`, `HubNode`.
+- `roadmap-panel.tsx` — the roadmap table / placeholder.
+- `shader-backdrop.tsx` — dynamic dithering shader.
+- `graph-data.ts` — puestos, knowledge, roadmaps, node layout.
 
-Wire `<LandingDemo />` into `src/frontend/components/landing/index.tsx` after
-`LandingHowItWorks`.
+`DemoExperience` is the only `"use client"` boundary; the graph/roadmap modules
+are reached through it (avoids server→client function-prop warnings).
 
-## Motion / a11y
+## Non-goals / notes
 
-- Under `prefers-reduced-motion`: shader `speed={0}` (frozen), no edge
-  animation. Nodes remain draggable (user-initiated, allowed).
-- Nav anchor: add `#demo` optionally (not required).
-
-## Non-goals (YAGNI)
-
-- No real data / backend — graph is static curated content.
-- No auto-layout engine (dagre/elk) — positions are hand-set.
-- No 3D / force physics.
-
-## Risks
-
-- `@paper-design/shaders-react` peer wants `react-dom >= 19.2.6`; project has
-  `19.2.4`. Expected to work; if the shader errors at runtime, fall back to the
-  existing soft blue glow (drop the shader dep) — the graph is the core.
-- External CDN dependency for logos (jsDelivr). Acceptable for a demo; can be
-  vendored locally later.
+- No backend — all content is static curated data.
+- Knowledge slots are reused across puestos (positions fixed); only one puesto's
+  knowledge is visible at a time.
+- `@paper-design/shaders-react` peer wants `react-dom >= 19.2.6` (project has
+  `19.2.4`); works in practice — fall back to the soft glow if it ever breaks.
 
 ## Verification
 
-`pnpm typecheck` · `pnpm check` · `pnpm build`, then browser at
-`http://localhost:3000`: graph renders, logos load, drag works, hover/click
-highlights a puesto's connections + updates caption, dark mode, reduced-motion
-(shader frozen). Confirm page scroll is not trapped by the canvas.
+`pnpm typecheck` · `pnpm check` · `pnpm build` all green. Browser: hover reveals
+each puesto's documents/decisions/criterios; click renders the roadmap table;
+fit never clips; dark mode + shader confirmed; page scroll not trapped.

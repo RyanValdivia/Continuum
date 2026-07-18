@@ -1,5 +1,6 @@
 import { LandingComparison } from "./comparison";
 import { LandingCta } from "./cta";
+import { LandingDemo } from "./demo/demo-section";
 import { LandingFooter } from "./footer";
 import { LandingHero } from "./hero";
 import { LandingHowItWorks } from "./how-it-works";
@@ -14,6 +15,7 @@ export function Landing() {
                 <LandingHero />
                 <LandingProblem />
                 <LandingHowItWorks />
+                <LandingDemo />
                 <LandingComparison />
                 <LandingCta />
             </main>

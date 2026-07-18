@@ -25,3 +25,6 @@ drizzle/**/*.sql.bak
 
 # SDD / port scratch (agents)
 .superpowers/
+
+# agent worktrees (local, transient)
+.claude/worktrees/
