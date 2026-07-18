@@ -1,4 +1,5 @@
 import { Elysia } from "elysia";
+import { applyRoute } from "./routes/apply.route";
 import { closeVacancyRoute } from "./routes/close-vacancy.route";
 import { createVacancyRoute } from "./routes/create-vacancy.route";
 import { getVacancyRoute } from "./routes/get-vacancy.route";
@@ -14,4 +15,5 @@ export const recruitmentRouter = new Elysia({ prefix: "/recruitment" })
     .use(createVacancyRoute)
     .use(getVacancyRoute)
     .use(closeVacancyRoute)
-    .use(regenerateTokenRoute);
+    .use(regenerateTokenRoute)
+    .use(applyRoute);
