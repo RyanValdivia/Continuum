@@ -4,7 +4,10 @@ import {
     MAX_CANDIDATES_PER_VACANCY,
     MAX_CV_BYTES,
 } from "@/core/recruitment/domain/schemas";
-import type { ApplyInput } from "@/core/recruitment/domain/types";
+import type {
+    ApplyInput,
+    CandidateProfile,
+} from "@/core/recruitment/domain/types";
 import {
     AppErrors,
     type AsyncAppResult,
@@ -63,7 +66,7 @@ export async function applyToVacancyService(
             return err(AppErrors.conflict({ targets: ["email"] }));
         }
 
-        let profile;
+        let profile: CandidateProfile;
         try {
             profile = await parseCv(input.cv.data);
         } catch (cause) {
