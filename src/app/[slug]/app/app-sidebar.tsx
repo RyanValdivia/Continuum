@@ -5,6 +5,7 @@ import {
     Briefcase,
     ClipboardCheck,
     FolderKanban,
+    GraduationCap,
     LayoutDashboard,
     LogOut,
     Plug,
@@ -42,6 +43,7 @@ const NAV: NavItem[] = [
     { title: "Inicio", segment: "", icon: LayoutDashboard, adminOnly: true },
     { title: "Proyectos", segment: "projects", icon: FolderKanban },
     { title: "Conocimiento", segment: "knowledge", icon: Sparkles },
+    { title: "Onboarding", segment: "welcome", icon: GraduationCap },
     { title: "Grafo", segment: "graph", icon: Waypoints },
     {
         title: "Documentos",
