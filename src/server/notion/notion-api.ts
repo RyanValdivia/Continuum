@@ -326,3 +326,74 @@ export class NotionUnauthorizedError extends Error {
         this.name = "NotionUnauthorizedError";
     }
 }
+
+// ── Page content (blocks → plain text) ────────────────────────────────────────
+
+export type NotionBlock = {
+    type: string;
+    has_children?: boolean;
+    [key: string]: unknown;
+};
+
+const MAX_BLOCK_PAGES = 5; // up to ~500 top-level blocks per page
+
+/**
+ * Flatten Notion blocks to plain text. Every text-bearing block type
+ * (paragraph, headings, list items, to_do, quote, callout, code, toggle)
+ * exposes a `rich_text` array under a key equal to its `type`; we join those.
+ * Pure + deterministic (no I/O) so it is unit-tested.
+ */
+export function blocksToPlainText(blocks: NotionBlock[]): string {
+    const lines: string[] = [];
+    for (const block of blocks) {
+        const content = block[block.type] as
+            | { rich_text?: { plain_text?: string }[] }
+            | undefined;
+        const rich = content?.rich_text;
+        if (!rich || rich.length === 0) continue;
+        const text = rich
+            .map((t) => t.plain_text ?? "")
+            .join("")
+            .trim();
+        if (text) lines.push(text);
+    }
+    return lines.join("\n");
+}
+
+/** Fetch a page's top-level child blocks (paginated, bounded). */
+export async function fetchNotionPageBlocks(
+    accessToken: string,
+    pageId: string,
+): Promise<NotionBlock[]> {
+    const blocks: NotionBlock[] = [];
+    let cursor: string | undefined;
+
+    for (let page = 0; page < MAX_BLOCK_PAGES; page++) {
+        const url = new URL(`${NOTION_API_BASE}/blocks/${pageId}/children`);
+        url.searchParams.set("page_size", "100");
+        if (cursor) url.searchParams.set("start_cursor", cursor);
+
+        const res = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Notion-Version": NOTION_VERSION,
+            },
+        });
+        if (res.status === 401) throw new NotionUnauthorizedError();
+        if (!res.ok) {
+            throw new Error(
+                `Notion blocks fetch failed: ${res.status} ${await res.text()}`,
+            );
+        }
+        const data = (await res.json()) as {
+            results: NotionBlock[];
+            next_cursor: string | null;
+            has_more: boolean;
+        };
+        blocks.push(...data.results);
+        if (!data.has_more || !data.next_cursor) break;
+        cursor = data.next_cursor;
+    }
+
+    return blocks;
+}

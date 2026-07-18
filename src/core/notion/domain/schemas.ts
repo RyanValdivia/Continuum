@@ -38,3 +38,23 @@ export const notionCallbackQuerySchema = z.object({
     state: z.string(),
     error: z.string().optional(),
 });
+
+/** Request body: which shared pages to pull into the knowledge graph. */
+export const ingestNotionSchema = z.object({
+    pageIds: z.array(z.string().min(1)).min(1).max(50),
+});
+
+export const notionIngestItemSchema = z.object({
+    pageId: z.string(),
+    title: z.string(),
+    ok: z.boolean(),
+    chunksCreated: z.number().int().nonnegative(),
+    nodesCreated: z.number().int().nonnegative(),
+    error: z.string().nullable(),
+});
+
+export const notionIngestResultSchema = z.object({
+    ingested: z.number().int().nonnegative(),
+    failed: z.number().int().nonnegative(),
+    items: z.array(notionIngestItemSchema),
+});

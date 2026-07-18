@@ -26,5 +26,7 @@ export const useNotion = (organizationId: string) => {
             }),
         );
 
-    return { useStatus, usePages, useDisconnect };
+    const useIngest = () => useMutation(client.ingest.post.mutationOptions());
+
+    return { useStatus, usePages, useDisconnect, useIngest };
 };

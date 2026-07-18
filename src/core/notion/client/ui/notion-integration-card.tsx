@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 import { useOrganization } from "@/frontend/components/auth/organization-provider";
 import { Button } from "@/frontend/components/ui/button";
 import {
@@ -91,8 +92,9 @@ function NotionIntegrationCardContent({
 }
 
 function NotionSharedPages({ organizationId }: { organizationId: string }) {
-    const { usePages } = useNotion(organizationId);
+    const { usePages, useIngest } = useNotion(organizationId);
     const { data, isPending, error } = usePages();
+    const ingest = useIngest();
     const items = data?.response.items ?? [];
 
     if (isPending) return <Skeleton className="h-16 w-full" />;
@@ -115,14 +117,49 @@ function NotionSharedPages({ organizationId }: { organizationId: string }) {
     }
 
     const tree = buildNotionPageTree(items);
+    const pageIds = items
+        .filter((item) => item.object === "page")
+        .map((item) => item.id)
+        .slice(0, 50);
+
+    const runIngest = () => {
+        ingest.mutate(
+            { pageIds },
+            {
+                onSuccess: (res) => {
+                    const { response } = res as {
+                        response: { ingested: number; failed: number };
+                    };
+                    toast.success(
+                        `Ingestadas ${response.ingested} página${response.ingested === 1 ? "" : "s"} al grafo` +
+                            (response.failed
+                                ? ` · ${response.failed} con error`
+                                : ""),
+                    );
+                },
+                onError: () => toast.error("Falló la ingesta de Notion"),
+            },
+        );
+    };
 
     return (
-        <div className="flex flex-col gap-2">
-            <p className="text-muted-foreground text-xs">
-                {items.length} página{items.length === 1 ? "" : "s"} compartida
-                {items.length === 1 ? "" : "s"} — compartir una página en Notion
-                comparte todas sus subpáginas.
-            </p>
+        <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between gap-2">
+                <p className="text-muted-foreground text-xs">
+                    {items.length} página{items.length === 1 ? "" : "s"}{" "}
+                    compartida{items.length === 1 ? "" : "s"} — compartir una
+                    página en Notion comparte todas sus subpáginas.
+                </p>
+                <Button
+                    size="sm"
+                    onClick={runIngest}
+                    disabled={ingest.isPending || pageIds.length === 0}
+                >
+                    {ingest.isPending
+                        ? "Ingestando…"
+                        : `Ingestar ${pageIds.length} al grafo`}
+                </Button>
+            </div>
             <NotionPageTree nodes={tree} />
         </div>
     );
