@@ -66,8 +66,8 @@ vi.mock("@/core/knowledge/server/services/ingest-document-service", () => ({
 
 import { ingestDocumentService } from "@/core/knowledge/server/services/ingest-document-service";
 import { getOrgMembership } from "@/server/auth/get-org-membership";
-import { createOAuthState } from "@/server/common/oauth-state";
-import { encryptSecret } from "@/server/common/token-cipher";
+import { createOAuthState } from "@/server/security/oauth-state";
+import { encryptSecret } from "@/server/security/token-cipher";
 import {
     downloadDriveItemPdf,
     downloadDriveItemText,

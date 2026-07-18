@@ -19,6 +19,15 @@ export const env = createEnv({
         MICROSOFT_CLIENT_SECRET: z.string().optional(),
         MICROSOFT_TENANT_ID: z.string().optional(),
         TOKEN_ENCRYPTION_KEY: z.string().optional(),
+        // Optional: personal Slack account linking (OpenID Connect) is
+        // disabled until both are set.
+        SLACK_CLIENT_ID: z.string().optional(),
+        SLACK_CLIENT_SECRET: z.string().optional(),
+        // Optional: the org-wide Slack bot (channel monitoring + Events API)
+        // is disabled until all three are set. Signing secret verifies
+        // incoming Events API webhook requests — separate from the OAuth
+        // client secret.
+        SLACK_SIGNING_SECRET: z.string().optional(),
     },
     client: {
         NEXT_PUBLIC_APP_URL: z.url(),
@@ -33,6 +42,9 @@ export const env = createEnv({
         MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
         MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
         TOKEN_ENCRYPTION_KEY: process.env.TOKEN_ENCRYPTION_KEY,
+        SLACK_CLIENT_ID: process.env.SLACK_CLIENT_ID,
+        SLACK_CLIENT_SECRET: process.env.SLACK_CLIENT_SECRET,
+        SLACK_SIGNING_SECRET: process.env.SLACK_SIGNING_SECRET,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     },
     emptyStringAsUndefined: true,

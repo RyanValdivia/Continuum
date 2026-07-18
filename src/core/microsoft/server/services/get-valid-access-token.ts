@@ -1,6 +1,6 @@
 import "server-only";
 import { ServerConfig } from "@/config/server-config";
-import { decryptSecret, encryptSecret } from "@/server/common/token-cipher";
+import { decryptSecret, encryptSecret } from "@/server/security/token-cipher";
 import type { MicrosoftConnectionRow } from "@/server/drizzle/schemas/microsoft-schema";
 import { refreshMicrosoftToken } from "@/server/microsoft/graph-api";
 import { upsertMicrosoftConnection } from "../repository/upsert-microsoft-connection";

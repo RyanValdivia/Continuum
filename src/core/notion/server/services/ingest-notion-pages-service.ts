@@ -15,7 +15,7 @@ import {
     err,
     ok,
 } from "@/server/common/responses";
-import { decryptSecret, encryptSecret } from "@/server/common/token-cipher";
+import { decryptSecret, encryptSecret } from "@/server/security/token-cipher";
 import {
     blocksToPlainText,
     fetchNotionPageBlocks,

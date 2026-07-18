@@ -4,7 +4,7 @@ import { organization } from "./organization-schema";
 
 /**
  * One Notion workspace connection per organization. `accessToken`/`refreshToken`
- * are encrypted at rest (see `server/common/token-cipher.ts`) — never select
+ * are encrypted at rest (see `server/security/token-cipher.ts`) — never select
  * them into a wire response.
  */
 export const notionConnection = pgTable(

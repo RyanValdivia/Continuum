@@ -1,5 +1,7 @@
 import { MicrosoftIntegrationCard } from "@/core/microsoft/client/ui/microsoft-integration-card";
 import { NotionIntegrationCard } from "@/core/notion/client/ui/notion-integration-card";
+import { SlackIntegrationCard } from "@/core/slack/client/ui/slack-integration-card";
+import { SlackWorkspaceCard } from "@/core/slack/client/ui/slack-workspace-card";
 
 export default function IntegrationsPage() {
     return (
@@ -7,6 +9,8 @@ export default function IntegrationsPage() {
             <h1 className="font-semibold text-2xl">Integraciones</h1>
             <NotionIntegrationCard />
             <MicrosoftIntegrationCard />
+            <SlackIntegrationCard />
+            <SlackWorkspaceCard />
         </div>
     );
 }

@@ -1,14 +1,14 @@
 import "server-only";
 import { eq } from "drizzle-orm";
 import { ServerConfig } from "@/config/server-config";
-import { verifyOAuthState } from "@/server/common/oauth-state";
+import { verifyOAuthState } from "@/server/security/oauth-state";
 import {
     AppErrors,
     type AsyncAppResult,
     err,
     ok,
 } from "@/server/common/responses";
-import { encryptSecret } from "@/server/common/token-cipher";
+import { encryptSecret } from "@/server/security/token-cipher";
 import { db } from "@/server/drizzle/db";
 import { organization } from "@/server/drizzle/schemas/organization-schema";
 import { exchangeNotionCode } from "@/server/notion/notion-api";

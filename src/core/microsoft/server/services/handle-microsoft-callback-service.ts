@@ -1,13 +1,13 @@
 import "server-only";
 import { ServerConfig } from "@/config/server-config";
-import { verifyOAuthState } from "@/server/common/oauth-state";
+import { verifyOAuthState } from "@/server/security/oauth-state";
 import {
     AppErrors,
     type AsyncAppResult,
     err,
     ok,
 } from "@/server/common/responses";
-import { encryptSecret } from "@/server/common/token-cipher";
+import { encryptSecret } from "@/server/security/token-cipher";
 import { exchangeMicrosoftCode } from "@/server/microsoft/graph-api";
 import { findOrgSlug } from "../repository/find-org-slug";
 import { upsertMicrosoftConnection } from "../repository/upsert-microsoft-connection";

@@ -4,7 +4,7 @@ import {
     getOrgMembership,
     ORG_ADMIN_ROLES,
 } from "@/server/auth/get-org-membership";
-import { createOAuthState } from "@/server/common/oauth-state";
+import { createOAuthState } from "@/server/security/oauth-state";
 import {
     AppErrors,
     type AsyncAppResult,

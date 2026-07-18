@@ -36,6 +36,7 @@ export interface DocumentReviewRowAction {
 
 const CONNECTOR_OPTIONS: { label: string; value: Connector }[] = [
     { label: "Notion", value: "notion" },
+    { label: "Slack", value: "slack" },
     { label: "Manual", value: "manual" },
 ];
 
