@@ -18,6 +18,7 @@ export default defineConfig({
             DATABASE_URL: "postgres://user:pass@localhost:5432/app",
             BETTER_AUTH_SECRET: "test-secret-least-thirty-two-chars-long",
             NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+            GOOGLE_GENERATIVE_AI_API_KEY: "test-gemini-key",
         },
     },
 });
