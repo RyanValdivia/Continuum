@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "@ai-sdk/google": "^4.0.18",
+        "@ai-sdk/react": "^4.0.34",
         "@base-ui/react": "^1.6.0",
         "@better-auth-ui/core": "^1.6.27",
         "@better-auth-ui/react": "^1.6.27",

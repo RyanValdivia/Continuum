@@ -1,0 +1,116 @@
+"use client";
+
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { Brain, Send } from "lucide-react";
+import { type KeyboardEvent, useState } from "react";
+import { Button } from "@/frontend/components/ui/button";
+import { Textarea } from "@/frontend/components/ui/textarea";
+import { cn } from "@/frontend/lib/utils";
+
+const transport = new DefaultChatTransport({ api: "/api/v1/knowledge/chat" });
+
+/** Text of a message, joining its text parts. */
+function messageText(parts: { type: string; text?: string }[]): string {
+    return parts
+        .filter((p) => p.type === "text" && p.text)
+        .map((p) => p.text)
+        .join("");
+}
+
+/**
+ * Streaming chat with the organization's knowledge agent. Answers are grounded
+ * on retrieved knowledge (server-side) and cite their sources. No history is
+ * persisted — the conversation lives in the client for the session.
+ */
+export function KnowledgeChat() {
+    const [input, setInput] = useState("");
+    const { messages, sendMessage, status } = useChat({ transport });
+
+    const busy = status === "submitted" || status === "streaming";
+
+    const send = () => {
+        const text = input.trim();
+        if (!text || busy) return;
+        sendMessage({ text });
+        setInput("");
+    };
+
+    const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            send();
+        }
+    };
+
+    return (
+        <div className="mx-auto flex h-[calc(100svh-4rem)] w-full max-w-3xl flex-col p-6">
+            <div className="flex-1 space-y-4 overflow-y-auto pb-4">
+                {messages.length === 0 ? (
+                    <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-muted-foreground">
+                        <Brain className="size-10" />
+                        <div>
+                            <p className="font-medium text-foreground">
+                                Pregúntale a la memoria de la organización
+                            </p>
+                            <p className="text-sm">
+                                Ej: «¿Cómo se decidió migrar de Firebase?» ·
+                                «¿Cuál es el proceso de onboarding?»
+                            </p>
+                        </div>
+                    </div>
+                ) : (
+                    messages.map((message) => (
+                        <div
+                            key={message.id}
+                            className={cn(
+                                "flex",
+                                message.role === "user"
+                                    ? "justify-end"
+                                    : "justify-start",
+                            )}
+                        >
+                            <div
+                                className={cn(
+                                    "max-w-[80%] whitespace-pre-wrap rounded-lg px-4 py-2 text-sm",
+                                    message.role === "user"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-muted text-foreground",
+                                )}
+                            >
+                                {messageText(message.parts) ||
+                                    (busy ? "…" : "")}
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    send();
+                }}
+                className="flex items-end gap-2 border-t pt-4"
+            >
+                <Textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={onKeyDown}
+                    placeholder="Escribe tu pregunta…"
+                    rows={1}
+                    className="max-h-40 min-h-11 resize-none"
+                    disabled={busy}
+                />
+                <Button
+                    type="submit"
+                    size="icon"
+                    disabled={busy || !input.trim()}
+                >
+                    <Send className="size-4" />
+                    <span className="sr-only">Enviar</span>
+                </Button>
+            </form>
+        </div>
+    );
+}
