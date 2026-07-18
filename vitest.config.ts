@@ -19,6 +19,8 @@ export default defineConfig({
             BETTER_AUTH_SECRET: "test-secret-least-thirty-two-chars-long",
             NEXT_PUBLIC_APP_URL: "http://localhost:3000",
             GOOGLE_GENERATIVE_AI_API_KEY: "test-gemini-key",
+            TOKEN_ENCRYPTION_KEY:
+                "Isnyla5i0RU0s/sMerKmcoHm8pdPn9tiuemcXpCWKsU=",
         },
     },
 });

@@ -5,6 +5,16 @@ export const ServerConfig = {
     baseUrl: env.NEXT_PUBLIC_APP_URL,
     betterAuthSecret: env.BETTER_AUTH_SECRET,
     googleApiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
+    tokenEncryptionKey: env.TOKEN_ENCRYPTION_KEY ?? "",
+    notion: {
+        clientId: env.NOTION_CLIENT_ID,
+        clientSecret: env.NOTION_CLIENT_SECRET,
+        isConfigured: Boolean(
+            env.NOTION_CLIENT_ID &&
+                env.NOTION_CLIENT_SECRET &&
+                env.TOKEN_ENCRYPTION_KEY,
+        ),
+    },
     info: {
         name: "Hackaton Starter API",
         version: "1.0.0",

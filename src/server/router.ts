@@ -7,6 +7,7 @@ import { Elysia } from "elysia";
 import { z } from "zod";
 import { ServerConfig } from "@/config/server-config";
 import { knowledgeRouter } from "@/core/knowledge/server/api/router";
+import { notionRouter } from "@/core/notion/server/api/router";
 import { projectRouter } from "@/core/project/server/api/router";
 import { auth } from "./auth/auth";
 import type { APIResponse } from "./common/responses";
@@ -70,7 +71,8 @@ const app = new Elysia({ prefix: "/api/v1" })
         } satisfies APIResponse;
     })
     .use(projectRouter)
-    .use(knowledgeRouter);
+    .use(knowledgeRouter)
+    .use(notionRouter);
 
 export default app;
 export type AppRouter = typeof app;

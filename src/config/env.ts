@@ -8,6 +8,11 @@ export const env = createEnv({
         // Gemini API key — powers embeddings + graph extraction. The AI SDK
         // google provider also reads this env name by default.
         GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1),
+        // Optional: the Notion integration is disabled (routes return a
+        // config error) until all three of these are set.
+        NOTION_CLIENT_ID: z.string().optional(),
+        NOTION_CLIENT_SECRET: z.string().optional(),
+        TOKEN_ENCRYPTION_KEY: z.string().optional(),
     },
     client: {
         NEXT_PUBLIC_APP_URL: z.url(),
@@ -16,6 +21,9 @@ export const env = createEnv({
         DATABASE_URL: process.env.DATABASE_URL,
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
         GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+        NOTION_CLIENT_ID: process.env.NOTION_CLIENT_ID,
+        NOTION_CLIENT_SECRET: process.env.NOTION_CLIENT_SECRET,
+        TOKEN_ENCRYPTION_KEY: process.env.TOKEN_ENCRYPTION_KEY,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     },
     emptyStringAsUndefined: true,

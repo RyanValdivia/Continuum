@@ -61,11 +61,12 @@ export function CreateOrganizationDialog({
 
   const { mutate: createOrganization, isPending: isCreating } =
     useCreateOrganization(authClient as OrganizationAuthClient, {
+      // A new org has no data yet — send the creator into onboarding (step 2:
+      // first ingestion / connect Notion) rather than back to where they were.
       onSuccess: (data) => {
         onOpenChange(false)
-        // Take the new owner straight to their organization's dashboard.
         const targetSlug = createdOrgSlug(data) ?? slug
-        if (targetSlug) navigate({ to: `/${targetSlug}/app/projects` })
+        if (targetSlug) navigate({ to: `/${targetSlug}/app/onboarding` })
       }
     })
 

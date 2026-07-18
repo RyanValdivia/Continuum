@@ -1,7 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { FolderKanban, LogOut, Sparkles } from "lucide-react";
+import { FolderKanban, LogOut, Plug, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/frontend/auth/auth";
@@ -24,6 +24,7 @@ type NavItem = { title: string; segment: string; icon: LucideIcon };
 const NAV: NavItem[] = [
     { title: "Proyectos", segment: "projects", icon: FolderKanban },
     { title: "Conocimiento", segment: "knowledge", icon: Sparkles },
+    { title: "Integraciones", segment: "integrations", icon: Plug },
 ];
 
 function useActiveTitle(): string {
