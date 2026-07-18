@@ -3,6 +3,7 @@ import { applyRoute } from "./routes/apply.route";
 import { closeVacancyRoute } from "./routes/close-vacancy.route";
 import { createVacancyRoute } from "./routes/create-vacancy.route";
 import { deleteCandidateRoute } from "./routes/delete-candidate.route";
+import { generateRoleDescriptionRoute } from "./routes/generate-role-description.route";
 import { getVacancyRoute } from "./routes/get-vacancy.route";
 import { listCandidatesRoute } from "./routes/list-candidates.route";
 import { listPeopleRoute } from "./routes/list-people.route";
@@ -16,6 +17,7 @@ export const recruitmentRouter = new Elysia({ prefix: "/recruitment" })
     .use(offboardPersonRoute)
     .use(listVacanciesRoute)
     .use(createVacancyRoute)
+    .use(generateRoleDescriptionRoute)
     .use(getVacancyRoute)
     .use(closeVacancyRoute)
     .use(regenerateTokenRoute)

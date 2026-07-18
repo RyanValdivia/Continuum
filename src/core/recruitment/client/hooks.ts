@@ -27,6 +27,14 @@ export const useRecruitment = () => {
             }),
         );
 
+    const useGenerateRoleDescription = () =>
+        useMutation({
+            mutationFn: (input: { title: string; personId?: string }) =>
+                client.vacancies["generate-description"].post
+                    .mutationOptions()
+                    .mutationFn(input),
+        });
+
     const useRegenerateToken = (id: string) =>
         useMutation(
             client.vacancies({ id })["regenerate-token"].post.mutationOptions({
@@ -64,6 +72,7 @@ export const useRecruitment = () => {
     return {
         useOffboard,
         useCreateVacancy,
+        useGenerateRoleDescription,
         useRegenerateToken,
         useCloseVacancy,
         useRetryAnalysis,

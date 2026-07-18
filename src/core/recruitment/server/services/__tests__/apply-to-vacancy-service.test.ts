@@ -175,7 +175,11 @@ describe("applyToVacancyService", () => {
                 { name: "c", score: 3, strengths: [], gaps: [] },
             ],
             summary: "s",
-            interviewQuestions: ["q1", "q2", "q3"],
+            interviewQuestions: [
+                { question: "q1", measures: "m" },
+                { question: "q2", measures: "m" },
+                { question: "q3", measures: "m" },
+            ],
         });
 
         const result = await applyToVacancyService(input, {

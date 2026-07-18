@@ -1,6 +1,7 @@
 "use client";
 
 import type { AnyFieldApi } from "@tanstack/react-form";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import {
     Dialog,
@@ -31,8 +32,9 @@ export function CreateVacancyModal({
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }) {
-    const { useCreateVacancy } = useRecruitment();
+    const { useCreateVacancy, useGenerateRoleDescription } = useRecruitment();
     const createVacancy = useCreateVacancy();
+    const generate = useGenerateRoleDescription();
 
     const form = useAppForm({
         defaultValues: { title: "", description: "" },
@@ -90,9 +92,40 @@ export function CreateVacancyModal({
                             const hasError = !field.state.meta.isValid;
                             return (
                                 <Field data-invalid={hasError}>
-                                    <Label htmlFor={field.name}>
-                                        Descripción del rol
-                                    </Label>
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor={field.name}>
+                                            Descripción del rol
+                                        </Label>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            disabled={
+                                                generate.isPending ||
+                                                !form
+                                                    .getFieldValue("title")
+                                                    ?.trim()
+                                            }
+                                            onClick={async () => {
+                                                const title = form
+                                                    .getFieldValue("title")
+                                                    ?.trim();
+                                                if (!title) return;
+                                                const res =
+                                                    await generate.mutateAsync({
+                                                        title,
+                                                    });
+                                                field.handleChange(
+                                                    res.response.description,
+                                                );
+                                            }}
+                                        >
+                                            <Sparkles className="size-3.5" />
+                                            {generate.isPending
+                                                ? "Generando…"
+                                                : "Generar con IA"}
+                                        </Button>
+                                    </div>
                                     <Textarea
                                         id={field.name}
                                         name={field.name}

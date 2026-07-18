@@ -1,11 +1,33 @@
 import "server-only";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { Connector } from "@/core/knowledge/domain/types";
 import { db } from "@/server/drizzle/db";
 import {
     type SourceDocumentRow,
     sourceDocuments,
 } from "@/server/drizzle/schemas/knowledge-schema";
+import type { SourceDoc } from "../chat/sources";
+
+/** Resolve source documents by id (org-scoped) — for chat citation cards. */
+export async function findDocumentsByIds(
+    organizationId: string,
+    ids: string[],
+): Promise<SourceDoc[]> {
+    if (ids.length === 0) return [];
+    return db
+        .select({
+            id: sourceDocuments.id,
+            title: sourceDocuments.title,
+            url: sourceDocuments.url,
+        })
+        .from(sourceDocuments)
+        .where(
+            and(
+                eq(sourceDocuments.organizationId, organizationId),
+                inArray(sourceDocuments.id, ids),
+            ),
+        );
+}
 
 export interface UpsertSourceDocumentInput {
     organizationId: string;

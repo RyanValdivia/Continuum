@@ -76,7 +76,7 @@ const analysisRow = (over: Partial<AnalysisRow> = {}): AnalysisRow => ({
     score: 77,
     dimensions: [],
     summary: "ok",
-    interviewQuestions: ["q"],
+    interviewQuestions: [{ question: "q", measures: "m" }],
     createdAt: new Date("2026-01-01T00:00:00.000Z"),
     ...over,
 });
@@ -109,7 +109,11 @@ describe("candidate admin services", () => {
                     { name: "c", score: 3, strengths: [], gaps: [] },
                 ],
                 summary: "ok",
-                interviewQuestions: ["q1", "q2", "q3"],
+                interviewQuestions: [
+                    { question: "q1", measures: "m" },
+                    { question: "q2", measures: "m" },
+                    { question: "q3", measures: "m" },
+                ],
             }),
         });
         expect(result.ok).toBe(true);

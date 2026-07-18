@@ -68,7 +68,11 @@ const output: AnalysisOutput = {
         { name: "Criterio", score: 81, strengths: ["x"], gaps: [] },
     ],
     summary: "Buen fit",
-    interviewQuestions: ["q1", "q2", "q3"],
+    interviewQuestions: [
+        { question: "q1", measures: "m" },
+        { question: "q2", measures: "m" },
+        { question: "q3", measures: "m" },
+    ],
 };
 
 const fakeAnalyze: AnalyzeBenchmarkFn = async () => output;

@@ -29,7 +29,9 @@ The benchmark is either the captured knowledge of the person who held the role
 Score the fit 0-100 and break it into 3-6 dimensions (e.g. processes, domain,
 seniority of judgment). Each dimension: name, score 0-100, strengths, gaps —
 always grounded in the benchmark vs the CV, never invented. Then a 2-3 sentence
-summary and 5-8 interview questions that probe the gaps.
+summary and 5-8 interview questions. Each question is an object
+{ question, measures } where "measures" names the competency or dimension the
+question probes (e.g. "Dominio técnico", "Criterio de decisión").
 Answer in the language of the benchmark.`;
 
 const google = createGoogleGenerativeAI({ apiKey: ServerConfig.googleApiKey });

@@ -9,6 +9,9 @@ import type {
     candidateSchema,
     candidateStatusSchema,
     createManualVacancySchema,
+    generatedRoleSchema,
+    generateRoleInputSchema,
+    interviewQuestionSchema,
     offboardInputSchema,
     personListItemSchema,
     publicVacancySchema,
@@ -25,6 +28,7 @@ export type Vacancy = z.infer<typeof vacancySchema>;
 export type VacancyListItem = z.infer<typeof vacancyListItemSchema>;
 export type Candidate = z.infer<typeof candidateSchema>;
 export type AnalysisDimension = z.infer<typeof analysisDimensionSchema>;
+export type InterviewQuestion = z.infer<typeof interviewQuestionSchema>;
 export type Analysis = z.infer<typeof analysisSchema>;
 export type RankedCandidate = z.infer<typeof rankedCandidateSchema>;
 export type PersonListItem = z.infer<typeof personListItemSchema>;
@@ -36,3 +40,5 @@ export type CreateManualVacancyInput = z.infer<
 export type CandidateProfile = z.infer<typeof candidateProfileSchema>;
 export type AnalysisOutput = z.infer<typeof analysisOutputSchema>;
 export type ApplyInput = z.infer<typeof applyInputSchema>;
+export type GenerateRoleInput = z.infer<typeof generateRoleInputSchema>;
+export type GeneratedRole = z.infer<typeof generatedRoleSchema>;

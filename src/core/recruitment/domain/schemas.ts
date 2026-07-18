@@ -38,12 +38,18 @@ export const analysisDimensionSchema = z.object({
     gaps: z.array(z.string()),
 });
 
+/** An interview question plus the competency it probes ("qué mide"). */
+export const interviewQuestionSchema = z.object({
+    question: z.string().max(500),
+    measures: z.string().max(200),
+});
+
 export const analysisSchema = z.object({
     candidateId: z.string(),
     score: z.number().min(0).max(100),
     dimensions: z.array(analysisDimensionSchema),
     summary: z.string(),
-    interviewQuestions: z.array(z.string()),
+    interviewQuestions: z.array(interviewQuestionSchema),
     createdAt: z.string(),
 });
 
@@ -78,6 +84,17 @@ export const createManualVacancySchema = z.object({
     description: z.string().trim().min(1).max(10_000),
 });
 
+/** Ask the AI to draft a role description from a title (and optionally the
+ *  captured knowledge of the person being replaced). */
+export const generateRoleInputSchema = z.object({
+    title: z.string().trim().min(1).max(200),
+    personId: z.string().trim().min(1).optional(),
+});
+
+export const generatedRoleSchema = z.object({
+    description: z.string(),
+});
+
 // ── LLM outputs (structured generateObject targets) ──────────────────────────
 export const candidateProfileSchema = z.object({
     /** Full cleaned plain text of the CV — stored as `cvText`. */
@@ -100,7 +117,7 @@ export const analysisOutputSchema = z.object({
     score: z.number().min(0).max(100),
     dimensions: z.array(analysisDimensionSchema).min(3).max(6),
     summary: z.string().max(4000),
-    interviewQuestions: z.array(z.string().max(500)).min(3).max(10),
+    interviewQuestions: z.array(interviewQuestionSchema).min(3).max(10),
 });
 
 // ── Public apply input (service-level; the route parses multipart with
