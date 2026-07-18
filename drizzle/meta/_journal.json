@@ -43,6 +43,13 @@
       "when": 1784404812537,
       "tag": "0005_charming_magdalene",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784404970572,
+      "tag": "0006_flowery_purple_man",
+      "breakpoints": true
     }
   ]
 }

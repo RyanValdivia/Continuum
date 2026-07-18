@@ -27,6 +27,8 @@ export const NODE_TYPES: NodeType[] = [
     "process",
     "concept",
     "document",
+    "person",
+    "vacancy",
 ];
 
 /** Vivid, dark-canvas-friendly hues, one per node type. */
@@ -35,6 +37,8 @@ export const NODE_TYPE_COLORS: Record<NodeType, string> = {
     process: "#3b82f6", // blue (brand family)
     concept: "#8b5cf6", // violet
     document: "#10b981", // emerald
+    person: "#ec4899", // pink
+    vacancy: "#ef4444", // red — an open seat
 };
 
 export const NODE_TYPE_LABELS: Record<NodeType, string> = {
@@ -42,6 +46,8 @@ export const NODE_TYPE_LABELS: Record<NodeType, string> = {
     process: "Proceso",
     concept: "Concepto",
     document: "Documento",
+    person: "Persona",
+    vacancy: "Vacante",
 };
 
 export function computeDegree(
