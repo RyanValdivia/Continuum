@@ -46,7 +46,7 @@ export function Dashboard({
                 <TopRisks risks={data.topRisks} />
             </div>
 
-            <KeyPeople people={data.keyPeople} />
+            <KeyPeople people={data.keyPeople} slug={slug} />
 
             <Link
                 href={`/${slug}/app/graph`}
