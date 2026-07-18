@@ -63,6 +63,9 @@ vi.mock("@/server/microsoft/pdf-text", () => ({ extractPdfText: vi.fn() }));
 vi.mock("@/core/knowledge/server/services/ingest-document-service", () => ({
     ingestDocumentService: vi.fn(),
 }));
+vi.mock("../resolve-microsoft-author", () => ({
+    resolveMicrosoftAuthor: vi.fn(),
+}));
 
 import { ingestDocumentService } from "@/core/knowledge/server/services/ingest-document-service";
 import { getOrgMembership } from "@/server/auth/get-org-membership";
@@ -96,6 +99,7 @@ import { listMicrosoftChannelsService } from "../list-channels-service";
 import { listMicrosoftDriveItemsService } from "../list-drive-items-service";
 import { listMicrosoftSitesService } from "../list-sites-service";
 import { listMicrosoftTeamsService } from "../list-teams-service";
+import { resolveMicrosoftAuthor } from "../resolve-microsoft-author";
 
 const connRow = (overrides: Record<string, unknown> = {}) => ({
     id: "conn1",
@@ -484,6 +488,7 @@ describe("ingestMicrosoftTeamsChannelsService", () => {
                 edgesCreated: 0,
             },
         } as never);
+        vi.mocked(resolveMicrosoftAuthor).mockResolvedValue(null);
     });
 
     it("ingests a channel doc plus a per-user doc for active authors", async () => {
@@ -498,6 +503,10 @@ describe("ingestMicrosoftTeamsChannelsService", () => {
                 ["u1", "jane@corp.com"],
                 ["u2", null],
             ]),
+        );
+        vi.mocked(resolveMicrosoftAuthor).mockImplementation(
+            async (_org, microsoftUserId) =>
+                microsoftUserId === "u1" ? "user-jane" : null,
         );
 
         const r = await ingestMicrosoftTeamsChannelsService("org1", "admin1", {
@@ -522,7 +531,7 @@ describe("ingestMicrosoftTeamsChannelsService", () => {
         expect(calls).toHaveLength(2);
         expect(calls[1][1]).toMatchObject({
             externalId: "teams:t1:c1:w30:user:jane@corp.com",
-            personId: "jane@corp.com",
+            personId: "user-jane",
         });
 
         // the since window is applied

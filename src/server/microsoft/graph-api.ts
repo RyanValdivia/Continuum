@@ -93,6 +93,80 @@ export function refreshMicrosoftToken(params: {
     });
 }
 
+// ── Personal identity link (per-user, no token persisted) ──────────────────
+
+/** Scopes for "Sign in with Microsoft" — identity only, no `offline_access`
+ *  since this flow never needs to call Graph again after resolving `/me`. */
+export const MICROSOFT_IDENTITY_SCOPES = "openid profile email User.Read";
+
+/** Exchanges the identity-link `code` for an access token. Deliberately
+ *  narrower than `GraphTokenResponse` — no refresh token to track. */
+export async function exchangeMicrosoftIdentityCode(params: {
+    code: string;
+    redirectUri: string;
+    clientId: string;
+    clientSecret: string;
+    tenantId: string;
+}): Promise<string> {
+    const res = await fetch(
+        `${LOGIN_BASE}/${params.tenantId}/oauth2/v2.0/token`,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                grant_type: "authorization_code",
+                code: params.code,
+                redirect_uri: params.redirectUri,
+                client_id: params.clientId,
+                client_secret: params.clientSecret,
+                scope: MICROSOFT_IDENTITY_SCOPES,
+            }).toString(),
+        },
+    );
+    if (!res.ok) {
+        throw new Error(
+            `Microsoft identity token exchange failed: ${res.status} ${await res.text()}`,
+        );
+    }
+    const data = (await res.json()) as { access_token: string };
+    return data.access_token;
+}
+
+export type MicrosoftIdentityProfile = {
+    id: string;
+    email: string | null;
+    displayName: string | null;
+};
+
+/** Resolves the signed-in user's own Microsoft identity via `/me` — used
+ *  only for the personal account-link flow (falls back to
+ *  `userPrincipalName` when `mail` is unset, common for accounts without an
+ *  Exchange mailbox). */
+export async function fetchMicrosoftMe(
+    accessToken: string,
+): Promise<MicrosoftIdentityProfile> {
+    const res = await fetch(
+        `${GRAPH_BASE}/me?$select=id,mail,userPrincipalName,displayName`,
+        { headers: { Authorization: `Bearer ${accessToken}` } },
+    );
+    if (!res.ok) {
+        throw new Error(
+            `Microsoft /me failed: ${res.status} ${await res.text()}`,
+        );
+    }
+    const data = (await res.json()) as {
+        id: string;
+        mail?: string | null;
+        userPrincipalName?: string;
+        displayName?: string;
+    };
+    return {
+        id: data.id,
+        email: data.mail ?? data.userPrincipalName ?? null,
+        displayName: data.displayName ?? null,
+    };
+}
+
 // ── Shared fetch wrapper ──────────────────────────────────────────────────────
 
 async function graphFetch(accessToken: string, url: string): Promise<Response> {

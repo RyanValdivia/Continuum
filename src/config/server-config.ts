@@ -19,11 +19,20 @@ export const ServerConfig = {
         clientId: env.MICROSOFT_CLIENT_ID,
         clientSecret: env.MICROSOFT_CLIENT_SECRET,
         tenantId: env.MICROSOFT_TENANT_ID,
+        // Org-wide tenant connection (SharePoint/OneDrive/Teams ingestion) —
+        // persists tokens, needs the encryption key.
         isConfigured: Boolean(
             env.MICROSOFT_CLIENT_ID &&
                 env.MICROSOFT_CLIENT_SECRET &&
                 env.MICROSOFT_TENANT_ID &&
                 env.TOKEN_ENCRYPTION_KEY,
+        ),
+        // Personal "Sign in with Microsoft" linking — no token persisted, so
+        // no encryption key needed. Same app credentials as the org-wide flow.
+        isIdentityConfigured: Boolean(
+            env.MICROSOFT_CLIENT_ID &&
+                env.MICROSOFT_CLIENT_SECRET &&
+                env.MICROSOFT_TENANT_ID,
         ),
     },
     slack: {

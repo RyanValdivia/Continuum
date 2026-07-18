@@ -8,6 +8,8 @@ import type {
     microsoftConnectionSchema,
     microsoftDriveItemSchema,
     microsoftDriveItemsSchema,
+    microsoftIdentitySchema,
+    microsoftIdentityStatusSchema,
     microsoftIngestResultSchema,
     microsoftSiteSchema,
     microsoftSitesSchema,
@@ -18,6 +20,10 @@ import type {
 
 export type MicrosoftConnection = z.infer<typeof microsoftConnectionSchema>;
 export type MicrosoftStatus = z.infer<typeof microsoftStatusSchema>;
+export type MicrosoftIdentity = z.infer<typeof microsoftIdentitySchema>;
+export type MicrosoftIdentityStatus = z.infer<
+    typeof microsoftIdentityStatusSchema
+>;
 export type MicrosoftCallbackQuery = z.infer<
     typeof microsoftCallbackQuerySchema
 >;

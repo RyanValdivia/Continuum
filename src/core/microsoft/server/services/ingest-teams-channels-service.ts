@@ -32,6 +32,7 @@ import {
     resolveAuthorEmails,
 } from "@/server/microsoft/graph-api";
 import { resolveMicrosoftAccessToken } from "./resolve-microsoft-access-token";
+import { resolveMicrosoftAuthor } from "./resolve-microsoft-author";
 
 /** Below this, a per-author doc carries too little signal to be worth a doc. */
 const MIN_AUTHOR_MESSAGES = 3;
@@ -182,6 +183,12 @@ export async function ingestMicrosoftTeamsChannelsService(
                         authorKey,
                     );
                     const userTitle = `${group.authorName} en #${channelName}`;
+                    const personId = await resolveMicrosoftAuthor(
+                        organizationId,
+                        group.authorId,
+                        email ?? null,
+                        group.authorName,
+                    );
                     try {
                         const userResult = await ingestDocumentService(
                             organizationId,
@@ -192,7 +199,7 @@ export async function ingestMicrosoftTeamsChannelsService(
                                 content: truncateContent(
                                     renderTranscript(group.messages, emails),
                                 ),
-                                personId: authorKey,
+                                personId: personId ?? undefined,
                                 extract: true,
                             },
                         );

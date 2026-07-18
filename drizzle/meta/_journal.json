@@ -15,6 +15,13 @@
       "when": 1784411764490,
       "tag": "0001_amazing_steve_rogers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784412040556,
+      "tag": "0002_cheerful_jack_power",
+      "breakpoints": true
     }
   ]
 }

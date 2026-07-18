@@ -1,7 +1,7 @@
 import "server-only";
 import { ingestDocumentService } from "@/core/knowledge/server/services/ingest-document-service";
 import type { SlackMessage } from "@/server/slack/slack-api";
-import { findSlackIdentityBySlackUser } from "../repository/find-slack-identity-by-slack-user";
+import { resolveSlackAuthor } from "./resolve-slack-author";
 
 /** Below this many characters a message is almost never a decision — "ok",
  *  "+1", "lol" — not worth an embedding + LLM extraction call. Cheap noise
@@ -28,7 +28,7 @@ export async function ingestSlackMessage(params: {
     }
 
     const personId = params.message.userId
-        ? await findSlackIdentityBySlackUser(
+        ? await resolveSlackAuthor(
               params.organizationId,
               params.message.userId,
           )

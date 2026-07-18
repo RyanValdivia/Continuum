@@ -23,6 +23,26 @@ export const microsoftCallbackQuerySchema = z.object({
     error: z.string().optional(),
 });
 
+/** Wire shape — this domain never stores a token, so there's nothing to
+ *  exclude the way the org-wide `microsoftConnectionSchema` excludes tokens. */
+export const microsoftIdentitySchema = z.object({
+    id: z.string(),
+    organizationId: z.string(),
+    userId: z.string(),
+    microsoftUserId: z.string(),
+    email: z.string().nullable(),
+    displayName: z.string().nullable(),
+    avatarUrl: z.string().nullable(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+});
+
+export const microsoftIdentityStatusSchema = z.object({
+    configured: z.boolean(),
+    connected: z.boolean(),
+    identity: microsoftIdentitySchema.nullable(),
+});
+
 /** A browsable drive root: a SharePoint site's default drive or the connecting user's OneDrive. */
 export const microsoftSiteSchema = z.object({
     driveId: z.string(),

@@ -9,6 +9,12 @@ export function getMicrosoftConnectUrl(organizationId: string): string {
     return `/api/v1/microsoft/${organizationId}/connect`;
 }
 
+/** Plain link, not a fetch — same reasoning as `getMicrosoftConnectUrl`, but
+ *  for the personal identity link instead of the org-wide tenant connection. */
+export function getMicrosoftIdentityConnectUrl(organizationId: string): string {
+    return `/api/v1/microsoft/${organizationId}/connect-identity`;
+}
+
 export const useMicrosoft = (organizationId: string) => {
     const client = useElysia().microsoft({ organizationId });
     const queryClient = useQueryClient();
@@ -54,4 +60,25 @@ export const useMicrosoft = (organizationId: string) => {
         useIngestFiles,
         useIngestTeams,
     };
+};
+
+/** The personal identity link — any member connects their own Microsoft
+ *  account so Teams messages get attributed to them, separate from the
+ *  org-wide tenant connection above. */
+export const useMicrosoftIdentity = (organizationId: string) => {
+    const client = useElysia().microsoft({ organizationId }).identity;
+    const queryClient = useQueryClient();
+    const STATUS_KEY = client.status.get.queryKey();
+
+    const useStatus = () => useQuery(client.status.get.queryOptions());
+
+    const useDisconnect = () =>
+        useMutation(
+            client.delete.mutationOptions({
+                onSuccess: () =>
+                    queryClient.invalidateQueries({ queryKey: STATUS_KEY }),
+            }),
+        );
+
+    return { useStatus, useDisconnect };
 };

@@ -1,3 +1,4 @@
+import { MicrosoftIdentityCard } from "@/core/microsoft/client/ui/microsoft-identity-card";
 import { MicrosoftIntegrationCard } from "@/core/microsoft/client/ui/microsoft-integration-card";
 import { NotionIntegrationCard } from "@/core/notion/client/ui/notion-integration-card";
 import { SlackIntegrationCard } from "@/core/slack/client/ui/slack-integration-card";
@@ -9,6 +10,7 @@ export default function IntegrationsPage() {
             <h1 className="font-semibold text-2xl">Integraciones</h1>
             <NotionIntegrationCard />
             <MicrosoftIntegrationCard />
+            <MicrosoftIdentityCard />
             <SlackIntegrationCard />
             <SlackWorkspaceCard />
         </div>
