@@ -20,8 +20,12 @@ import {
     insertCandidate,
 } from "../repository/candidates";
 import { countCandidates, findVacancyByToken } from "../repository/vacancies";
+import {
+    type AnalyzeDeps,
+    analyzeCandidateService,
+} from "./analyze-candidate-service";
 
-export interface ApplyDeps {
+export interface ApplyDeps extends AnalyzeDeps {
     parseCv?: ParseCvFn;
 }
 
@@ -52,7 +56,7 @@ export async function applyToVacancyService(
         }
 
         const vacancy = await findVacancyByToken(input.token);
-        if (!vacancy || vacancy.status !== "open") {
+        if (vacancy?.status !== "open") {
             return err(AppErrors.notFound());
         }
 
@@ -75,7 +79,7 @@ export async function applyToVacancyService(
             );
         }
 
-        await insertCandidate({
+        const inserted = await insertCandidate({
             vacancyId: vacancy.id,
             name: input.name,
             email: input.email,
@@ -84,6 +88,10 @@ export async function applyToVacancyService(
             profile,
             status: "pending",
         });
+
+        // In-process analysis (no queue in this project). Failure leaves the
+        // candidate `failed` — the application itself is already received.
+        await analyzeCandidateService(inserted.id, deps);
 
         return ok({ received: true });
     } catch (cause) {

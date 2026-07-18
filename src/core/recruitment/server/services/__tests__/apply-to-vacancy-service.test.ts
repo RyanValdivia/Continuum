@@ -23,7 +23,9 @@ import type {
 import type { ParseCvFn } from "../../llm/parse-cv";
 import {
     findCandidateByEmail,
+    findCandidateWithVacancy,
     insertCandidate,
+    setCandidateStatus,
 } from "../../repository/candidates";
 import {
     countCandidates,
@@ -148,5 +150,67 @@ describe("applyToVacancyService", () => {
         expect(inserted.cvText).toBe("CV de Ana...");
         expect(inserted.profile).toEqual(profile);
         expect(inserted.status).toBe("pending");
+    });
+
+    it("runs analysis right after intake", async () => {
+        vi.mocked(findCandidateWithVacancy).mockResolvedValue({
+            candidate: {
+                id: "c1",
+                vacancyId: "v1",
+                name: "Ana",
+                email: "ana@x.com",
+                cvFilename: "cv.pdf",
+                cvText: profile.plainText,
+                profile,
+                status: "pending",
+                createdAt: new Date(),
+            },
+            vacancy: vacancyRow(),
+        });
+        const analyze = vi.fn().mockResolvedValue({
+            score: 50,
+            dimensions: [
+                { name: "a", score: 1, strengths: [], gaps: [] },
+                { name: "b", score: 2, strengths: [], gaps: [] },
+                { name: "c", score: 3, strengths: [], gaps: [] },
+            ],
+            summary: "s",
+            interviewQuestions: ["q1", "q2", "q3"],
+        });
+
+        const result = await applyToVacancyService(input, {
+            parseCv: fakeParse,
+            analyze,
+        });
+
+        expect(result.ok).toBe(true);
+        expect(analyze).toHaveBeenCalledOnce();
+    });
+
+    it("still returns received when analysis fails", async () => {
+        vi.mocked(findCandidateWithVacancy).mockResolvedValue({
+            candidate: {
+                id: "c1",
+                vacancyId: "v1",
+                name: "Ana",
+                email: "ana@x.com",
+                cvFilename: "cv.pdf",
+                cvText: profile.plainText,
+                profile,
+                status: "pending",
+                createdAt: new Date(),
+            },
+            vacancy: vacancyRow(),
+        });
+
+        const result = await applyToVacancyService(input, {
+            parseCv: fakeParse,
+            analyze: async () => {
+                throw new Error("model down");
+            },
+        });
+
+        expect(result.ok).toBe(true);
+        expect(setCandidateStatus).toHaveBeenCalledWith("c1", "failed");
     });
 });

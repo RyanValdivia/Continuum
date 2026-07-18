@@ -14,7 +14,7 @@ export async function getPublicVacancyService(
 ): AsyncAppResult<PublicVacancy> {
     try {
         const row = await findVacancyByToken(token);
-        if (!row || row.status !== "open") {
+        if (row?.status !== "open") {
             return err(AppErrors.notFound());
         }
         return ok({
