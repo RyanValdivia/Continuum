@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
     NODE_TYPE_COLORS,
     nodeRadius,
+    PERSON_NODE_COLOR,
     type VizGraph,
     type VizNode,
 } from "../viz/graph-viz";
@@ -131,13 +132,22 @@ export function GraphCanvas({
                         const dim =
                             highlightIds !== null && !highlightIds.has(n.id);
                         const r = nodeRadius(n.degree);
-                        const color =
-                            NODE_TYPE_COLORS[
-                                n.type as keyof typeof NODE_TYPE_COLORS
-                            ] ?? "#94a3b8";
+                        const isPerson = n.kind === "person";
+                        const color = isPerson
+                            ? PERSON_NODE_COLOR
+                            : (NODE_TYPE_COLORS[
+                                  n.type as keyof typeof NODE_TYPE_COLORS
+                              ] ?? "#94a3b8");
                         ctx.globalAlpha = dim ? 0.12 : 1;
                         ctx.beginPath();
-                        ctx.arc(n.x, n.y, r, 0, 2 * Math.PI);
+                        // Person nodes render as a square, knowledge nodes as
+                        // a circle — a shape distinction survives dark-mode
+                        // color-blindness better than hue alone.
+                        if (isPerson) {
+                            ctx.rect(n.x - r, n.y - r, r * 2, r * 2);
+                        } else {
+                            ctx.arc(n.x, n.y, r, 0, 2 * Math.PI);
+                        }
                         ctx.fillStyle = color;
                         ctx.shadowColor = color;
                         ctx.shadowBlur = dim ? 0 : 12;

@@ -16,10 +16,9 @@ import {
 import { Separator } from "@/frontend/components/ui/separator";
 import { Skeleton } from "@/frontend/components/ui/skeleton";
 import { Switch } from "@/frontend/components/ui/switch";
+import { ORG_ADMIN_ROLES } from "@/server/auth/org-admin-roles";
 import type { SlackChannel } from "../../domain/types";
 import { getSlackWorkspaceConnectUrl, useSlackWorkspace } from "../hooks";
-
-const ADMIN_ROLES = new Set(["owner", "admin"]);
 
 /** Org-wide bot install + channel picker. Owner/admin only — a plain member
  *  never sees this card, unlike the personal Slack link above it. */
@@ -32,7 +31,7 @@ export function SlackWorkspaceCard() {
         return <Skeleton className="h-32 w-full" />;
     }
 
-    if (!role?.role || !ADMIN_ROLES.has(role.role)) {
+    if (!role?.role || !ORG_ADMIN_ROLES.has(role.role)) {
         return null;
     }
 

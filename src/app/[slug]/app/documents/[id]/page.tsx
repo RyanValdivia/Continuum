@@ -2,10 +2,9 @@ import { notFound } from "next/navigation";
 import { DocumentDetail } from "@/core/document-review/client/ui/detail/document-detail";
 import { getDocumentService } from "@/core/document-review/server/services/get-document-service";
 import { resolveResult } from "@/frontend/lib/result";
+import { ORG_ADMIN_ROLES } from "@/server/auth/get-org-membership";
 import { requireAuth } from "@/server/auth/require-auth";
 import { requireOrganization } from "@/server/auth/require-organization";
-
-const ADMIN_ROLES = new Set(["owner", "admin"]);
 
 /**
  * Server entry for `/documents/[id]`. Owner/admin-only, same UI gate as the
@@ -23,7 +22,7 @@ export default async function DocumentDetailPage({
     const { user } = await requireAuth();
     const { slug, id } = await params;
     const { organization, role } = await requireOrganization(slug, user.id);
-    if (!ADMIN_ROLES.has(role)) notFound();
+    if (!ORG_ADMIN_ROLES.has(role)) notFound();
 
     const document = await resolveResult(
         getDocumentService(user.id, organization.id, id),

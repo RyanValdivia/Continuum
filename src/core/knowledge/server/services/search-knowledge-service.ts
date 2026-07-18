@@ -5,6 +5,7 @@ import type {
     SearchKnowledge,
     SearchResult,
 } from "@/core/knowledge/domain/types";
+import { resolveAccessScope } from "@/server/authorization/resolve-access-scope";
 import {
     AppErrors,
     type AsyncAppResult,
@@ -26,16 +27,19 @@ export interface SearchDeps {
  * similarity (org- and optionally person-scoped), then expand the matched nodes
  * `hops` deep through the graph. Chunks are the citations; nodes+edges are the
  * structured context. Vector-matched nodes keep their score; nodes reached only
- * by graph expansion have a null score.
+ * by graph expansion have a null score. Every read is additionally scoped by
+ * the caller's resolved ACL access token — see `resolveAccessScope`.
  */
 export async function searchKnowledgeService(
     organizationId: string,
+    userId: string,
     params: SearchKnowledge,
     deps: SearchDeps = {},
 ): AsyncAppResult<SearchResult> {
     const embed = deps.embed ?? googleEmbed;
 
     try {
+        const scope = await resolveAccessScope(organizationId, userId);
         const [queryEmbedding] = await embed([params.query], "RETRIEVAL_QUERY");
 
         const [chunkHits, nodeHits] = await Promise.all([
@@ -44,12 +48,14 @@ export async function searchKnowledgeService(
                 queryEmbedding,
                 personId: params.personId,
                 limit: params.limit,
+                scope,
             }),
             searchNodes({
                 organizationId,
                 queryEmbedding,
                 personId: params.personId,
                 limit: params.limit,
+                scope,
             }),
         ]);
 
@@ -67,6 +73,7 @@ export async function searchKnowledgeService(
                 organizationId,
                 seedNodeIds: nodeHits.map(({ row }) => row.id),
                 hops: params.hops,
+                scope,
             });
 
             const nodes: ScoredNode[] = subgraph.nodes.map((row) => ({

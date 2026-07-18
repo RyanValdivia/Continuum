@@ -8,6 +8,7 @@ import {
     distinctPersonIds,
     filterByPerson,
     filterByTypes,
+    filterPeople,
     matchNodeByLabel,
     NODE_TYPES,
     neighborIds,
@@ -33,6 +34,7 @@ export function KnowledgeGraphExplorer() {
     const [activeTypes, setActiveTypes] = useState<Set<NodeType>>(
         () => new Set(NODE_TYPES),
     );
+    const [showPeople, setShowPeople] = useState(true);
     const [personId, setPersonId] = useState<string | null>(null);
     const [hoverId, setHoverId] = useState<string | null>(null);
     const [selected, setSelected] = useState<VizNode | null>(null);
@@ -58,11 +60,14 @@ export function KnowledgeGraphExplorer() {
         [data],
     );
 
-    // Person scope first, then type filter.
+    // Person scope, then type filter, then the people-visibility toggle.
     const filtered = useMemo(() => {
         if (!data) return null;
-        return filterByTypes(filterByPerson(data, personId), activeTypes);
-    }, [data, personId, activeTypes]);
+        return filterPeople(
+            filterByTypes(filterByPerson(data, personId), activeTypes),
+            showPeople,
+        );
+    }, [data, personId, activeTypes, showPeople]);
 
     const highlightIds = useMemo(() => {
         if (!hoverId || !filtered) return null;
@@ -130,7 +135,12 @@ export function KnowledgeGraphExplorer() {
 
     return (
         <div className="relative h-[calc(100svh-4rem)] w-full overflow-hidden bg-[radial-gradient(ellipse_at_center,rgba(15,23,42,0.4),transparent)]">
-            <GraphLegend active={activeTypes} onToggle={toggleType} />
+            <GraphLegend
+                active={activeTypes}
+                onToggle={toggleType}
+                showPeople={showPeople}
+                onTogglePeople={() => setShowPeople((v) => !v)}
+            />
             <GraphSearch onSubmit={onSearch} />
             <GraphPersonFilter
                 personIds={personIds}

@@ -15,11 +15,11 @@ import { searchKnowledgeService } from "../../services/search-knowledge-service"
 
 export const searchKnowledgeRoute = new Elysia().use(authed).post(
     "/search",
-    async ({ session, body, status }) => {
+    async ({ session, user, body, status }) => {
         const org = requireActiveOrg(session);
         if (!org.ok) return status(403, errorToResponse(org.error));
 
-        const result = await searchKnowledgeService(org.data, body);
+        const result = await searchKnowledgeService(org.data, user.id, body);
         if (!result.ok)
             return status(
                 result.error.status as 500,

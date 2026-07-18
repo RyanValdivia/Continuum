@@ -5,6 +5,7 @@ import { openAPI, organization } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { ServerConfig } from "@/config/server-config";
+import { provisionPersonPrincipal } from "@/core/authorization/server/repository/provision-person-principal";
 import { db } from "@/server/drizzle/db";
 import * as authSchema from "@/server/drizzle/schemas/auth-schema";
 import * as organizationSchema from "@/server/drizzle/schemas/organization-schema";
@@ -45,6 +46,26 @@ export const auth = betterAuth({
                     email: data.email,
                     link: inviteLink,
                 });
+            },
+            organizationHooks: {
+                // Every path that creates a `member` row (org creation, an
+                // admin adding someone directly, invitation acceptance) needs
+                // a matching `person` principal before that user's first
+                // authorization check — see provisionPersonPrincipal's doc.
+                async afterAddMember({ member, user }) {
+                    await provisionPersonPrincipal({
+                        organizationId: member.organizationId,
+                        userId: user.id,
+                        name: user.name,
+                    });
+                },
+                async afterAcceptInvitation({ member, user }) {
+                    await provisionPersonPrincipal({
+                        organizationId: member.organizationId,
+                        userId: user.id,
+                        name: user.name,
+                    });
+                },
             },
         }),
     ],

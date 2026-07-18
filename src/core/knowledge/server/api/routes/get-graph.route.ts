@@ -12,11 +12,11 @@ import { getGraphService } from "../../services/get-graph-service";
 
 export const getGraphRoute = new Elysia().use(authed).get(
     "/graph",
-    async ({ session, query, status }) => {
+    async ({ session, user, query, status }) => {
         const org = requireActiveOrg(session);
         if (!org.ok) return status(403, errorToResponse(org.error));
 
-        const result = await getGraphService(org.data, query);
+        const result = await getGraphService(org.data, user.id, query);
         if (!result.ok)
             return status(
                 result.error.status as 500,

@@ -1,5 +1,7 @@
 import "server-only";
 import { and, eq, sql } from "drizzle-orm";
+import { buildAccessPredicate } from "@/server/authorization/build-access-predicate";
+import type { AccessScope } from "@/server/authorization/resolve-access-scope";
 import { db } from "@/server/drizzle/db";
 import {
     type ChunkRow,
@@ -58,6 +60,7 @@ export async function searchChunks(params: {
     queryEmbedding: number[];
     personId?: string | null;
     limit: number;
+    scope: AccessScope;
 }): Promise<ScoredChunkRow[]> {
     const literal = toVectorLiteral(params.queryEmbedding);
     const distance = sql<number>`(${chunks.embedding} <=> ${literal}::vector)`;
@@ -65,6 +68,14 @@ export async function searchChunks(params: {
     const where = and(
         eq(chunks.organizationId, params.organizationId),
         params.personId ? eq(chunks.personId, params.personId) : undefined,
+        // A chunk is a fragment of a document — the ACL grants on the
+        // document, not per-chunk, so this checks chunks.documentId.
+        buildAccessPredicate({
+            accessToken: params.scope.accessToken,
+            defaultAccess: params.scope.defaultAccess,
+            resourceType: "source_document",
+            resourceIdColumn: chunks.documentId,
+        }),
     );
 
     const rows = await db

@@ -7,6 +7,8 @@ import {
     NODE_TYPE_COLORS,
     NODE_TYPE_LABELS,
     neighborIds,
+    PERSON_NODE_COLOR,
+    PERSON_NODE_LABEL,
     type VizGraph,
     type VizNode,
 } from "../viz/graph-viz";
@@ -36,14 +38,22 @@ export function NodeDetailPanel({
                     <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2">
                             <span
-                                className="size-3 rounded-full"
+                                className={
+                                    node.kind === "person"
+                                        ? "size-3"
+                                        : "size-3 rounded-full"
+                                }
                                 style={{
                                     backgroundColor:
-                                        NODE_TYPE_COLORS[node.type],
+                                        node.kind === "person"
+                                            ? PERSON_NODE_COLOR
+                                            : NODE_TYPE_COLORS[node.type],
                                 }}
                             />
                             <span className="text-muted-foreground text-xs uppercase tracking-wide">
-                                {NODE_TYPE_LABELS[node.type]}
+                                {node.kind === "person"
+                                    ? PERSON_NODE_LABEL
+                                    : NODE_TYPE_LABELS[node.type]}
                             </span>
                         </div>
                         <Button
@@ -61,24 +71,32 @@ export function NodeDetailPanel({
                         {node.label}
                     </h2>
 
-                    {node.summary ? (
+                    {node.kind === "knowledge" && node.summary ? (
                         <p className="text-muted-foreground text-sm">
                             {node.summary}
                         </p>
                     ) : null}
 
-                    <dl className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                            <dt className="text-muted-foreground">Origen</dt>
-                            <dd className="text-foreground">{node.origin}</dd>
-                        </div>
-                        <div>
-                            <dt className="text-muted-foreground">Confianza</dt>
-                            <dd className="text-foreground">
-                                {Math.round(node.confidence * 100)}%
-                            </dd>
-                        </div>
-                    </dl>
+                    {node.kind === "knowledge" ? (
+                        <dl className="grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                                <dt className="text-muted-foreground">
+                                    Origen
+                                </dt>
+                                <dd className="text-foreground">
+                                    {node.origin}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt className="text-muted-foreground">
+                                    Confianza
+                                </dt>
+                                <dd className="text-foreground">
+                                    {Math.round(node.confidence * 100)}%
+                                </dd>
+                            </div>
+                        </dl>
+                    ) : null}
 
                     <NeighborList
                         graph={graph}
@@ -119,7 +137,10 @@ function NeighborList({
                             <span
                                 className="size-2 shrink-0 rounded-full"
                                 style={{
-                                    backgroundColor: NODE_TYPE_COLORS[n.type],
+                                    backgroundColor:
+                                        n.kind === "person"
+                                            ? PERSON_NODE_COLOR
+                                            : NODE_TYPE_COLORS[n.type],
                                 }}
                             />
                             <span className="truncate text-foreground">

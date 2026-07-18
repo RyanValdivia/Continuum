@@ -6,6 +6,7 @@ import {
     FolderKanban,
     LogOut,
     Plug,
+    ShieldCheck,
     Sparkles,
     Waypoints,
 } from "lucide-react";
@@ -25,8 +26,7 @@ import {
     SidebarMenuItem,
     SidebarRail,
 } from "@/frontend/components/ui/sidebar";
-
-const ADMIN_ROLES = new Set(["owner", "admin"]);
+import { ORG_ADMIN_ROLES } from "@/server/auth/org-admin-roles";
 
 type NavItem = {
     title: string;
@@ -43,6 +43,12 @@ const NAV: NavItem[] = [
         title: "Documentos",
         segment: "documents",
         icon: ClipboardCheck,
+        adminOnly: true,
+    },
+    {
+        title: "Control de acceso",
+        segment: "access-control",
+        icon: ShieldCheck,
         adminOnly: true,
     },
     { title: "Integraciones", segment: "integrations", icon: Plug },
@@ -70,7 +76,7 @@ export function AppSidebar({
 }) {
     const pathname = usePathname();
     const router = useRouter();
-    const isAdmin = ADMIN_ROLES.has(role);
+    const isAdmin = ORG_ADMIN_ROLES.has(role);
 
     const signOut = async () => {
         await authClient.signOut();

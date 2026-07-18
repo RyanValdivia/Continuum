@@ -1,5 +1,8 @@
 import "server-only";
 import { and, desc, eq, inArray, or } from "drizzle-orm";
+import type { PgColumn } from "drizzle-orm/pg-core";
+import { buildAccessPredicate } from "@/server/authorization/build-access-predicate";
+import type { AccessScope } from "@/server/authorization/resolve-access-scope";
 import { db } from "@/server/drizzle/db";
 import {
     type KnowledgeEdgeRow,
@@ -23,9 +26,18 @@ export async function expandGraph(params: {
     organizationId: string;
     seedNodeIds: string[];
     hops: number;
+    scope: AccessScope;
 }): Promise<Subgraph> {
     const visited = new Set(params.seedNodeIds);
     const edgesById = new Map<string, KnowledgeEdgeRow>();
+
+    const nodeAccess = (column: PgColumn) =>
+        buildAccessPredicate({
+            accessToken: params.scope.accessToken,
+            defaultAccess: params.scope.defaultAccess,
+            resourceType: "knowledge_node",
+            resourceIdColumn: column,
+        });
 
     let frontier = params.seedNodeIds;
     for (let depth = 0; depth < params.hops && frontier.length > 0; depth++) {
@@ -39,6 +51,10 @@ export async function expandGraph(params: {
                         inArray(knowledgeEdges.fromNodeId, frontier),
                         inArray(knowledgeEdges.toNodeId, frontier),
                     ),
+                    // Both endpoints must be individually visible — an edge
+                    // through a denied node is never traversed or returned.
+                    nodeAccess(knowledgeEdges.fromNodeId),
+                    nodeAccess(knowledgeEdges.toNodeId),
                 ),
             );
 
@@ -64,6 +80,7 @@ export async function expandGraph(params: {
                   and(
                       eq(knowledgeNodes.organizationId, params.organizationId),
                       inArray(knowledgeNodes.id, nodeIds),
+                      nodeAccess(knowledgeNodes.id),
                   ),
               )
         : [];
@@ -79,6 +96,7 @@ export async function listGraph(params: {
     organizationId: string;
     personId?: string | null;
     limit: number;
+    scope: AccessScope;
 }): Promise<Subgraph> {
     const nodes = await db
         .select()
@@ -89,6 +107,12 @@ export async function listGraph(params: {
                 params.personId
                     ? eq(knowledgeNodes.personId, params.personId)
                     : undefined,
+                buildAccessPredicate({
+                    accessToken: params.scope.accessToken,
+                    defaultAccess: params.scope.defaultAccess,
+                    resourceType: "knowledge_node",
+                    resourceIdColumn: knowledgeNodes.id,
+                }),
             ),
         )
         .orderBy(desc(knowledgeNodes.createdAt))

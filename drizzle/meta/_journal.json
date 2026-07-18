@@ -57,6 +57,20 @@
       "when": 1784400182828,
       "tag": "0007_serious_the_fury",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1784403563558,
+      "tag": "0009_solid_skin",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1784403563558,
+      "tag": "0008_solid_skin",
+      "breakpoints": true
     }
   ]
 }

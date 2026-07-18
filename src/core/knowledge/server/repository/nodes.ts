@@ -1,6 +1,8 @@
 import "server-only";
 import { and, eq, isNotNull, sql } from "drizzle-orm";
 import type { NodeOrigin, NodeType } from "@/core/knowledge/domain/types";
+import { buildAccessPredicate } from "@/server/authorization/build-access-predicate";
+import type { AccessScope } from "@/server/authorization/resolve-access-scope";
 import { db } from "@/server/drizzle/db";
 import {
     type KnowledgeNodeRow,
@@ -57,6 +59,7 @@ export async function searchNodes(params: {
     queryEmbedding: number[];
     personId?: string | null;
     limit: number;
+    scope: AccessScope;
 }): Promise<ScoredNodeRow[]> {
     const literal = toVectorLiteral(params.queryEmbedding);
     const distance = sql<number>`(${knowledgeNodes.embedding} <=> ${literal}::vector)`;
@@ -67,6 +70,12 @@ export async function searchNodes(params: {
         params.personId
             ? eq(knowledgeNodes.personId, params.personId)
             : undefined,
+        buildAccessPredicate({
+            accessToken: params.scope.accessToken,
+            defaultAccess: params.scope.defaultAccess,
+            resourceType: "knowledge_node",
+            resourceIdColumn: knowledgeNodes.id,
+        }),
     );
 
     const rows = await db

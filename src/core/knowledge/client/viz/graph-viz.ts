@@ -1,7 +1,8 @@
 import type { Graph, NodeType } from "@/core/knowledge/domain/types";
 
 /** A node ready for the force canvas (force-graph mutates x/y/vx/vy at runtime). */
-export type VizNode = {
+export type VizKnowledgeNode = {
+    kind: "knowledge";
     id: string;
     label: string;
     type: NodeType;
@@ -11,6 +12,18 @@ export type VizNode = {
     personId: string | null;
     degree: number;
 };
+
+export type VizPersonNode = {
+    kind: "person";
+    id: string;
+    label: string;
+    /** Ties this node back to the knowledge it authored — knowledge nodes'
+     *  `personId` attribution is this same value. */
+    userId: string;
+    degree: number;
+};
+
+export type VizNode = VizKnowledgeNode | VizPersonNode;
 
 /** A link; `source`/`target` are node ids before the sim resolves them to refs. */
 export type VizLink = {
@@ -44,6 +57,12 @@ export const NODE_TYPE_LABELS: Record<NodeType, string> = {
     document: "Documento",
 };
 
+/** Distinct from `NODE_TYPE_COLORS`/`NODE_TYPE_LABELS` — a `person` node
+ *  isn't a `NodeType`, it's the graph's other node kind (see `graph-viz`'s
+ *  `VizNode` union and the domain's `graphNodeSchema`). */
+export const PERSON_NODE_COLOR = "#ec4899"; // pink
+export const PERSON_NODE_LABEL = "Persona";
+
 export function computeDegree(
     nodes: Pick<VizNode, "id">[],
     links: VizLink[],
@@ -70,16 +89,29 @@ export function toVizGraph(graph: Graph): VizGraph {
         weight: e.weight,
     }));
     const degree = computeDegree(graph.nodes, links);
-    const nodes: VizNode[] = graph.nodes.map((n) => ({
-        id: n.id,
-        label: n.label,
-        type: n.type,
-        origin: n.origin,
-        confidence: n.confidence,
-        summary: n.summary,
-        personId: n.personId,
-        degree: degree.get(n.id) ?? 0,
-    }));
+    const nodes: VizNode[] = graph.nodes.map((n) => {
+        const deg = degree.get(n.id) ?? 0;
+        if (n.kind === "person") {
+            return {
+                kind: "person",
+                id: n.id,
+                label: n.label,
+                userId: n.userId,
+                degree: deg,
+            };
+        }
+        return {
+            kind: "knowledge",
+            id: n.id,
+            label: n.label,
+            type: n.type,
+            origin: n.origin,
+            confidence: n.confidence,
+            summary: n.summary,
+            personId: n.personId,
+            degree: deg,
+        };
+    });
     return { nodes, links };
 }
 
@@ -93,11 +125,11 @@ export function neighborIds(links: VizLink[], nodeId: string): Set<string> {
     return out;
 }
 
-export function filterByTypes(
-    graph: VizGraph,
-    active: Set<NodeType>,
-): VizGraph {
-    const nodes = graph.nodes.filter((n) => active.has(n.type));
+/** Hides/shows `person` nodes as a whole — the legend's dedicated toggle,
+ *  independent of the per-type toggles which only apply to knowledge nodes. */
+export function filterPeople(graph: VizGraph, show: boolean): VizGraph {
+    if (show) return graph;
+    const nodes = graph.nodes.filter((n) => n.kind !== "person");
     const kept = new Set(nodes.map((n) => n.id));
     const links = graph.links.filter(
         (l) => kept.has(l.source) && kept.has(l.target),
@@ -105,12 +137,34 @@ export function filterByTypes(
     return { nodes, links };
 }
 
+/** Type toggles only ever apply to knowledge nodes — person nodes always
+ *  pass through; there's no "type" to filter them by. */
+export function filterByTypes(
+    graph: VizGraph,
+    active: Set<NodeType>,
+): VizGraph {
+    const nodes = graph.nodes.filter(
+        (n) => n.kind === "person" || active.has(n.type),
+    );
+    const kept = new Set(nodes.map((n) => n.id));
+    const links = graph.links.filter(
+        (l) => kept.has(l.source) && kept.has(l.target),
+    );
+    return { nodes, links };
+}
+
+/** Scopes to one person's authored knowledge, plus that person's own node
+ *  (matched by `userId`, not the knowledge nodes' `id`). */
 export function filterByPerson(
     graph: VizGraph,
     personId: string | null,
 ): VizGraph {
     if (!personId) return graph;
-    const nodes = graph.nodes.filter((n) => n.personId === personId);
+    const nodes = graph.nodes.filter((n) =>
+        n.kind === "person"
+            ? n.userId === personId
+            : n.personId === personId,
+    );
     const kept = new Set(nodes.map((n) => n.id));
     const links = graph.links.filter(
         (l) => kept.has(l.source) && kept.has(l.target),
@@ -122,9 +176,10 @@ export function distinctPersonIds(nodes: VizNode[]): string[] {
     const seen: string[] = [];
     const set = new Set<string>();
     for (const n of nodes) {
-        if (n.personId && !set.has(n.personId)) {
-            set.add(n.personId);
-            seen.push(n.personId);
+        const personId = n.kind === "person" ? n.userId : n.personId;
+        if (personId && !set.has(personId)) {
+            set.add(personId);
+            seen.push(personId);
         }
     }
     return seen;

@@ -5,13 +5,16 @@ import type {
     edgeSchema,
     edgeTypeSchema,
     extractedGraphSchema,
+    graphNodeSchema,
     graphQuerySchema,
     graphSchema,
     ingestDocumentSchema,
     ingestResultSchema,
+    knowledgeGraphNodeSchema,
     nodeOriginSchema,
     nodeSchema,
     nodeTypeSchema,
+    personGraphNodeSchema,
     scoredChunkSchema,
     scoredNodeSchema,
     searchKnowledgeSchema,
@@ -38,6 +41,9 @@ export type ScoredNode = z.infer<typeof scoredNodeSchema>;
 export type SearchResult = z.infer<typeof searchResultSchema>;
 
 export type GraphQuery = z.infer<typeof graphQuerySchema>;
+export type PersonGraphNode = z.infer<typeof personGraphNodeSchema>;
+export type KnowledgeGraphNode = z.infer<typeof knowledgeGraphNodeSchema>;
+export type GraphNode = z.infer<typeof graphNodeSchema>;
 export type Graph = z.infer<typeof graphSchema>;
 
 export type ExtractedGraph = z.infer<typeof extractedGraphSchema>;

@@ -16,11 +16,15 @@ vi.mock("../../repository/graph", () => ({
     expandGraph: vi.fn(),
     listGraph: vi.fn(),
 }));
+vi.mock("@/server/authorization/resolve-access-scope", () => ({
+    resolveAccessScope: vi.fn(),
+}));
 
 import type {
     ExtractedGraph,
     IngestDocument,
 } from "@/core/knowledge/domain/types";
+import { resolveAccessScope } from "@/server/authorization/resolve-access-scope";
 import type {
     ChunkRow,
     KnowledgeEdgeRow,
@@ -203,6 +207,10 @@ describe("ingestDocumentService", () => {
 describe("searchKnowledgeService", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(resolveAccessScope).mockResolvedValue({
+            accessToken: ["person-u1"],
+            defaultAccess: "open",
+        });
         vi.mocked(searchChunks).mockResolvedValue([
             { row: chunkRow({ id: "c1" }), score: 0.9 },
         ]);
@@ -219,6 +227,7 @@ describe("searchKnowledgeService", () => {
 
         const result = await searchKnowledgeService(
             ORG,
+            "u1",
             { query: "why postgres", limit: 8, hops: 1 },
             { embed: fakeEmbed },
         );
@@ -239,6 +248,7 @@ describe("searchKnowledgeService", () => {
     it("skips graph expansion when hops=0", async () => {
         const result = await searchKnowledgeService(
             ORG,
+            "u1",
             { query: "why postgres", limit: 8, hops: 0 },
             { embed: fakeEmbed },
         );

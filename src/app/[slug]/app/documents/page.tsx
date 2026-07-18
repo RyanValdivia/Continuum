@@ -5,10 +5,9 @@ import DocumentReviewsTableServer from "@/core/document-review/client/ui/table/s
 import { documentReviewSearchSchema } from "@/core/document-review/domain/schemas";
 import { documentReviewsSearchParamsCache } from "@/core/document-review/domain/search-params";
 import { DataTableSkeleton } from "@/frontend/components/data-table/data-table-skeleton";
+import { ORG_ADMIN_ROLES } from "@/server/auth/get-org-membership";
 import { requireAuth } from "@/server/auth/require-auth";
 import { requireOrganization } from "@/server/auth/require-organization";
-
-const ADMIN_ROLES = new Set(["owner", "admin"]);
 
 /**
  * Server entry for `/documents`. Owner/admin-only surface — this is a UI gate;
@@ -29,7 +28,7 @@ export default async function DocumentsPage({
     const { user } = await requireAuth();
     const { slug } = await params;
     const { organization, role } = await requireOrganization(slug, user.id);
-    if (!ADMIN_ROLES.has(role)) notFound();
+    if (!ORG_ADMIN_ROLES.has(role)) notFound();
 
     const options = documentReviewSearchSchema.parse(
         await documentReviewsSearchParamsCache.parse(searchParams),

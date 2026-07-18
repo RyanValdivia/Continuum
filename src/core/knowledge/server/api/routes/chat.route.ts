@@ -38,7 +38,7 @@ const emptyResult = (query: string) => ({
  */
 export const chatRoute = new Elysia().use(authed).post(
     "/chat",
-    async ({ session, body, status }) => {
+    async ({ session, user, body, status }) => {
         const org = requireActiveOrg(session);
         if (!org.ok) return status(403, errorToResponse(org.error));
 
@@ -54,7 +54,7 @@ export const chatRoute = new Elysia().use(authed).post(
 
         // Retrieve grounding context; a retrieval failure degrades to no context
         // rather than failing the whole turn.
-        const search = await searchKnowledgeService(org.data, {
+        const search = await searchKnowledgeService(org.data, user.id, {
             query,
             personId: body.personId,
             limit: 8,

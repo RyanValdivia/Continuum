@@ -108,13 +108,38 @@ export const searchResultSchema = z.object({
 });
 
 // ── Graph view ────────────────────────────────────────────────────────────────
+// The visualization graph mixes two node kinds: `knowledge` (decisions,
+// processes, concepts, documents — same shape as `nodeSchema`) and `person`
+// (an org member, synthesized from their `principal` row). A person is
+// deliberately NOT part of `nodeTypeSchema` — see the comment on
+// `knowledge_nodes` in the Drizzle schema — so this lives as its own
+// discriminated union rather than widening that enum.
 export const graphQuerySchema = z.object({
     personId: z.string().trim().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(500).default(200),
 });
 
+export const personGraphNodeSchema = z.object({
+    kind: z.literal("person"),
+    id: z.string(),
+    label: z.string(),
+    /** The Better Auth user id — the same value knowledge nodes' `personId`
+     *  attribution already carries, so this exposes nothing new. Lets the
+     *  client tie a person node back to the knowledge it authored. */
+    userId: z.string(),
+});
+
+export const knowledgeGraphNodeSchema = nodeSchema.extend({
+    kind: z.literal("knowledge"),
+});
+
+export const graphNodeSchema = z.discriminatedUnion("kind", [
+    personGraphNodeSchema,
+    knowledgeGraphNodeSchema,
+]);
+
 export const graphSchema = z.object({
-    nodes: z.array(nodeSchema),
+    nodes: z.array(graphNodeSchema),
     edges: z.array(edgeSchema),
 });
 
