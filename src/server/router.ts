@@ -11,6 +11,7 @@ import { knowledgeRouter } from "@/core/knowledge/server/api/router";
 import { microsoftRouter } from "@/core/microsoft/server/api/router";
 import { notionRouter } from "@/core/notion/server/api/router";
 import { projectRouter } from "@/core/project/server/api/router";
+import { recruitmentRouter } from "@/core/recruitment/server/api/router";
 import { slackRouter } from "@/core/slack/server/api/router";
 import { auth } from "./auth/auth";
 import type { APIResponse } from "./common/responses";
@@ -75,10 +76,10 @@ const app = new Elysia({ prefix: "/api/v1" })
     })
     .use(projectRouter)
     .use(knowledgeRouter)
-    .use(notionRouter)
     .use(microsoftRouter)
     .use(slackRouter)
-    .use(documentReviewRouter);
+    .use(documentReviewRouter)
+    .use(recruitmentRouter);
 
 export default app;
 export type AppRouter = typeof app;

@@ -33,6 +33,8 @@ export const knowledgeNodeType = pgEnum("knowledge_node_type", [
     "process",
     "concept",
     "document",
+    "person",
+    "vacancy",
 ]);
 export const knowledgeNodeOrigin = pgEnum("knowledge_node_origin", [
     "sync",
@@ -146,8 +148,9 @@ export const chunks = pgTable(
 
 /**
  * A knowledge-graph node: a decision, process, concept, or document distilled
- * from the source. `personId` is the attribution seam (retrieval scopes on it).
- * A person is NOT a node type — attribution stays a single column write.
+ * from the source — or a structural node: `person` (an org member; id =
+ * member.id) and `vacancy` (an open role; a departed member's node flips to
+ * this type in place, keeping every `personId` attribution).
  */
 export const knowledgeNodes = pgTable(
     "knowledge_nodes",

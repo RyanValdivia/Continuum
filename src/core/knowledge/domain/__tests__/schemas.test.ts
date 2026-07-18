@@ -2,8 +2,16 @@ import { describe, expect, it } from "vitest";
 import {
     extractedGraphSchema,
     ingestDocumentSchema,
+    nodeTypeSchema,
     searchKnowledgeSchema,
 } from "../schemas";
+
+describe("nodeTypeSchema", () => {
+    it("accepts structural person and vacancy node types", () => {
+        expect(nodeTypeSchema.parse("person")).toBe("person");
+        expect(nodeTypeSchema.parse("vacancy")).toBe("vacancy");
+    });
+});
 
 describe("ingestDocumentSchema", () => {
     it("defaults extract to true and trims fields", () => {

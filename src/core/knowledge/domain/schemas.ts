@@ -12,6 +12,18 @@ export const nodeTypeSchema = z.enum([
     "process",
     "concept",
     "document",
+    "person",
+    "vacancy",
+]);
+
+/** Content node types the LLM extractor may emit — structural types
+ *  (`person`, `vacancy`) are created by the recruitment domain, never by
+ *  extraction. */
+export const extractedNodeTypeSchema = z.enum([
+    "decision",
+    "process",
+    "concept",
+    "document",
 ]);
 export const nodeOriginSchema = z.enum(["sync", "interview", "manual"]);
 export const edgeTypeSchema = z.enum([
@@ -131,7 +143,7 @@ export const extractedGraphSchema = z.object({
         .array(
             z.object({
                 tempId: z.string(),
-                type: nodeTypeSchema,
+                type: extractedNodeTypeSchema,
                 label: z.string().min(1).max(200),
                 summary: z.string().max(2000).optional(),
             }),

@@ -2,12 +2,14 @@
 
 import type { LucideIcon } from "lucide-react";
 import {
+    Briefcase,
     ClipboardCheck,
     FolderKanban,
     LayoutDashboard,
     LogOut,
     Plug,
     Sparkles,
+    Users,
     Waypoints,
 } from "lucide-react";
 import Link from "next/link";
@@ -45,6 +47,13 @@ const NAV: NavItem[] = [
         title: "Documentos",
         segment: "documents",
         icon: ClipboardCheck,
+        adminOnly: true,
+    },
+    { title: "Personas", segment: "people", icon: Users, adminOnly: true },
+    {
+        title: "Contratación",
+        segment: "hiring",
+        icon: Briefcase,
         adminOnly: true,
     },
     { title: "Integraciones", segment: "integrations", icon: Plug },
