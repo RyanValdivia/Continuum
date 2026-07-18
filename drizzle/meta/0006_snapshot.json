@@ -1,6 +1,6 @@
 {
-  "id": "cfe547a7-d53a-40a7-b1de-1306a729743c",
-  "prevId": "92f025c2-bab5-414b-82d2-909f781d5cf4",
+  "id": "92f025c2-bab5-414b-82d2-909f781d5cf4",
+  "prevId": "03964359-f6aa-40fd-8fec-9054b0e9563f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1952,7 +1952,6 @@
       "schema": "public",
       "values": [
         "notion",
-        "slack",
         "manual"
       ]
     },

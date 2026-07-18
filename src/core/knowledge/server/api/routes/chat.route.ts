@@ -10,10 +10,10 @@ import { Elysia } from "elysia";
 import { z } from "zod";
 import { ServerConfig } from "@/config/server-config";
 import { authed } from "@/server/auth/middleware/authed";
+import { requireActiveOrg } from "@/server/auth/require-active-org";
 import { AppErrors, errorToResponse } from "@/server/common/responses";
 import { buildSystemPrompt, latestUserText } from "../../chat/build-context";
 import { searchKnowledgeService } from "../../services/search-knowledge-service";
-import { requireActiveOrg } from "../require-active-org";
 
 const google = createGoogleGenerativeAI({ apiKey: ServerConfig.googleApiKey });
 const CHAT_MODEL = "gemini-2.5-flash";
