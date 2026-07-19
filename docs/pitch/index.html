@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Continuum — Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  /* brand blue — matched to app globals.css oklch(0.52 0.18 256) */
+  --primary: oklch(0.52 0.18 256);
+  --primary-hi: oklch(0.62 0.19 256);
+  --primary-deep: oklch(0.42 0.17 262);
+  --edge: oklch(0.68 0.13 220);        /* analogous cyan for graph edges */
+  --good: oklch(0.62 0.15 155);
+  --warn: oklch(0.75 0.16 70);
+  --bad:  oklch(0.58 0.22 27);
+
+  /* blue-biased neutrals (chosen, not default grey) */
+  --bg:        oklch(0.99 0.004 256);
+  --bg-2:      oklch(0.975 0.006 256);
+  --panel:     oklch(1 0 0);
+  --fg:        oklch(0.17 0.012 262);
+  --muted:     oklch(0.5 0.02 258);
+  --line:      oklch(0.91 0.008 256);
+  --line-soft: oklch(0.94 0.006 256);
+
+  --radius: 14px;
+  --maxw: 1120px;
+  --font: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --primary: oklch(0.66 0.17 256);
+    --primary-hi: oklch(0.74 0.15 256);
+    --primary-deep: oklch(0.5 0.18 262);
+    --edge: oklch(0.72 0.12 220);
+    --bg:        oklch(0.155 0.015 262);
+    --bg-2:      oklch(0.185 0.017 262);
+    --panel:     oklch(0.215 0.018 262);
+    --fg:        oklch(0.97 0.01 256);
+    --muted:     oklch(0.72 0.03 256);
+    --line:      oklch(1 0 0 / 12%);
+    --line-soft: oklch(1 0 0 / 7%);
+  }
+}
+:root[data-theme="dark"]{
+  --primary: oklch(0.66 0.17 256);
+  --primary-hi: oklch(0.74 0.15 256);
+  --primary-deep: oklch(0.5 0.18 262);
+  --edge: oklch(0.72 0.12 220);
+  --bg:        oklch(0.155 0.015 262);
+  --bg-2:      oklch(0.185 0.017 262);
+  --panel:     oklch(0.215 0.018 262);
+  --fg:        oklch(0.97 0.01 256);
+  --muted:     oklch(0.72 0.03 256);
+  --line:      oklch(1 0 0 / 12%);
+  --line-soft: oklch(1 0 0 / 7%);
+}
+:root[data-theme="light"]{
+  --primary: oklch(0.52 0.18 256);
+  --primary-hi: oklch(0.62 0.19 256);
+  --primary-deep: oklch(0.42 0.17 262);
+  --edge: oklch(0.68 0.13 220);
+  --bg:        oklch(0.99 0.004 256);
+  --bg-2:      oklch(0.975 0.006 256);
+  --panel:     oklch(1 0 0);
+  --fg:        oklch(0.17 0.012 262);
+  --muted:     oklch(0.5 0.02 258);
+  --line:      oklch(0.91 0.008 256);
+  --line-soft: oklch(0.94 0.006 256);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--fg);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+
+/* ---------- deck mechanics ---------- */
+#deck{
+  display:flex;
+  width:100vw;height:100vh;height:100dvh;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;
+}
+#deck::-webkit-scrollbar{display:none}
+.slide{
+  position:relative;
+  flex:0 0 100vw;
+  width:100vw;height:100vh;height:100dvh;
+  scroll-snap-align:center;scroll-snap-stop:always;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(28px,5.5vh,68px) clamp(24px,6vw,90px);
+  overflow:hidden;
+}
+.inner{width:100%;max-width:var(--maxw);margin:0 auto}
+
+/* progress + chrome */
+#bar{position:fixed;top:0;left:0;height:3px;background:var(--primary);width:0;z-index:60;transition:width .35s cubic-bezier(.2,.7,.2,1)}
+#chrome{position:fixed;bottom:18px;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:center;gap:16px;pointer-events:none}
+#dots{display:flex;gap:8px;pointer-events:auto;background:color-mix(in oklab,var(--panel) 78%,transparent);border:1px solid var(--line);border-radius:999px;padding:8px 12px;backdrop-filter:blur(10px)}
+.dot{width:8px;height:8px;border-radius:50%;border:none;background:var(--line);cursor:pointer;padding:0;transition:transform .2s,background .2s}
+.dot:hover{background:var(--muted)}
+.dot[aria-current="true"]{background:var(--primary);transform:scale(1.35)}
+#count{position:fixed;bottom:20px;right:24px;z-index:60;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.05em}
+#brandmini{position:fixed;top:18px;left:24px;z-index:60;display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px;letter-spacing:-.01em}
+#brandmini svg{width:20px;height:20px;color:var(--primary)}
+#themeBtn{position:fixed;top:16px;right:22px;z-index:61;pointer-events:auto;border:1px solid var(--line);background:color-mix(in oklab,var(--panel) 80%,transparent);color:var(--muted);border-radius:999px;width:34px;height:34px;cursor:pointer;font-size:15px;display:grid;place-items:center;backdrop-filter:blur(10px)}
+#themeBtn:hover{color:var(--fg);border-color:var(--primary)}
+.arrow{position:fixed;top:50%;transform:translateY(-50%);z-index:60;pointer-events:auto;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:color-mix(in oklab,var(--panel) 70%,transparent);color:var(--muted);cursor:pointer;font-size:20px;display:grid;place-items:center;backdrop-filter:blur(8px);transition:.2s;opacity:.5}
+.arrow:hover{opacity:1;color:var(--fg);border-color:var(--primary)}
+#prev{left:16px}#next{right:16px}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:6px}
+
+/* ---------- typography ---------- */
+.eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--primary);display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--primary);opacity:.6}
+h1{font-size:clamp(38px,6.4vw,84px);font-weight:900;letter-spacing:-.035em;line-height:.98;text-wrap:balance}
+h2{font-size:clamp(28px,4.4vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1.04;text-wrap:balance}
+h3{font-size:clamp(17px,1.5vw,20px);font-weight:700;letter-spacing:-.01em}
+.lead{font-size:clamp(16px,1.7vw,21px);line-height:1.5;color:var(--muted);max-width:58ch;text-wrap:pretty}
+.sm{font-size:14px;line-height:1.55;color:var(--muted)}
+strong.k{color:var(--fg);font-weight:700}
+.grad{color:var(--primary)}
+@supports (-webkit-background-clip:text){
+  @media screen{
+    .grad{background:linear-gradient(100deg,var(--primary),var(--edge));-webkit-background-clip:text;background-clip:text;color:transparent}
+  }
+}
+
+/* ---------- reusable ---------- */
+.grid{display:grid;gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 20px}
+.card .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:color-mix(in oklab,var(--primary) 14%,transparent);color:var(--primary);margin-bottom:14px;font-size:19px}
+.pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.tag-good{color:var(--good);border-color:color-mix(in oklab,var(--good) 45%,var(--line))}
+.stat{font-size:clamp(34px,5vw,56px);font-weight:900;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.stat .u{font-size:.45em;font-weight:700;color:var(--muted);letter-spacing:-.01em}
+.divider{height:1px;background:var(--line);margin:26px 0}
+
+/* cover */
+#cover{align-items:flex-start}
+#cnv{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+#cover .inner{position:relative;z-index:2}
+#cover::after{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(120% 90% at 15% 20%,transparent 40%,var(--bg) 92%);pointer-events:none}
+.logo-lockup{display:flex;align-items:center;gap:16px;margin-bottom:34px}
+.logo-lockup svg{width:clamp(48px,6vw,68px);height:auto;color:var(--primary)}
+.logo-lockup .wm{font-size:clamp(28px,3.4vw,40px);font-weight:800;letter-spacing:-.03em}
+.cover-foot{display:flex;gap:26px;flex-wrap:wrap;margin-top:40px;align-items:center}
+.cover-foot .pill{background:var(--panel)}
+
+/* problem */
+.pain{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
+.big-quote{font-size:clamp(24px,3vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1.15;max-width:20ch}
+
+/* loop diagram */
+.loop{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:34px;position:relative}
+.loop-step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 14px;position:relative;text-align:center}
+.loop-step .n{font-family:var(--mono);font-size:11px;color:var(--primary);font-weight:600}
+.loop-step .t{font-weight:700;font-size:15px;margin:8px 0 5px}
+.loop-step .d{font-size:12.5px;color:var(--muted);line-height:1.4}
+.loop-step:not(:last-child)::after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--primary);font-weight:800;z-index:3}
+.loop-back{margin-top:14px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--edge);letter-spacing:.03em}
+
+/* screens */
+.screens{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.screen{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;position:relative;overflow:hidden}
+.screen .num{position:absolute;top:12px;right:14px;font-family:var(--mono);font-size:12px;color:var(--line);font-weight:600}
+.screen h3{font-size:15px;margin-bottom:6px}
+.screen p{font-size:12.5px;color:var(--muted);line-height:1.45}
+.screen .mini{margin-top:12px;height:52px;border-radius:8px;border:1px solid var(--line-soft);background:var(--bg-2);position:relative;overflow:hidden}
+
+/* value */
+.vcols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+
+/* market */
+.market{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;align-items:center}
+.rings{position:relative;aspect-ratio:1;max-width:280px;margin:0 auto;width:100%}
+.ring{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:14px;font-weight:800}
+.r1{inset:0;background:color-mix(in oklab,var(--primary) 10%,var(--panel));border:1px solid color-mix(in oklab,var(--primary) 25%,var(--line))}
+.r2{inset:19%;background:color-mix(in oklab,var(--primary) 18%,var(--panel));border:1px solid color-mix(in oklab,var(--primary) 35%,var(--line))}
+.r3{inset:35%;background:var(--primary);color:#fff;justify-content:center;padding-top:0;text-align:center}
+.ring .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;opacity:.85;font-weight:600}
+.ring .val{font-size:clamp(15px,1.8vw,22px);letter-spacing:-.02em}
+.r3 .val{font-size:clamp(15px,1.9vw,20px)}
+.tailwinds{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+.tw{display:flex;gap:12px;align-items:baseline}
+.tw .v{font-family:var(--mono);font-weight:600;color:var(--primary);font-size:14px;min-width:66px}
+
+/* table */
+.twrap{overflow-x:auto;margin-top:22px;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line-soft)}
+thead th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.feat{font-weight:600;color:var(--fg)}
+.mark{font-weight:800}
+.yes{color:var(--good)}.no{color:var(--bad)}.mid{color:var(--warn)}
+tr.us{background:color-mix(in oklab,var(--primary) 9%,transparent)}
+tr.us td{border-color:color-mix(in oklab,var(--primary) 20%,var(--line))}
+tr.us td.feat{color:var(--primary)}
+
+/* moat */
+.moat{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.moat .card h3{margin-bottom:8px}
+
+/* biz */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:6px}
+.tier{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.tier.hi{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+.tier .price{font-size:30px;font-weight:900;letter-spacing:-.03em;margin:6px 0 2px}
+.tier .price span{font-size:14px;color:var(--muted);font-weight:600}
+.tier ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.tier li{font-size:13px;color:var(--muted);display:flex;gap:8px}
+.tier li::before{content:"→";color:var(--primary)}
+.solo-wrap{display:flex;justify-content:center}
+.tier.solo{max-width:640px;width:100%;padding:30px 34px}
+.solo-feats{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:11px 28px;margin-top:2px}
+.solo-feats li{font-size:13.5px;color:var(--muted);display:flex;gap:8px;line-height:1.35}
+.solo-feats li::before{content:"→";color:var(--primary)}
+.blist{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.blist li{font-size:13px;color:var(--muted);line-height:1.4;display:flex;gap:9px}
+.blist li::before{content:"→";color:var(--primary);flex:none;font-weight:700}
+.blist li strong{color:var(--fg);font-weight:600}
+
+/* roadmap */
+.rm{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+.rm .col{border-top:2px solid var(--line);padding-top:14px}
+.rm .col.done{border-top-color:var(--good)}
+.rm .col.now{border-top-color:var(--primary)}
+.rm .q{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;margin-bottom:10px}
+.rm .col.done .q{color:var(--good)}
+.rm .col.now .q{color:var(--primary)}
+.rm ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.rm li{font-size:12.5px;color:var(--muted);line-height:1.35}
+
+/* close */
+#close{background:linear-gradient(150deg,var(--primary-deep),var(--primary));color:#fff}
+#close .eyebrow{color:#fff}#close .eyebrow::before{background:#fff}
+#close h1{color:#fff}
+#close .lead{color:rgba(255,255,255,.85)}
+#close .pill{border-color:rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.08)}
+.team{display:flex;gap:28px;flex-wrap:wrap;margin-top:30px;font-size:14px}
+
+/* utilities */
+.mt8{margin-top:8px}.mt16{margin-top:16px}.mt24{margin-top:24px}.mt32{margin-top:32px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.src{font-family:var(--mono);font-size:10.5px;color:var(--muted);opacity:.75;margin-top:14px;letter-spacing:.02em}
+
+/* ---------- print / PDF: one slide per landscape page ---------- */
+@media print{
+  /* force readable light palette on white paper */
+  :root{
+    --primary: oklch(0.52 0.18 256); --primary-hi: oklch(0.62 0.19 256); --primary-deep: oklch(0.42 0.17 262);
+    --edge: oklch(0.68 0.13 220);
+    --bg: oklch(0.99 0.004 256); --bg-2: oklch(0.975 0.006 256); --panel: oklch(1 0 0);
+    --fg: oklch(0.17 0.012 262); --muted: oklch(0.5 0.02 258);
+    --line: oklch(0.91 0.008 256); --line-soft: oklch(0.94 0.006 256);
+  }
+  @page{ size: 1280px 720px; margin:0; }
+  html,body{ overflow:visible!important; height:auto!important; width:auto!important; }
+  body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  #deck{ display:block!important; width:auto!important; height:auto!important; overflow:visible!important; }
+  .slide{
+    width:1280px!important; height:720px!important; flex:none!important;
+    scroll-snap-align:none!important; break-inside:avoid;
+    justify-content:flex-start!important;      /* top-align so eyebrow never clips */
+    padding:52px 90px 36px!important;
+  }
+  #cover{ justify-content:center!important; }   /* cover stays centered */
+  .slide:not(:last-child){ break-after:page; page-break-after:always; }
+  #bar,#chrome,#count,#themeBtn,.arrow,#brandmini,#cnv{ display:none!important; }
+  #cover{ background:linear-gradient(155deg, color-mix(in oklab,var(--primary) 13%,var(--bg)), var(--bg) 62%)!important; }
+  #cover::after{ display:none; }
+  /* Chrome prints media queries at ~letter width → the 820px breakpoint fires wrongly.
+     Restore the intended desktop grids so slides mirror the on-screen layout. */
+  .pain,.vcols,.screens{ grid-template-columns:repeat(3,1fr)!important; }
+  .loop{ grid-template-columns:repeat(5,1fr)!important; }
+  .tiers{ grid-template-columns:repeat(3,1fr)!important; }
+  .rm{ grid-template-columns:repeat(4,1fr)!important; }
+  .market,.moat{ grid-template-columns:1.1fr 1fr!important; }
+  .loop-step:not(:last-child)::after{ display:block!important; }
+}
+
+/* responsive */
+@media (max-width:820px){
+  .pain,.loop,.screens,.vcols,.tiers,.rm{grid-template-columns:1fr 1fr}
+  .market,.moat{grid-template-columns:1fr}
+  .loop-step:not(:last-child)::after{display:none}
+  .arrow{display:none}
+}
+@media (max-width:520px){
+  .pain,.loop,.screens,.vcols,.tiers,.rm,.solo-feats{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="bar"></div>
+<div id="brandmini" aria-hidden="true">
+  <svg viewBox="0 0 200 196" fill="none" aria-hidden="true"><circle cx="36" cy="98" r="28" fill="currentColor"/><circle cx="160" cy="40" r="20" stroke="currentColor" stroke-width="15"/><circle cx="160" cy="156" r="20" stroke="currentColor" stroke-width="15"/><path d="M56 66 C72 44 116 37 135 47" stroke="currentColor" stroke-width="15" stroke-linecap="round"/><path d="M56 130 C72 152 116 159 135 149" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg>
+  Continuum
+</div>
+<button id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">◐</button>
+<button class="arrow" id="prev" aria-label="Anterior">‹</button>
+<button class="arrow" id="next" aria-label="Siguiente">›</button>
+
+<main id="deck">
+
+  <!-- 1 · COVER -->
+  <section class="slide" id="cover" data-title="Portada">
+    <canvas id="cnv"></canvas>
+    <div class="inner">
+      <div class="logo-lockup">
+        <svg viewBox="0 0 200 196" fill="none" aria-label="Continuum"><circle cx="36" cy="98" r="28" fill="currentColor"/><circle cx="160" cy="40" r="20" stroke="currentColor" stroke-width="15"/><circle cx="160" cy="156" r="20" stroke="currentColor" stroke-width="15"/><path d="M56 66 C72 44 116 37 135 47" stroke="currentColor" stroke-width="15" stroke-linecap="round"/><path d="M56 130 C72 152 116 159 135 149" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg>
+        <span class="wm">Continuum</span>
+      </div>
+      <h1>La memoria viva<br/>de tu organización.</h1>
+      <p class="lead mt24">Conectamos tus fuentes y construimos un <strong class="k">grafo de conocimiento</strong> propio: quién sabe qué, qué decisiones se tomaron y por qué. Un solo ciclo que empieza <em>antes</em> de contratar y sigue mientras la persona crece.</p>
+      <div class="cover-foot">
+        <span class="pill">◆ Knowledge Graph</span>
+        <span class="pill">◇ Agente por persona</span>
+        <span class="pill">◇ Contratación · Onboarding</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · PROBLEM -->
+  <section class="slide" data-title="Problema">
+    <div class="inner">
+      <div class="eyebrow">El problema</div>
+      <h2>El conocimiento se va<br/>por la puerta.</h2>
+      <p class="lead mt24">Cuando alguien clave renuncia, no pierdes un asiento: pierdes el <strong class="k">contexto</strong>. Por qué se decidió algo, cómo funciona de verdad ese proceso, a quién preguntarle. Ese saber vive en cabezas, chats y docs dispersos — nunca en un solo lugar.</p>
+      <div class="pain">
+        <div class="card">
+          <div class="ic">⚠</div>
+          <h3>Bus factor invisible</h3>
+          <p class="sm mt8">Roles críticos dependen de una sola persona. Nadie lo mide hasta que es tarde.</p>
+        </div>
+        <div class="card">
+          <div class="ic">⌛</div>
+          <h3>Onboarding lento</h3>
+          <p class="sm mt8">El nuevo tarda meses en entender "cómo se hacen las cosas aquí". El que sabía ya no está.</p>
+        </div>
+        <div class="card">
+          <div class="ic">◎</div>
+          <h3>Contratar a ciegas</h3>
+          <p class="sm mt8">Se filtra por keywords del CV, no por el conocimiento real que exige el puesto.</p>
+        </div>
+      </div>
+      <p class="src">Estimaciones sector: reemplazar un rol cualificado cuesta 50–200% de su salario anual; un empleado nuevo alcanza plena productividad en ~8–12 meses. (Rangos de industria HR, ilustrativos.)</p>
+    </div>
+  </section>
+
+  <!-- 3 · SOLUTION -->
+  <section class="slide" style="background:var(--bg-2)" data-title="Solución">
+    <div class="inner">
+      <div class="eyebrow">La solución</div>
+      <div class="row" style="gap:40px;align-items:center">
+        <div style="flex:1 1 380px">
+          <h2>Nuestra solución es<br/><span class="grad">el grafo de conocimiento.</span></h2>
+          <p class="lead mt24">Continuum construye un <strong class="k">mapa vivo de cómo trabaja tu empresa</strong>: cada persona es un nodo, con sus documentos, decisiones y relaciones. Un activo que solo tú tienes.</p>
+          <p class="lead mt16">Sobre ese grafo montamos un ciclo único — capturar, contratar mejor y acelerar el onboarding — todo con las <strong class="k">mismas fuentes de verdad</strong>, siempre citadas.</p>
+        </div>
+        <div style="flex:1 1 300px">
+          <div class="card" style="padding:26px">
+            <div class="pill tag-good">✓ Defensible por diseño</div>
+            <p class="mt16" style="font-size:15px;line-height:1.55;color:var(--fg)">El grafo se construye con <strong class="k">tus datos, tu historial y tu forma real de trabajar</strong>. No es replicable desde fuera: cuanto más lo usas, más completo y más valioso se vuelve. Ese es el foso.</p>
+            <div class="divider"></div>
+            <div class="row" style="gap:26px">
+              <div><div class="stat">1</div><div class="sm">grafo por org</div></div>
+              <div><div class="stat">∞</div><div class="sm">fuentes conectables</div></div>
+              <div><div class="stat">100%</div><div class="sm">respuestas con fuente</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · HOW IT WORKS -->
+  <section class="slide" data-title="Cómo funciona">
+    <div class="inner">
+      <div class="eyebrow">Cómo funciona · el ciclo unificado</div>
+      <h2>Un solo ciclo de conocimiento.</h2>
+      <p class="lead mt16">No son piezas sueltas. Cada etapa alimenta al grafo, y el grafo potencia la siguiente etapa.</p>
+      <div class="loop">
+        <div class="loop-step"><div class="n">01</div><div class="t">Conectar</div><div class="d">Notion, Slack, M365, Drive → ingesta a un grafo.</div></div>
+        <div class="loop-step"><div class="n">02</div><div class="t">Mapear</div><div class="d">Nodos por persona, decisión, proceso. Bus factor visible.</div></div>
+        <div class="loop-step"><div class="n">03</div><div class="t">Contratar</div><div class="d">Vacante desde el perfil real del rol. CVs vs conocimiento.</div></div>
+        <div class="loop-step"><div class="n">04</div><div class="t">Entrevistar</div><div class="d">Preguntas generadas + qué competencia mide cada una.</div></div>
+        <div class="loop-step"><div class="n">05</div><div class="t">Onboarding</div><div class="d">Plan automático + agente que responde con el historial real.</div></div>
+      </div>
+      <div class="loop-back">↺ el nuevo empleado genera conocimiento → vuelve al grafo</div>
+    </div>
+  </section>
+
+  <!-- 5 · PRODUCT / SCREENS -->
+  <section class="slide" style="background:var(--bg-2)" data-title="Producto">
+    <div class="inner">
+      <div class="eyebrow">El producto · 6 pantallas, una narrativa</div>
+      <h2>De captura a contratación<br/>a onboarding — en 5 minutos.</h2>
+      <div class="screens">
+        <div class="screen"><span class="num">01</span><h3>Dashboard</h3><p>Knowledge Score, gente clave y vacantes. Grafo visual de nodos-persona.</p><div class="mini" data-mini="dash"></div></div>
+        <div class="screen"><span class="num">02</span><h3>Perfil de persona</h3><p>Docs, decisiones y un botón: "Hablar con el agente de María".</p><div class="mini" data-mini="person"></div></div>
+        <div class="screen"><span class="num">03</span><h3>Nueva vacante</h3><p>"Reemplazar a María" → la IA autocompleta el puesto desde su nodo.</p><div class="mini" data-mini="vac"></div></div>
+        <div class="screen"><span class="num">04</span><h3>Match de CVs</h3><p>Tabla de compatibilidad con % y el porqué — no keyword matching.</p><div class="mini" data-mini="match"></div></div>
+        <div class="screen"><span class="num">05</span><h3>Entrevista</h3><p>Preguntas generadas, cada una con la competencia que mide.</p><div class="mini" data-mini="int"></div></div>
+        <div class="screen"><span class="num">06</span><h3>Onboarding + Chat</h3><p>Plan día a día con "Preguntar al agente". Chat que cita fuentes internas.</p><div class="mini" data-mini="chat"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · VALUE PROP -->
+  <section class="slide" data-title="Propuesta de valor">
+    <div class="inner">
+      <div class="eyebrow">Propuesta de valor</div>
+      <h2>Un activo, tres retornos.</h2>
+      <p class="lead mt16">El mismo grafo paga tres veces. Ese es el argumento de compra.</p>
+      <div class="vcols mt24">
+        <div class="card">
+          <div class="ic">◆</div>
+          <h3>Captura el conocimiento</h3>
+          <p class="sm mt8">Convierte chats, docs y decisiones dispersas en memoria consultable. Mide tu bus factor y reduce el riesgo antes de que alguien se vaya.</p>
+          <div class="pill mt16">Reduce riesgo de continuidad</div>
+        </div>
+        <div class="card">
+          <div class="ic">◎</div>
+          <h3>Contrata mejor</h3>
+          <p class="sm mt8">Compara candidatos contra el conocimiento real del puesto, no contra keywords. Entrevistas con foco en las competencias que faltan.</p>
+          <div class="pill mt16">Mejor señal, menos sesgo</div>
+        </div>
+        <div class="card">
+          <div class="ic">↗</div>
+          <h3>Onboarding acelerado</h3>
+          <p class="sm mt8">Plan generado automáticamente + un agente que responde "cómo se hace aquí" con el historial real. Semanas, no meses.</p>
+          <div class="pill mt16">Time-to-productivity ↓</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · MARKET -->
+  <section class="slide" style="background:var(--bg-2)" data-title="Mercado">
+    <div class="inner">
+      <div class="eyebrow">Mercado</div>
+      <div class="market">
+        <div>
+          <h2>Tres presupuestos<br/>que hoy compras por separado.</h2>
+          <p class="lead mt16">Continuum toca gestión del conocimiento, reclutamiento y onboarding — mercados que las empresas ya pagan con herramientas distintas. Nosotros los unimos sobre un solo grafo.</p>
+          <div class="tailwinds">
+            <div class="tw"><span class="v">Viento 1</span><span class="sm">La IA generativa vuelve por fin usable el conocimiento no estructurado de la empresa.</span></div>
+            <div class="tw"><span class="v">Viento 2</span><span class="sm">Rotación alta + trabajo distribuido → la pérdida de contexto es un dolor de CEO.</span></div>
+            <div class="tw"><span class="v">Viento 3</span><span class="sm">"Search empresarial con IA" (Glean, etc.) valida el presupuesto y educa al mercado.</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="rings" role="img" aria-label="TAM SAM SOM">
+            <div class="ring r1"><span class="lbl">TAM</span><span class="val">~US$60B+</span></div>
+            <div class="ring r2"><span class="lbl">SAM</span><span class="val">~US$12B</span></div>
+            <div class="ring r3"><div><span class="lbl">SOM</span><br/><span class="val">US$150M</span></div></div>
+          </div>
+          <p class="src">TAM = knowledge mgmt + recruiting + onboarding software combinados. SAM = empresas 50–2.000 empleados en mercados objetivo. SOM = meta alcanzable a 3–5 años. Cifras directivas, no auditadas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · EARLY ADOPTERS / ICP -->
+  <section class="slide" data-title="Early adopters">
+    <div class="inner">
+      <div class="eyebrow">Go-to-market · early adopters</div>
+      <h2>A quién le vendemos primero.</h2>
+      <p class="lead mt16">El conocimiento vive en cabezas, contratan seguido y ya usan Notion/Slack. Sienten el dolor hoy y deciden rápido.</p>
+      <div class="grid mt16" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card">
+          <div class="ic">◆</div>
+          <h3>Scale-ups tech</h3>
+          <p class="sm mt8">30–250 personas, crecen rápido, contratan cada mes, sin documentación formal. Ya viven en Notion + Slack.</p>
+          <div class="pill mt16">Dolor + velocidad</div>
+        </div>
+        <div class="card">
+          <div class="ic">◈</div>
+          <h3>Consultoras &amp; agencias</h3>
+          <p class="sm mt8">El conocimiento <em>es</em> el producto. Alta rotación, saber por proyecto/cliente, bus factor crítico.</p>
+          <div class="pill mt16">Conocimiento = negocio</div>
+        </div>
+        <div class="card">
+          <div class="ic">◇</div>
+          <h3>Equipos remote-first</h3>
+          <p class="sm mt8">Sin oficina donde "preguntar al de al lado". Contexto y onboarding son el cuello de botella.</p>
+          <div class="pill mt16">Contexto disperso</div>
+        </div>
+      </div>
+      <div class="grid mt16" style="grid-template-columns:1fr 1fr">
+        <div class="card">
+          <h3>Por qué son ideales como early adopters</h3>
+          <ul class="blist">
+            <li>Sienten el dolor <strong>hoy</strong>: rotación alta y contratación constante.</li>
+            <li>Fuentes ya conectables → el grafo <strong>se llena en horas</strong>, no meses.</li>
+            <li>Decisión rápida: founder / Head of People firma. Ciclo de venta corto.</li>
+            <li>Dispuestos a ser <strong>design partners</strong> a cambio de precio de lanzamiento.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Gatillo de compra</h3>
+          <ul class="blist">
+            <li>Renunció alguien clave y se llevó el contexto.</li>
+            <li>Van a <strong>duplicar el equipo</strong> (5+ roles abiertos).</li>
+            <li>Ronda nueva → presión por profesionalizar procesos.</li>
+            <li>Reemplazo o transición de un líder / fundador.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="src">Beachhead: scale-ups tech de 50–200, remote-first, hispanohablantes. No (todavía): enterprises 1000+ (ciclo largo, seguridad) ni equipos &lt;15 (aún no duele).</p>
+    </div>
+  </section>
+
+  <!-- 9 · COMPETITION -->
+  <section class="slide" data-title="Competencia">
+    <div class="inner">
+      <div class="eyebrow">Competencia</div>
+      <h2>Todos resuelven un tramo.<br/>Nadie cierra el ciclo.</h2>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Capacidad</th>
+              <th>Glean / Guru</th>
+              <th>Notion AI</th>
+              <th>ATS (Lever/Greenhouse)</th>
+              <th>LMS onboarding</th>
+              <th>Continuum</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="feat">Grafo de conocimiento propio</td><td class="mark mid">~</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark yes">✓</td></tr>
+            <tr><td class="feat">Agente por persona/rol</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark yes">✓</td></tr>
+            <tr><td class="feat">Match CV vs conocimiento real</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark mid">~</td><td class="mark no">✗</td><td class="mark yes">✓</td></tr>
+            <tr><td class="feat">Entrevistas por competencia</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark mid">~</td><td class="mark no">✗</td><td class="mark yes">✓</td></tr>
+            <tr><td class="feat">Onboarding con contexto real</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark mid">~</td><td class="mark yes">✓</td></tr>
+            <tr class="us"><td class="feat">Ciclo unificado sobre un grafo</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark no">✗</td><td class="mark yes">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="src">✓ nativo · ~ parcial / plugin · ✗ no lo hace. Los demás cubren búsqueda O contratación O formación; Continuum los conecta.</p>
+    </div>
+  </section>
+
+  <!-- 9 · MOAT -->
+  <section class="slide" style="background:var(--bg-2)" data-title="Diferenciador">
+    <div class="inner">
+      <div class="eyebrow">Por qué es defensible</div>
+      <h2>El foso es el grafo,<br/>y crece con el uso.</h2>
+      <div class="moat">
+        <div class="card"><h3>◆ Dato propietario</h3><p class="sm mt8">El grafo se construye con el historial único de cada empresa. No es replicable desde fuera ni por un competidor con más ingenieros.</p></div>
+        <div class="card"><h3>↗ Efecto acumulativo</h3><p class="sm mt8">Cada documento, decisión y contratación enriquece el grafo. Cuanto más se usa, mejor contrata y onboarda — y más caro es irse.</p></div>
+        <div class="card"><h3>⛓ Costo de cambio</h3><p class="sm mt8">Migrar significa reconstruir la memoria de la organización desde cero. El grafo se vuelve infraestructura, no una app más.</p></div>
+        <div class="card"><h3>◎ Un ciclo, no features</h3><p class="sm mt8">Los rivales tendrían que replicar captura + contratación + onboarding integrados. Nosotros vendemos el ciclo completo desde el día uno.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · BUSINESS MODEL (suggested) -->
+  <section class="slide" data-title="Modelo de negocio">
+    <div class="inner">
+      <div class="eyebrow">Modelo de negocio</div>
+      <h2>Un precio simple,<br/>todo incluido.</h2>
+      <p class="lead mt16">Asequible desde el día uno. Un solo plan por asiento — grafo, agentes, contratación y onboarding, sin módulos que cobrar aparte.</p>
+      <div class="solo-wrap mt24">
+        <div class="tier hi solo">
+          <div class="row" style="justify-content:space-between;align-items:flex-start;gap:16px">
+            <div>
+              <div class="pill tag-good">✦ Plan único · lanzamiento</div>
+              <div class="price" style="font-size:46px;margin-top:14px">US$8 <span>/ usuario · mes</span></div>
+              <p class="sm">Facturación mensual. Sin permanencia. Cancela cuando quieras.</p>
+            </div>
+            <span class="pill">◆ Todo el ciclo</span>
+          </div>
+          <div class="divider"></div>
+          <ul class="solo-feats">
+            <li>Grafo de conocimiento + chat con fuentes</li>
+            <li>Agente por persona / rol</li>
+            <li>Conectores: Notion · Slack · M365 · Drive</li>
+            <li>Contratación: vacante → ranking de CVs</li>
+            <li>Onboarding automático + Knowledge Score</li>
+            <li>Usuarios y equipos ilimitados</li>
+          </ul>
+        </div>
+      </div>
+      <p class="src">Precio de lanzamiento, ilustrativo. Enterprise (SSO, SLA, despliegue dedicado) a medida más adelante.</p>
+    </div>
+  </section>
+
+  <!-- 11 · ROADMAP (suggested) -->
+  <section class="slide" style="background:var(--bg-2)" data-title="Roadmap">
+    <div class="inner">
+      <div class="eyebrow">Estado &amp; roadmap</div>
+      <h2>Ya funciona end-to-end.</h2>
+      <p class="lead mt16">No es un mockup: grafo, chat con citas, conectores e ingesta ya corren.</p>
+      <div class="rm">
+        <div class="col done"><div class="q">✓ Construido</div><ul><li>Grafo + retrieval híbrido (vector + BFS)</li><li>Chat con fuentes citadas</li><li>Notion · Slack · M365 · Drive</li><li>Knowledge Continuity Score</li></ul></div>
+        <div class="col now"><div class="q">● Ahora</div><ul><li>Reclutamiento: vacante → ranking de CVs</li><li>Perfil de persona + agente</li><li>Onboarding journey</li></ul></div>
+        <div class="col"><div class="q">Q siguiente</div><ul><li>Agente de entrevista en vivo</li><li>Analítica de brechas de conocimiento</li><li>Más conectores (Jira, GitHub)</li></ul></div>
+        <div class="col"><div class="q">Visión</div><ul><li>Recomendación proactiva de riesgo</li><li>Planes de sucesión automáticos</li><li>Marketplace de conectores</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · CLOSE -->
+  <section class="slide" id="close" data-title="Cierre">
+    <div class="inner">
+      <div class="eyebrow">En una frase</div>
+      <h1>Un ciclo.<br/>Un grafo.<br/>Tu memoria.</h1>
+      <p class="lead mt24">Continuum captura el conocimiento, lo usa para contratar mejor y acelera el onboarding — todo conectado sobre el mismo grafo que solo tu empresa tiene.</p>
+      <div class="row mt32">
+        <span class="pill">◆ continuum</span>
+        <span class="pill">Demo en vivo</span>
+        <span class="pill">Vende el grafo, no el chatbot</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="chrome"><div id="dots" role="tablist" aria-label="Navegación de slides"></div></div>
+<div id="count"></div>
+
+<script>
+(function(){
+  "use strict";
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var dotsWrap = document.getElementById('dots');
+  var bar = document.getElementById('bar');
+  var count = document.getElementById('count');
+  var cur = 0;
+
+  // dots
+  slides.forEach(function(s,i){
+    var b = document.createElement('button');
+    b.className = 'dot'; b.setAttribute('role','tab');
+    b.title = s.dataset.title || ('Slide '+(i+1));
+    b.setAttribute('aria-label', b.title);
+    b.addEventListener('click', function(){ go(i); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function go(i){
+    i = Math.max(0, Math.min(slides.length-1, i));
+    slides[i].scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
+  }
+  function render(){
+    dots.forEach(function(d,i){ d.setAttribute('aria-current', i===cur ? 'true':'false'); });
+    bar.style.width = ((cur)/(slides.length-1)*100)+'%';
+    count.textContent = String(cur+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+  }
+
+  // track current via scroll position
+  var raf=null;
+  deck.addEventListener('scroll', function(){
+    if(raf) return;
+    raf = requestAnimationFrame(function(){
+      raf=null;
+      var i = Math.round(deck.scrollLeft / deck.clientWidth);
+      if(i!==cur){ cur=i; render(); }
+    });
+  }, {passive:true});
+
+  // keyboard
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); go(cur+1); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(cur-1); }
+    else if(e.key==='Home'){ e.preventDefault(); go(0); }
+    else if(e.key==='End'){ e.preventDefault(); go(slides.length-1); }
+  });
+  document.getElementById('next').addEventListener('click', function(){ go(cur+1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(cur-1); });
+
+  // vertical wheel -> horizontal (nudge, not hijack)
+  var wlock=false;
+  deck.addEventListener('wheel', function(e){
+    if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+      if(wlock) return;
+      wlock=true; setTimeout(function(){wlock=false;}, 420);
+      go(cur + (e.deltaY>0?1:-1));
+      e.preventDefault();
+    }
+  }, {passive:false});
+
+  // theme toggle
+  var tb=document.getElementById('themeBtn');
+  tb.addEventListener('click', function(){
+    var root=document.documentElement;
+    var isDark = root.getAttribute('data-theme')==='dark' ||
+      (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  });
+
+  render();
+
+  /* ---- cover constellation (canvas, subtle) ---- */
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cnv = document.getElementById('cnv');
+  if(cnv && cnv.getContext){
+    var ctx = cnv.getContext('2d');
+    var W,H,DPR,nodes=[];
+    function accent(){
+      // read computed --primary as rgba-ish; fallback blue
+      return getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || 'oklch(0.52 0.18 256)';
+    }
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio||1, 2);
+      W = cnv.clientWidth; H = cnv.clientHeight;
+      cnv.width = W*DPR; cnv.height=H*DPR;
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+      var n = Math.max(26, Math.min(52, Math.floor(W*H/26000)));
+      nodes = [];
+      for(var i=0;i<n;i++){
+        nodes.push({x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.18, vy:(Math.random()-.5)*.18, r:Math.random()*1.8+1});
+      }
+    }
+    function frame(){
+      ctx.clearRect(0,0,W,H);
+      var col = accent();
+      for(var i=0;i<nodes.length;i++){
+        var a=nodes[i];
+        a.x+=a.vx; a.y+=a.vy;
+        if(a.x<0||a.x>W)a.vx*=-1;
+        if(a.y<0||a.y>H)a.vy*=-1;
+        for(var j=i+1;j<nodes.length;j++){
+          var b=nodes[j], dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
+          if(d<130){
+            ctx.globalAlpha = (1-d/130)*0.18;
+            ctx.strokeStyle = col; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+          }
+        }
+      }
+      for(var k=0;k<nodes.length;k++){
+        var p=nodes[k];
+        ctx.globalAlpha=.55; ctx.fillStyle=col;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.2832); ctx.fill();
+      }
+      ctx.globalAlpha=1;
+      if(!reduce) requestAnimationFrame(frame);
+    }
+    resize(); window.addEventListener('resize', resize);
+    if(reduce){ frame(); } else { requestAnimationFrame(frame); }
+  }
+
+  /* ---- tiny screen-preview sketches ---- */
+  document.querySelectorAll('.mini').forEach(function(m){
+    var t=m.dataset.mini, html='';
+    var bar='<div style="height:6px;border-radius:3px;background:var(--primary);opacity:.7;"></div>';
+    if(t==='dash') html='<div style="display:flex;gap:5px;padding:8px;height:100%"><div style="flex:1;border-radius:5px;background:color-mix(in oklab,var(--primary) 18%,transparent)"></div><div style="flex:1;border-radius:5px;background:color-mix(in oklab,var(--edge) 22%,transparent)"></div><div style="flex:2;border-radius:5px;background:var(--line-soft)"></div></div>';
+    else if(t==='person') html='<div style="display:flex;align-items:center;gap:7px;padding:9px"><div style="width:22px;height:22px;border-radius:50%;background:var(--primary)"></div><div style="flex:1"><div style="height:5px;width:60%;border-radius:3px;background:var(--line);margin-bottom:5px"></div><div style="height:5px;width:40%;border-radius:3px;background:var(--line-soft)"></div></div><div style="font-size:9px;font-family:var(--mono);color:var(--primary)">agente ▸</div></div>';
+    else if(t==='vac') html='<div style="padding:9px;display:flex;flex-direction:column;gap:5px"><div style="height:5px;width:70%;border-radius:3px;background:var(--line)"></div><div style="height:5px;width:90%;border-radius:3px;background:var(--line-soft)"></div><div style="height:5px;width:50%;border-radius:3px;background:var(--line-soft)"></div></div>';
+    else if(t==='match') html='<div style="padding:8px;display:flex;flex-direction:column;gap:6px">'+row(92)+row(74)+row(58)+'</div>';
+    else if(t==='int') html='<div style="padding:9px;display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:6px;align-items:center"><span style="font-size:9px;font-family:var(--mono);color:var(--edge)">Q1</span><div style="flex:1;height:5px;border-radius:3px;background:var(--line)"></div></div><div style="display:flex;gap:6px;align-items:center"><span style="font-size:9px;font-family:var(--mono);color:var(--edge)">Q2</span><div style="flex:1;height:5px;border-radius:3px;background:var(--line-soft)"></div></div></div>';
+    else if(t==='chat') html='<div style="padding:8px;display:flex;flex-direction:column;gap:5px"><div style="align-self:flex-end;height:12px;width:55%;border-radius:6px;background:color-mix(in oklab,var(--primary) 30%,transparent)"></div><div style="align-self:flex-start;height:16px;width:70%;border-radius:6px;background:var(--line-soft)"></div><div style="align-self:flex-start;font-size:8px;font-family:var(--mono);color:var(--primary)">↳ fuente: Notion</div></div>';
+    m.innerHTML=html;
+    function row(p){return '<div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:6px;border-radius:3px;background:var(--line-soft);overflow:hidden"><div style="height:100%;width:'+p+'%;background:var(--primary);opacity:.7"></div></div><span style="font-size:9px;font-family:var(--mono);color:var(--muted)">'+p+'%</span></div>';}
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContinuumLogo } from "@/frontend/components/landing/logo";
 
 export function LandingFooter() {
     return (
@@ -8,7 +9,7 @@ export function LandingFooter() {
                     href="/"
                     className="flex items-center gap-2 font-semibold text-foreground tracking-tight"
                 >
-                    <span className="size-2.5 rounded-full bg-primary" />
+                    <ContinuumLogo className="h-6 w-auto" />
                     Continuum
                 </Link>
 
