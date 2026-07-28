@@ -51,6 +51,29 @@ export const ServerConfig = {
                 env.SLACK_SIGNING_SECRET,
         ),
     },
+    github: {
+        clientId: env.GITHUB_CLIENT_ID,
+        clientSecret: env.GITHUB_CLIENT_SECRET,
+        isConfigured: Boolean(
+            env.GITHUB_CLIENT_ID &&
+                env.GITHUB_CLIENT_SECRET &&
+                env.TOKEN_ENCRYPTION_KEY,
+        ),
+    },
+    linear: {
+        clientId: env.LINEAR_CLIENT_ID,
+        clientSecret: env.LINEAR_CLIENT_SECRET,
+        isConfigured: Boolean(
+            env.LINEAR_CLIENT_ID &&
+                env.LINEAR_CLIENT_SECRET &&
+                env.TOKEN_ENCRYPTION_KEY,
+        ),
+    },
+    plane: {
+        // Self-hosted, token-based (no app registration) — each org pastes its
+        // own workspace URL + API key, so this only needs the encryption key.
+        isConfigured: Boolean(env.TOKEN_ENCRYPTION_KEY),
+    },
     info: {
         name: "Hackaton Starter API",
         version: "1.0.0",
