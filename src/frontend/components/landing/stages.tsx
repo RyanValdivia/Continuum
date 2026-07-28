@@ -146,9 +146,9 @@ export function LandingStages() {
                                         {stage.n}.0 · {stage.kicker} ·{" "}
                                         {stage.when}
                                     </Label>
-                                    <h2 className="mt-3 max-w-[16ch] font-display text-[length:var(--text-display-s)] leading-[1.05] tracking-[-0.025em]">
+                                    <h3 className="mt-3 max-w-[16ch] font-display text-[length:var(--text-display-s)] leading-[1.05] tracking-[-0.025em]">
                                         {stage.title}
-                                    </h2>
+                                    </h3>
                                     <p className="mt-[var(--space-lg)] max-w-[52ch] text-muted-foreground leading-relaxed">
                                         {stage.body}
                                     </p>
@@ -170,7 +170,7 @@ export function LandingStages() {
                         ))}
                     </ol>
 
-                    <div className="full-scene-progress absolute right-[var(--page-gutter)] bottom-[var(--space-xl)] left-[var(--page-gutter)] hidden lg:block">
+                    <div className="full-scene-progress absolute right-[var(--page-gutter)] bottom-[var(--space-xl)] left-[var(--page-gutter)] hidden">
                         <ol
                             aria-label="Progreso de las etapas"
                             className="grid grid-cols-4 gap-[var(--space-sm)]"
@@ -220,7 +220,7 @@ export function LandingStages() {
                             <p>
                                 {stage.n}.0 · {stage.kicker} · {stage.when}
                             </p>
-                            <h2>{stage.title}</h2>
+                            <h3>{stage.title}</h3>
                             <p>{stage.body}</p>
                             <p>{stage.accessibilitySummary}</p>
                             <ul>

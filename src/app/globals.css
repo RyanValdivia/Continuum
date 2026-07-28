@@ -229,6 +229,9 @@ body {
         min-height: 100svh;
         will-change: transform, opacity;
     }
+    .full-scene-progress {
+        display: block;
+    }
 }
 
 @media (min-width: 64rem) and (prefers-reduced-motion: reduce) {

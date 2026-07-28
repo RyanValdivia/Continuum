@@ -12,6 +12,8 @@ describe("LandingStages", () => {
         expect(screen).toContain(
             "Las mismas cuatro, siempre en el mismo orden. Continuum sostiene la estructura para que tú no tengas que recordarla.",
         );
+        expect(screen.match(/<h2(?:\s|>)/g)).toHaveLength(1);
+        expect(screen.match(/<h3(?:\s|>)/g)).toHaveLength(8);
         expect(screen).toContain('aria-hidden="true" class="shell relative"');
         expect(screen).toContain('aria-label="Todas las etapas"');
 
