@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { BrandShader } from "./brand-shader";
-import { Label } from "./lumen";
+import { Label, SectionHead } from "./lumen";
 import { GsapPinnedScenes } from "./motion";
 import { StageScreen } from "./stage-screens";
 
@@ -14,6 +14,7 @@ type Stage = {
     title: string;
     body: ReactNode;
     chips: string[];
+    accessibilitySummary: string;
     tone: "primary" | "chord";
 };
 
@@ -35,6 +36,8 @@ const STAGES: Stage[] = [
             </>
         ),
         chips: ["4 fuentes", "Sin migración"],
+        accessibilitySummary:
+            "Notion, Slack, Microsoft 365 y Documentos convergen en Continuum.",
         tone: "primary",
     },
     {
@@ -53,6 +56,8 @@ const STAGES: Stage[] = [
             </>
         ),
         chips: ["4 tipos de nodo", "Automático"],
+        accessibilitySummary:
+            "Persona, Decisión, Documento y Criterio están relacionados por el Grafo.",
         tone: "chord",
     },
     {
@@ -71,6 +76,8 @@ const STAGES: Stage[] = [
             </>
         ),
         chips: ["Agente por puesto", "Con contexto"],
+        accessibilitySummary:
+            "Head of Sales pregunta si puede cerrar con 20 % de descuento. Sin aprobación, el tope es 15 %. Las fuentes son Política comercial en Notion y Aprobaciones de descuento en Slack.",
         tone: "primary",
     },
     {
@@ -89,6 +96,8 @@ const STAGES: Stage[] = [
             </>
         ),
         chips: ["Sync continuo", "Sin mantenimiento manual"],
+        accessibilitySummary:
+            "Slack, Notion y Microsoft 365 están actualizados; el Grafo está al día.",
         tone: "chord",
     },
 ];
@@ -98,6 +107,13 @@ export function LandingStages() {
 
     return (
         <section id="etapas" className="scroll-mt-24 border-border border-b">
+            <div className="shell py-[var(--space-2xl)] lg:pt-[var(--space-3xl)] lg:pb-0">
+                <SectionHead
+                    kicker="Cómo funciona"
+                    title="Cuatro etapas, de la fuente a la ruta."
+                    lede="Las mismas cuatro, siempre en el mismo orden. Continuum sostiene la estructura para que tú no tengas que recordarla."
+                />
+            </div>
             <GsapPinnedScenes
                 onSceneChange={setActiveScene}
                 className="relative overflow-clip lg:min-h-svh"
@@ -136,6 +152,18 @@ export function LandingStages() {
                                     <p className="mt-[var(--space-lg)] max-w-[52ch] text-muted-foreground leading-relaxed">
                                         {stage.body}
                                     </p>
+                                    <ul className="mt-[var(--space-lg)] flex flex-wrap gap-x-[var(--space-lg)] gap-y-[var(--space-sm)]">
+                                        {stage.chips.map((chip) => (
+                                            <li
+                                                key={chip}
+                                                className="border-border border-l pl-3"
+                                            >
+                                                <Label className="text-muted-foreground">
+                                                    {chip}
+                                                </Label>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                                 <StageScreen index={index} />
                             </li>
@@ -194,6 +222,12 @@ export function LandingStages() {
                             </p>
                             <h2>{stage.title}</h2>
                             <p>{stage.body}</p>
+                            <p>{stage.accessibilitySummary}</p>
+                            <ul>
+                                {stage.chips.map((chip) => (
+                                    <li key={chip}>{chip}</li>
+                                ))}
+                            </ul>
                         </li>
                     ))}
                 </ol>
