@@ -7,10 +7,13 @@ import { Elysia } from "elysia";
 import { z } from "zod";
 import { ServerConfig } from "@/config/server-config";
 import { documentReviewRouter } from "@/core/document-review/server/api/router";
+import { githubRouter } from "@/core/github/server/api/router";
 import { knowledgeRouter } from "@/core/knowledge/server/api/router";
+import { linearRouter } from "@/core/linear/server/api/router";
 import { microsoftRouter } from "@/core/microsoft/server/api/router";
 import { notionRouter } from "@/core/notion/server/api/router";
 import { onboardingRouter } from "@/core/onboarding/server/api/router";
+import { planeRouter } from "@/core/plane/server/api/router";
 import { projectRouter } from "@/core/project/server/api/router";
 import { recruitmentRouter } from "@/core/recruitment/server/api/router";
 import { slackRouter } from "@/core/slack/server/api/router";
@@ -80,6 +83,9 @@ const app = new Elysia({ prefix: "/api/v1" })
     .use(notionRouter)
     .use(microsoftRouter)
     .use(slackRouter)
+    .use(githubRouter)
+    .use(linearRouter)
+    .use(planeRouter)
     .use(documentReviewRouter)
     .use(recruitmentRouter)
     .use(onboardingRouter);

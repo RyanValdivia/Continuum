@@ -28,6 +28,14 @@ export const env = createEnv({
         // incoming Events API webhook requests — separate from the OAuth
         // client secret.
         SLACK_SIGNING_SECRET: z.string().optional(),
+        // Optional: GitHub OAuth App (org-scoped repo access) — disabled until
+        // both are set. Needs TOKEN_ENCRYPTION_KEY to persist the token.
+        GITHUB_CLIENT_ID: z.string().optional(),
+        GITHUB_CLIENT_SECRET: z.string().optional(),
+        // Optional: Linear OAuth App (workspace-scoped) — disabled until both
+        // are set. Needs TOKEN_ENCRYPTION_KEY to persist the token.
+        LINEAR_CLIENT_ID: z.string().optional(),
+        LINEAR_CLIENT_SECRET: z.string().optional(),
     },
     client: {
         NEXT_PUBLIC_APP_URL: z.url(),
@@ -45,6 +53,10 @@ export const env = createEnv({
         SLACK_CLIENT_ID: process.env.SLACK_CLIENT_ID,
         SLACK_CLIENT_SECRET: process.env.SLACK_CLIENT_SECRET,
         SLACK_SIGNING_SECRET: process.env.SLACK_SIGNING_SECRET,
+        GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+        GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+        LINEAR_CLIENT_ID: process.env.LINEAR_CLIENT_ID,
+        LINEAR_CLIENT_SECRET: process.env.LINEAR_CLIENT_SECRET,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     },
     emptyStringAsUndefined: true,

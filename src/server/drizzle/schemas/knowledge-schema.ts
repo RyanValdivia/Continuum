@@ -27,6 +27,9 @@ export const knowledgeConnector = pgEnum("knowledge_connector", [
     "slack",
     "manual",
     "microsoft",
+    "github",
+    "linear",
+    "plane",
 ]);
 export const knowledgeNodeType = pgEnum("knowledge_node_type", [
     "decision",

@@ -6,6 +6,9 @@ export const connectorSchema = z.enum([
     "slack",
     "manual",
     "microsoft",
+    "github",
+    "linear",
+    "plane",
 ]);
 export const nodeTypeSchema = z.enum([
     "decision",

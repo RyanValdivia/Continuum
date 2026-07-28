@@ -22,6 +22,9 @@ export const connectorSchema = z.enum([
     "slack",
     "manual",
     "microsoft",
+    "github",
+    "linear",
+    "plane",
 ]);
 
 /** Wire shape (Date → ISO string at the repo boundary). */
