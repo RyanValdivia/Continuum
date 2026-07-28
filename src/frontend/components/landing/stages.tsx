@@ -142,7 +142,7 @@ export function LandingStages() {
                         ))}
                     </ol>
 
-                    <div className="absolute right-[var(--page-gutter)] bottom-[var(--space-xl)] left-[var(--page-gutter)] hidden lg:block">
+                    <div className="full-scene-progress absolute right-[var(--page-gutter)] bottom-[var(--space-xl)] left-[var(--page-gutter)] hidden lg:block">
                         <ol
                             aria-label="Progreso de las etapas"
                             className="grid grid-cols-4 gap-[var(--space-sm)]"

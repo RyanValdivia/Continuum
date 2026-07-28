@@ -237,6 +237,9 @@ body {
         inset: auto;
         min-height: 100svh;
     }
+    .full-scene-progress {
+        display: none;
+    }
 }
 
 /* The verb landmark: accent colour plus a 1px underline that draws in once.
