@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { PropsWithChildren } from "react";
-import { useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { getActiveSceneIndex } from "./scene-progress";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -242,6 +242,11 @@ export function GsapPinnedScenes({
 }: GsapPinnedScenesProps) {
     const root = useRef<HTMLDivElement>(null);
     const activeScene = useRef(0);
+    const onSceneChangeRef = useRef(onSceneChange);
+
+    useLayoutEffect(() => {
+        onSceneChangeRef.current = onSceneChange;
+    }, [onSceneChange]);
 
     useGSAP(
         () => {
@@ -251,6 +256,7 @@ export function GsapPinnedScenes({
             const media = gsap.matchMedia();
             media.add(
                 {
+                    all: "all",
                     desktop: "(min-width: 64rem)",
                     reduceMotion: "(prefers-reduced-motion: reduce)",
                 },
@@ -266,7 +272,7 @@ export function GsapPinnedScenes({
                         gsap.set(scenes, { clearProps: "all" });
                         if (progress) gsap.set(progress, { clearProps: "all" });
                         activeScene.current = 0;
-                        onSceneChange(0);
+                        onSceneChangeRef.current(0);
                         return;
                     }
 
@@ -296,7 +302,7 @@ export function GsapPinnedScenes({
                                 );
                                 if (next === activeScene.current) return;
                                 activeScene.current = next;
-                                onSceneChange(next);
+                                onSceneChangeRef.current(next);
                             },
                         },
                     });
@@ -339,7 +345,7 @@ export function GsapPinnedScenes({
 
             return () => media.revert();
         },
-        { scope: root, dependencies: [onSceneChange] },
+        { scope: root },
     );
 
     return (
