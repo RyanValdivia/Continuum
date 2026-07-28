@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { Label } from "./lumen";
 
 export function StageScreen({ index }: { index: number }) {
@@ -14,9 +14,13 @@ export function StageScreen({ index }: { index: number }) {
     }
 }
 
-function StageFrame({ children }: PropsWithChildren) {
+function StageFrame({
+    caption,
+    children,
+}: PropsWithChildren<{ caption: ReactNode }>) {
     return (
         <figure className="relative min-h-[20rem] overflow-hidden rounded-[var(--radius-card)] border border-border bg-card/90 p-[var(--space-lg)] shadow-[0_24px_70px_-32px_rgb(0_0_0/0.75)] lg:min-h-[28rem]">
+            <figcaption className="sr-only">{caption}</figcaption>
             <div className="relative z-10">{children}</div>
         </figure>
     );
@@ -26,10 +30,7 @@ function SourcesScreen() {
     const sources = ["Notion", "Slack", "Microsoft 365", "Documentos"];
 
     return (
-        <StageFrame>
-            <figcaption className="sr-only">
-                Cuatro fuentes convergen en Continuum.
-            </figcaption>
+        <StageFrame caption="Cuatro fuentes convergen en Continuum.">
             <Label className="text-primary">Conectar · fuentes</Label>
             <div className="mt-[var(--space-lg)] grid gap-[var(--space-md)] lg:grid-cols-[minmax(0,1fr)_9rem] lg:items-center">
                 <ul className="grid gap-3" aria-label="Fuentes conectadas">
@@ -60,10 +61,7 @@ function GraphScreen() {
     const nodes = ["Persona", "Decisión", "Documento", "Criterio"];
 
     return (
-        <StageFrame>
-            <figcaption className="sr-only">
-                Un grafo relaciona persona, decisión, documento y criterio.
-            </figcaption>
+        <StageFrame caption="Un grafo relaciona persona, decisión, documento y criterio.">
             <Label className="text-brand-chord">Mapear · relaciones</Label>
             <div className="relative mt-[var(--space-lg)] grid min-h-64 place-items-center">
                 <svg
@@ -125,10 +123,7 @@ function GraphScreen() {
 
 function AgentScreen() {
     return (
-        <StageFrame>
-            <figcaption className="sr-only">
-                Un agente de Head of Sales responde con sus fuentes.
-            </figcaption>
+        <StageFrame caption="Un agente de Head of Sales responde con sus fuentes.">
             <Label className="text-primary">Consultar · agente</Label>
             <div className="mt-[var(--space-lg)] grid gap-[var(--space-lg)]">
                 <div className="rounded-[var(--radius-card)] border border-border bg-secondary p-[var(--space-md)]">
@@ -165,10 +160,7 @@ function FreshnessScreen() {
     const sources = ["Slack", "Notion", "Microsoft 365"];
 
     return (
-        <StageFrame>
-            <figcaption className="sr-only">
-                Las fuentes sincronizadas mantienen el grafo al día.
-            </figcaption>
+        <StageFrame caption="Las fuentes sincronizadas mantienen el grafo al día.">
             <Label className="text-brand-chord">Mantener · sync continuo</Label>
             <ul
                 className="mt-[var(--space-lg)] grid gap-3"

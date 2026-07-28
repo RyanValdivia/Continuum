@@ -26,6 +26,7 @@ describe("StageScreen", () => {
         );
 
         expect(screen).toContain("<figure");
+        expect(screen).toMatch(/<figure[^>]*><figcaption/);
 
         for (const text of content) {
             expect(screen).toContain(text);
