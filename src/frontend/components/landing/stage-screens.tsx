@@ -146,8 +146,7 @@ function useStageCardMotion(
 
                     if (!desktop || reduceMotion) return;
 
-                    const timeline = buildStageTimeline(motion, active);
-                    return () => timeline.kill();
+                    buildStageTimeline(motion, active);
                 },
             );
 
