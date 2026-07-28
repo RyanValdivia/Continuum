@@ -231,6 +231,14 @@ body {
     }
 }
 
+@media (min-width: 64rem) and (prefers-reduced-motion: reduce) {
+    .full-scene-panel {
+        position: relative;
+        inset: auto;
+        min-height: 100svh;
+    }
+}
+
 /* The verb landmark: accent colour plus a 1px underline that draws in once.
    `em` is repurposed here and renders upright — no italic headings. */
 .lumen-verb {
