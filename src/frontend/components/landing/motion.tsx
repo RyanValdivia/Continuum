@@ -110,12 +110,17 @@ export function GsapReveal({
                 const badges = gsap.utils.toArray<HTMLElement>("[data-badge]");
 
                 if (context.conditions?.reduceMotion) {
-                    gsap.set([...items, ...badges], {
-                        autoAlpha: 1,
-                        y: 0,
-                        scale: 1,
-                    });
-                    gsap.set(rails, { scaleY: 1 });
+                    const revealTargets = [...items, ...badges];
+                    if (revealTargets.length > 0) {
+                        gsap.set(revealTargets, {
+                            autoAlpha: 1,
+                            y: 0,
+                            scale: 1,
+                        });
+                    }
+                    if (rails.length > 0) {
+                        gsap.set(rails, { scaleY: 1 });
+                    }
                     return;
                 }
 
@@ -287,6 +292,15 @@ export function GsapPinnedScenes({
 
                     const duration = scenes.length;
                     const timeline = gsap.timeline({
+                        onUpdate: () => {
+                            const next = getActiveSceneIndex(
+                                timeline.progress(),
+                                scenes.length,
+                            );
+                            if (next === activeScene.current) return;
+                            activeScene.current = next;
+                            onSceneChangeRef.current(next);
+                        },
                         scrollTrigger: {
                             trigger: element,
                             start: "top top",
@@ -295,15 +309,6 @@ export function GsapPinnedScenes({
                             pin: true,
                             scrub: 0.65,
                             invalidateOnRefresh: true,
-                            onUpdate: (self) => {
-                                const next = getActiveSceneIndex(
-                                    self.progress,
-                                    scenes.length,
-                                );
-                                if (next === activeScene.current) return;
-                                activeScene.current = next;
-                                onSceneChangeRef.current(next);
-                            },
                         },
                     });
 
