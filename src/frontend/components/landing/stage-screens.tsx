@@ -19,7 +19,7 @@ function StageFrame({
     children,
 }: PropsWithChildren<{ caption: ReactNode }>) {
     return (
-        <figure className="relative min-h-[20rem] overflow-hidden rounded-[var(--radius-card)] border border-border bg-card/90 p-[var(--space-lg)] shadow-[0_24px_70px_-32px_rgb(0_0_0/0.75)] lg:min-h-[28rem]">
+        <figure className="relative min-h-[20rem] overflow-hidden rounded-[var(--radius-card)] border border-border bg-card/90 p-[var(--space-lg)] lg:min-h-[28rem]">
             <figcaption className="sr-only">{caption}</figcaption>
             <div className="relative z-10">{children}</div>
         </figure>
@@ -49,8 +49,8 @@ function SourcesScreen() {
                         </li>
                     ))}
                 </ul>
-                <div className="grid aspect-square place-items-center rounded-full border border-border bg-primary p-6 text-center text-foreground">
-                    <Label className="text-foreground">Continuum</Label>
+                <div className="grid size-36 justify-self-center place-items-center rounded-full border border-border bg-primary p-6 text-center text-primary-foreground">
+                    <Label className="text-primary-foreground">Continuum</Label>
                 </div>
             </div>
         </StageFrame>
@@ -113,7 +113,7 @@ function GraphScreen() {
                         </span>
                     ))}
                 </div>
-                <span className="absolute rounded-full border border-border bg-primary px-4 py-3 text-sm text-foreground">
+                <span className="absolute rounded-full border border-border bg-primary px-4 py-3 text-primary-foreground text-sm">
                     Grafo
                 </span>
             </div>
@@ -176,8 +176,8 @@ function FreshnessScreen() {
                     </li>
                 ))}
             </ul>
-            <div className="mt-[var(--space-lg)] flex items-center justify-between rounded-[var(--radius-card)] border border-border bg-primary p-[var(--space-md)]">
-                <span className="text-foreground">Grafo al día</span>
+            <div className="mt-[var(--space-lg)] flex items-center justify-between rounded-[var(--radius-card)] border border-border bg-primary p-[var(--space-md)] text-primary-foreground">
+                <span>Grafo al día</span>
                 <span aria-hidden className="size-3 rounded-full bg-card" />
             </div>
         </StageFrame>
