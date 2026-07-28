@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { PropsWithChildren } from "react";
 import { useRef } from "react";
+import { getActiveSceneIndex } from "./scene-progress";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -220,6 +221,125 @@ export function GsapDrift({
             return () => mm.revert();
         },
         { scope: root, dependencies: [distance] },
+    );
+
+    return (
+        <div ref={root} className={className}>
+            {children}
+        </div>
+    );
+}
+
+type GsapPinnedScenesProps = PropsWithChildren<{
+    className?: string;
+    onSceneChange: (index: number) => void;
+}>;
+
+export function GsapPinnedScenes({
+    className,
+    onSceneChange,
+    children,
+}: GsapPinnedScenesProps) {
+    const root = useRef<HTMLDivElement>(null);
+    const activeScene = useRef(0);
+
+    useGSAP(
+        () => {
+            const element = root.current;
+            if (!element) return;
+
+            const media = gsap.matchMedia();
+            media.add(
+                {
+                    desktop: "(min-width: 64rem)",
+                    reduceMotion: "(prefers-reduced-motion: reduce)",
+                },
+                (context) => {
+                    const scenes =
+                        gsap.utils.toArray<HTMLElement>("[data-full-scene]");
+                    const progress = element.querySelector<HTMLElement>(
+                        "[data-scene-progress]",
+                    );
+                    const { desktop, reduceMotion } = context.conditions ?? {};
+
+                    if (!desktop || reduceMotion || scenes.length < 2) {
+                        gsap.set(scenes, { clearProps: "all" });
+                        if (progress) gsap.set(progress, { clearProps: "all" });
+                        activeScene.current = 0;
+                        onSceneChange(0);
+                        return;
+                    }
+
+                    gsap.set(scenes, { autoAlpha: 0, yPercent: 4 });
+                    gsap.set(scenes[0], { autoAlpha: 1, yPercent: 0 });
+                    if (progress) {
+                        gsap.set(progress, {
+                            scaleX: 0,
+                            transformOrigin: "left center",
+                        });
+                    }
+
+                    const duration = scenes.length;
+                    const timeline = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: element,
+                            start: "top top",
+                            end: () =>
+                                `+=${window.innerHeight * scenes.length}`,
+                            pin: true,
+                            scrub: 0.65,
+                            invalidateOnRefresh: true,
+                            onUpdate: (self) => {
+                                const next = getActiveSceneIndex(
+                                    self.progress,
+                                    scenes.length,
+                                );
+                                if (next === activeScene.current) return;
+                                activeScene.current = next;
+                                onSceneChange(next);
+                            },
+                        },
+                    });
+
+                    if (progress) {
+                        timeline.to(
+                            progress,
+                            { scaleX: 1, duration, ease: "none" },
+                            0,
+                        );
+                    }
+
+                    for (let index = 1; index < scenes.length; index += 1) {
+                        timeline
+                            .to(
+                                scenes[index - 1],
+                                {
+                                    autoAlpha: 0,
+                                    yPercent: -4,
+                                    duration: 0.25,
+                                    ease: "power1.inOut",
+                                },
+                                index,
+                            )
+                            .fromTo(
+                                scenes[index],
+                                { autoAlpha: 0, yPercent: 4 },
+                                {
+                                    autoAlpha: 1,
+                                    yPercent: 0,
+                                    duration: 0.25,
+                                    ease: "power1.inOut",
+                                    immediateRender: false,
+                                },
+                                "<",
+                            );
+                    }
+                },
+            );
+
+            return () => media.revert();
+        },
+        { scope: root, dependencies: [onSceneChange] },
     );
 
     return (
