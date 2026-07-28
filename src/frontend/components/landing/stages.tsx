@@ -111,7 +111,7 @@ export function LandingStages() {
                     aria-hidden
                     className="pointer-events-none absolute inset-0 bg-background/45"
                 />
-                <div className="shell relative">
+                <div aria-hidden className="shell relative">
                     <ol className="grid gap-[var(--space-lg)] py-[var(--space-2xl)] lg:min-h-svh lg:py-0">
                         {STAGES.map((stage, index) => (
                             <li
@@ -186,6 +186,17 @@ export function LandingStages() {
                         </div>
                     </div>
                 </div>
+                <ol className="sr-only" aria-label="Todas las etapas">
+                    {STAGES.map((stage) => (
+                        <li key={stage.n}>
+                            <p>
+                                {stage.n}.0 · {stage.kicker} · {stage.when}
+                            </p>
+                            <h2>{stage.title}</h2>
+                            <p>{stage.body}</p>
+                        </li>
+                    ))}
+                </ol>
             </GsapPinnedScenes>
         </section>
     );
