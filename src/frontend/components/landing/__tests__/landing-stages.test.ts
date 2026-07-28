@@ -16,6 +16,8 @@ describe("LandingStages", () => {
         expect(screen.match(/<h3(?:\s|>)/g)).toHaveLength(8);
         expect(screen).toContain('aria-hidden="true" class="shell relative"');
         expect(screen).toContain('aria-label="Todas las etapas"');
+        expect(screen.match(/data-stage-active="true"/g)).toHaveLength(1);
+        expect(screen.match(/data-stage-active="false"/g)).toHaveLength(3);
 
         const accessibleScenes = screen.slice(
             screen.indexOf('aria-label="Todas las etapas"'),

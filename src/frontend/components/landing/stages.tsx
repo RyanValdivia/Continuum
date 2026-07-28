@@ -133,7 +133,7 @@ export function LandingStages() {
                             <li
                                 key={stage.n}
                                 data-full-scene
-                                className="full-scene-panel grid min-w-0 gap-[var(--space-xl)] lg:absolute lg:inset-0 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center"
+                                className="full-scene-panel grid min-w-0 gap-[var(--space-xl)] lg:absolute lg:inset-0 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start lg:pt-[var(--space-2xl)] lg:pb-[var(--space-3xl)]"
                             >
                                 <div className="min-w-0">
                                     <Label
@@ -165,7 +165,10 @@ export function LandingStages() {
                                         ))}
                                     </ul>
                                 </div>
-                                <StageScreen index={index} />
+                                <StageScreen
+                                    index={index}
+                                    active={activeScene === index}
+                                />
                             </li>
                         ))}
                     </ol>
