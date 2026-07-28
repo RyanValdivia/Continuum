@@ -23,11 +23,12 @@ drizzle/**/*.sql.bak
 .DS_Store
 *.log
 
-# SDD / port scratch (agents)
+# local agent / skill state
+.agents/
+.claude/
+.hallmark/
 .superpowers/
-
-# agent worktrees (local, transient)
-.claude/worktrees/
+skills-lock.json
 
 # Playwright MCP e2e snapshots
 .playwright-mcp/

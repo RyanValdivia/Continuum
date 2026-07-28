@@ -17,11 +17,15 @@ export function Providers({ children }: PropsWithChildren) {
     const queryClient = getQueryClient();
     const router = useRouter();
 
+    // The marketing surface is pinned to the night canvas, so the product
+    // defaults to dark too — otherwise signing in from the landing throws the
+    // visitor from a dark page onto a light one. The toggle still works; only
+    // the default changed.
     return (
         <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
+            defaultTheme="dark"
+            enableSystem={false}
             disableTransitionOnChange
         >
             <NuqsAdapter>

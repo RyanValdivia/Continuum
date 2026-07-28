@@ -1,69 +1,60 @@
-import type { LucideIcon } from "lucide-react";
-import { Bot, Share2, Waypoints } from "lucide-react";
-import { Reveal } from "./reveal";
+import { cn } from "@/frontend/lib/utils";
+import { Label } from "./lumen";
 
-type Pillar = {
-    icon: LucideIcon;
+type Annotation = {
+    tag: string;
     title: string;
     body: string;
 };
 
-const PILLARS: Pillar[] = [
+const PILLARS: Annotation[] = [
     {
-        icon: Waypoints,
-        title: "Grafo de conocimiento",
-        body: "Conecta personas, decisiones, procesos y contexto — no archivos sueltos.",
+        tag: "Estructura",
+        title: "Relaciones, no archivos",
+        body: "Cada nodo sabe con qué se conecta. Eso es lo que un buscador no puede devolverte.",
     },
     {
-        icon: Bot,
+        tag: "Cobertura",
         title: "Un agente por persona",
-        body: "Cada agente modela el criterio y la experiencia de quien representa.",
+        body: "Cada puesto tiene un agente que responde con el criterio de quien lo ocupa.",
     },
     {
-        icon: Share2,
-        title: "Transferencia de conocimiento",
-        body: "El agente entiende y explica el trabajo, acelera el onboarding y sostiene la continuidad cuando alguien sale.",
+        tag: "Trazabilidad",
+        title: "Toda respuesta tiene origen",
+        body: "Cada respuesta apunta al nodo del que salió: la decisión, el documento o el criterio.",
     },
 ];
 
-export function LandingHowItWorks() {
+/**
+ * F5 · Annotated — margin labels for the graph above. Hairline rules only, no
+ * icons and no tiles: these read as annotations on the apparatus, not as a
+ * third feature grid.
+ */
+export function LandingHowItWorks({ className }: { className?: string }) {
     return (
-        <section
+        <aside
             id="como-funciona"
-            className="scroll-mt-20 border-border/60 border-y bg-muted/30"
+            aria-label="Cómo funciona"
+            className={cn("scroll-mt-24", className)}
         >
-            <div className="mx-auto max-w-5xl px-6 py-24">
-                <Reveal>
-                    <p className="font-medium text-primary text-sm">
-                        Cómo funciona
-                    </p>
-                    <h2 className="mt-3 max-w-2xl text-balance font-semibold text-3xl text-foreground tracking-tight sm:text-4xl">
-                        Modela cómo trabaja realmente cada persona.
-                    </h2>
-                    <p className="mt-4 max-w-xl text-muted-foreground leading-relaxed">
-                        No solo conecta documentos: captura cómo se toman las
-                        decisiones y cómo se transmite el conocimiento.
-                    </p>
-                </Reveal>
-
-                <div className="mt-14 grid gap-8 sm:grid-cols-3">
-                    {PILLARS.map((pillar, i) => (
-                        <Reveal key={pillar.title} delay={i * 0.08}>
-                            <div className="h-full">
-                                <span className="inline-flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                                    <pillar.icon className="size-5" />
-                                </span>
-                                <h3 className="mt-5 font-medium text-foreground text-lg">
-                                    {pillar.title}
-                                </h3>
-                                <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-                                    {pillar.body}
-                                </p>
-                            </div>
-                        </Reveal>
-                    ))}
-                </div>
-            </div>
-        </section>
+            <dl className="grid grid-cols-[minmax(0,1fr)] gap-[var(--space-lg)] sm:grid-cols-[repeat(3,minmax(0,1fr))]">
+                {PILLARS.map((pillar) => (
+                    <div
+                        key={pillar.title}
+                        className="border-border border-t pt-[var(--space-md)]"
+                    >
+                        <Label className="text-muted-foreground">
+                            {pillar.tag}
+                        </Label>
+                        <dt className="mt-2 font-display text-foreground text-xl leading-tight">
+                            {pillar.title}
+                        </dt>
+                        <dd className="mt-2 text-muted-foreground text-sm leading-relaxed">
+                            {pillar.body}
+                        </dd>
+                    </div>
+                ))}
+            </dl>
+        </aside>
     );
 }

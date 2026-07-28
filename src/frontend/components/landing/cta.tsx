@@ -1,34 +1,34 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/frontend/components/ui/button";
-import { Reveal } from "./reveal";
+import { BrandShader } from "./brand-shader";
+import { CtaButton } from "./cta-button";
+import { Label } from "./lumen";
 
+/** The closer. Names the first concrete step instead of restating the hero. */
 export function LandingCta() {
     return (
-        <section className="mx-auto max-w-5xl px-6 py-24">
-            <Reveal>
-                <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/5 px-8 py-16 text-center">
-                    <div
+        <section className="lumen-grid relative overflow-clip border-border border-b">
+            <BrandShader variant="field" />
+            <div className="relative shell grid justify-items-center gap-[var(--space-lg)] pt-[clamp(4rem,10vw,7rem)] pb-[clamp(4rem,10vw,7rem)] text-center">
+                <span className="inline-flex items-center gap-2">
+                    <span
                         aria-hidden
-                        className="-translate-x-1/2 pointer-events-none absolute top-[-6rem] left-1/2 size-[30rem] rounded-full bg-primary/10 blur-3xl"
+                        className="mark-pulse size-1.5 rounded-full bg-primary"
                     />
-                    <h2 className="relative text-balance font-semibold text-3xl text-foreground tracking-tight sm:text-4xl">
-                        Menos búsqueda, más continuidad.
-                    </h2>
-                    <p className="relative mx-auto mt-4 max-w-md text-balance text-muted-foreground leading-relaxed">
-                        Deja de perder el conocimiento de tu equipo. Empieza a
-                        preservarlo.
-                    </p>
-                    <div className="relative mt-8">
-                        <Button asChild size="lg">
-                            <Link href="/auth/sign-in">
-                                Empezar
-                                <ArrowRight />
-                            </Link>
-                        </Button>
-                    </div>
+                    <Label className="text-muted-foreground">Empezar</Label>
+                </span>
+
+                <h2 className="max-w-[18ch] font-display text-[length:var(--text-display-s)] text-foreground leading-[1.05] tracking-[-0.025em]">
+                    Empieza por un equipo. El grafo crece solo.
+                </h2>
+                <p className="max-w-[48ch] text-lg text-muted-foreground leading-relaxed">
+                    Conecta una fuente y elige un equipo. Cada documento,
+                    decisión y criterio que entra deja el grafo un poco más
+                    completo que ayer.
+                </p>
+
+                <div className="mt-[var(--space-sm)]">
+                    <CtaButton href="/auth/sign-in">Crear mi espacio</CtaButton>
                 </div>
-            </Reveal>
+            </div>
         </section>
     );
 }

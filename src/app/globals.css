@@ -1,73 +1,148 @@
+/* Hallmark · genre: atmospheric · macrostructure: Narrative Workflow (numbered
+ * stage rail), per the hum-07 reference · theme: Lumen surface + Hum structure
+ * nav: N10 floating-on-scroll morph · footer: Ft4 dense colophon
+ * hero: split — rail chips + display headline + 2 pill CTAs, apparatus right
+ * anchor hue: 256 azure (brand) · verb landmark: coral chord, hue 32
+ * display: Instrument Serif · body: Geist · label: JetBrains Mono
+ * axes: dark paper / classical-serif / cool accent
+ * NOTE: the brand now lives in the shadcn variables below, so /auth, the
+ * dashboard and every shadcn component inherit the same palette, radius and
+ * fonts. `[data-lumen]` adds only the marketing-surface extras on top.
+ * pre-emit critique: P5 H5 E4 S5 R4 V5
+ */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* Deliberate overflow (full-bleed art) must never scroll the document.
+   `clip` and not `hidden` — `hidden` breaks position: sticky on descendants. */
+html,
+body {
+    overflow-x: clip;
+}
+
 :root {
-    --radius: 0.625rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.52 0.18 256);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    /* Rounded, app-wide. shadcn derives sm/md/lg/xl from this one number, so
+       raising it here rounds buttons, inputs, dialogs and cards everywhere —
+       auth, dashboard and landing alike. */
+    --radius: 0.875rem;
+    --radius-card: 20px;
+    --radius-pill: 999px;
+
+    /* Light scheme — brand-anchored. Every neutral carries the anchor's
+       chroma; no zero-chroma grey, no pure white. */
+    --background: oklch(0.975 0.006 262);
+    --foreground: oklch(0.18 0.014 262);
+    --card: oklch(0.995 0.004 262);
+    --card-foreground: oklch(0.18 0.014 262);
+    --popover: oklch(0.995 0.004 262);
+    --popover-foreground: oklch(0.18 0.014 262);
+    --primary: oklch(0.52 0.16 256);
+    --primary-foreground: oklch(0.985 0.005 262);
+    --secondary: oklch(0.945 0.008 262);
+    --secondary-foreground: oklch(0.24 0.012 262);
+    --muted: oklch(0.945 0.008 262);
+    --muted-foreground: oklch(0.5 0.012 262);
+    --accent: oklch(0.945 0.008 262);
+    --accent-foreground: oklch(0.24 0.012 262);
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.52 0.18 256);
-    --sidebar: hsl(0 0% 98%);
-    --sidebar-foreground: hsl(240 5.3% 26.1%);
-    --sidebar-primary: hsl(240 5.9% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(240 4.8% 95.9%);
-    --sidebar-accent-foreground: hsl(240 5.9% 10%);
-    --sidebar-border: hsl(220 13% 91%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
+    --border: oklch(0.9 0.009 262);
+    --input: oklch(0.9 0.009 262);
+    --ring: oklch(0.52 0.16 256);
+    --sidebar: oklch(0.96 0.007 262);
+    --sidebar-foreground: oklch(0.3 0.012 262);
+    --sidebar-primary: oklch(0.52 0.16 256);
+    --sidebar-primary-foreground: oklch(0.985 0.005 262);
+    --sidebar-accent: oklch(0.93 0.009 262);
+    --sidebar-accent-foreground: oklch(0.24 0.012 262);
+    --sidebar-border: oklch(0.9 0.009 262);
+    --sidebar-ring: oklch(0.52 0.16 256);
+
+    /* Brand extras shared by every surface. */
+    --brand-deep: oklch(0.44 0.15 256);
+    --brand-chord: oklch(0.6 0.16 32);
+    --color-shader: #4a90f7;
+
+    /* 4pt scale, named by role. */
+    --space-3xs: 0.125rem;
+    --space-2xs: 0.25rem;
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2.5rem;
+    --space-2xl: 4rem;
+    --space-3xl: 6rem;
+    --space-4xl: 9rem;
+
+    --page-gutter: clamp(1.25rem, 5vw, 4.5rem);
+    --page-max: 78rem;
+    --text-display: clamp(2.5rem, 6.5vw, 4.5rem);
+    --text-display-s: clamp(1.875rem, 4.2vw, 3rem);
+    --rule-hair: 1px;
+
+    --z-base: 1;
+    --z-raised: 10;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-modal: 400;
+    --z-toast: 500;
+    --z-tooltip: 600;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-press: cubic-bezier(0.2, 0.7, 0.3, 1);
+    --dur-micro: 120ms;
+    --dur-short: 220ms;
+    --dur-long: 420ms;
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.62 0.18 256);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
+    /* Dark scheme — the Lumen Night canvas, re-anchored on the brand azure.
+       Elevation by lightness, never shadow. Hue never moves between modes. */
+    --background: oklch(0.13 0.016 262);
+    --foreground: oklch(0.95 0.006 262);
+    --card: oklch(0.17 0.018 262);
+    --card-foreground: oklch(0.95 0.006 262);
+    --popover: oklch(0.17 0.018 262);
+    --popover-foreground: oklch(0.95 0.006 262);
+    --primary: oklch(0.7 0.15 256);
+    --primary-foreground: oklch(0.13 0.016 262);
+    --secondary: oklch(0.21 0.02 262);
+    --secondary-foreground: oklch(0.95 0.006 262);
+    --muted: oklch(0.21 0.02 262);
+    --muted-foreground: oklch(0.72 0.014 262);
+    --accent: oklch(0.21 0.02 262);
+    --accent-foreground: oklch(0.95 0.006 262);
     --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.62 0.18 256);
-    --sidebar: hsl(240 5.9% 10%);
-    --sidebar-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-primary: hsl(224.3 76.3% 48%);
-    --sidebar-primary-foreground: hsl(0 0% 100%);
-    --sidebar-accent: hsl(240 3.7% 15.9%);
-    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-border: hsl(240 3.7% 15.9%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
+    --border: oklch(0.3 0.014 262);
+    --input: oklch(0.3 0.014 262);
+    --ring: oklch(0.7 0.15 256);
+    --sidebar: oklch(0.17 0.018 262);
+    --sidebar-foreground: oklch(0.9 0.008 262);
+    --sidebar-primary: oklch(0.7 0.15 256);
+    --sidebar-primary-foreground: oklch(0.13 0.016 262);
+    --sidebar-accent: oklch(0.21 0.02 262);
+    --sidebar-accent-foreground: oklch(0.95 0.006 262);
+    --sidebar-border: oklch(0.3 0.014 262);
+    --sidebar-ring: oklch(0.7 0.15 256);
+
+    --brand-deep: oklch(0.5 0.16 256);
+    --brand-chord: oklch(0.76 0.15 32);
 }
 
 @theme inline {
-    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-    --radius-sm: calc(var(--radius) - 4px);
-    --radius-md: calc(var(--radius) - 2px);
+    --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
+    --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+    --radius-sm: calc(var(--radius) - 6px);
+    --radius-md: calc(var(--radius) - 3px);
     --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) + 4px);
+    --radius-xl: calc(var(--radius) + 6px);
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --color-card: var(--card);
@@ -86,6 +161,8 @@
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+    --color-brand-chord: var(--brand-chord);
+    --color-brand-deep: var(--brand-deep);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -94,6 +171,7 @@
     --color-sidebar-primary: var(--sidebar-primary);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar: var(--sidebar);
+    --ease-out: var(--ease-out);
 }
 
 @layer base {
@@ -102,5 +180,197 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+    /* Display type wraps inside long words rather than pushing the page wide. */
+    h1,
+    h2,
+    h3 {
+        overflow-wrap: anywhere;
+        min-width: 0;
+    }
+    table,
+    .tnum {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+/* ── Marketing surface ────────────────────────────────────────────────────
+ * Only the extras the app itself doesn't need. Colours come from the shadcn
+ * variables above, so the landing and the app can never drift apart.
+ */
+
+/* One shell width. Bands paint background only; the shell carries the gutter,
+   so banded and plain sections align to the pixel on both edges. */
+.shell {
+    margin-inline: auto;
+    max-width: var(--page-max);
+    padding-inline: var(--page-gutter);
+}
+
+/* The blueprint grid — the "engineered, not vibed" background discipline. */
+.lumen-grid {
+    background-image:
+        linear-gradient(
+            color-mix(in oklab, var(--foreground) 4%, transparent) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            color-mix(in oklab, var(--foreground) 4%, transparent) 1px,
+            transparent 1px
+        );
+    background-size:
+        48px 48px,
+        48px 48px;
+}
+
+/* The verb landmark: accent colour plus a 1px underline that draws in once.
+   `em` is repurposed here and renders upright — no italic headings. */
+.lumen-verb {
+    font-style: normal;
+    color: var(--brand-chord);
+    position: relative;
+    white-space: nowrap;
+}
+.lumen-verb::after {
+    content: "";
+    position: absolute;
+    left: 0.04em;
+    right: 0.04em;
+    bottom: 0.04em;
+    height: 2px;
+    background: var(--brand-chord);
+    transform-origin: left;
+    animation: lumen-underline 320ms var(--ease-out) 600ms backwards;
+}
+@keyframes lumen-underline {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
+}
+
+/* Hum's push button — a solid colour EDGE plus a soft ground shadow. Never a
+   negative spread, never scale(): it lifts on hover and presses DOWN on
+   activate, so the press itself is the feedback. */
+.btn-push {
+    border-radius: var(--radius-pill);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow:
+        0 4px 0 0 var(--brand-deep),
+        0 6px 14px -4px color-mix(in oklab, var(--primary) 50%, transparent);
+    transform: translateY(0);
+    transition:
+        transform 140ms var(--ease-press),
+        box-shadow 140ms var(--ease-press),
+        background-color 160ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+    .btn-push:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 6px 0 0 var(--brand-deep),
+            0 12px 24px -5px
+            color-mix(in oklab, var(--primary) 50%, transparent);
+    }
+}
+.btn-push:active {
+    transform: translateY(3px);
+    box-shadow:
+        0 1px 0 0 var(--brand-deep),
+        0 2px 6px -2px color-mix(in oklab, var(--primary) 50%, transparent);
+    transition-duration: 70ms;
+}
+
+/* Card physics — rounded, lit from within, lifting on hover. */
+.lumen-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background-color: var(--card);
+    background-image: radial-gradient(
+        120% 100% at 12% 0%,
+        color-mix(in oklab, var(--primary) 6%, transparent) 0%,
+        transparent 62%
+    );
+    transition:
+        transform 220ms var(--ease-spring),
+        border-color 220ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+    .lumen-card:hover {
+        transform: translateY(-4px);
+        border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+    }
+}
+
+/* The character mark — one small thing that reacts. */
+.mark-pulse {
+    animation: mark-pulse 4s ease-in-out infinite;
+}
+@keyframes mark-pulse {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.85;
+    }
+    50% {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+}
+.star-burst {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background:
+        linear-gradient(
+            90deg,
+            transparent 47%,
+            var(--brand-chord) 47% 53%,
+            transparent 53%
+        ),
+        linear-gradient(
+            0deg,
+            transparent 47%,
+            var(--brand-chord) 47% 53%,
+            transparent 53%
+        );
+    animation: star-burst 420ms ease-out forwards;
+    pointer-events: none;
+}
+@keyframes star-burst {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    60% {
+        transform: scale(1.2) rotate(35deg);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1.4) rotate(45deg);
+        opacity: 0;
+    }
+}
+
+/* A global motion kill-switch has to outrank every utility that sets a
+   duration, so !important is load-bearing here rather than a shortcut. */
+/* biome-ignore-all lint/complexity/noImportantStyles: reduced-motion override */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 150ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 150ms !important;
+        scroll-behavior: auto !important;
+    }
+    .mark-pulse,
+    .star-burst,
+    .lumen-verb::after {
+        animation: none !important;
     }
 }

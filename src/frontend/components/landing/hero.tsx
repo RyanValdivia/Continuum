@@ -1,92 +1,131 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/frontend/components/ui/button";
-import { Reveal } from "./reveal";
+import { BrandShader } from "./brand-shader";
+import { CtaButton } from "./cta-button";
+import { CeoGraph } from "./demo/ceo-graph";
+import { Label } from "./lumen";
+import { GsapIntro } from "./motion";
 
+const STAGES = [
+    { n: "01", label: "Conectar", tone: "bg-primary" },
+    { n: "02", label: "Mapear", tone: "bg-brand-chord" },
+    { n: "03", label: "Consultar", tone: "bg-primary" },
+    { n: "04", label: "Mantener", tone: "bg-brand-chord" },
+];
+
+/**
+ * Split hero on the hum-07 model: a stage rail above the headline, display type
+ * with one accent verb, two pill CTAs and a mono source line — with a real
+ * graph on the right, rendered by the same SDK and node components as the
+ * interactive one further down.
+ */
 export function LandingHero() {
     return (
-        <section className="relative overflow-hidden">
-            {/* Soft blue glow */}
-            <div
-                aria-hidden
-                className="-translate-x-1/2 pointer-events-none absolute top-[-8rem] left-1/2 size-[42rem] rounded-full bg-primary/10 blur-3xl"
-            />
-            {/* Knowledge-graph node motif */}
-            <GraphMotif />
+        <section className="lumen-grid relative overflow-clip border-border border-b">
+            <BrandShader variant="field" />
 
-            <div className="relative mx-auto max-w-3xl px-6 pt-24 pb-20 text-center sm:pt-32">
-                <Reveal>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/60 px-3 py-1 text-muted-foreground text-xs backdrop-blur-sm">
-                        <span className="size-1.5 rounded-full bg-primary" />
-                        Plataforma de continuidad del conocimiento
-                    </span>
-                </Reveal>
+            <GsapIntro>
+                <div className="shell relative pt-[clamp(2.5rem,6vw,4rem)]">
+                    {/* Stage rail — the page's spine, previewed. Full width so the
+                    four chips never wrap into a dangling connector. */}
+                    <ol
+                        data-intro
+                        className="flex flex-wrap items-center gap-y-2"
+                    >
+                        {STAGES.map((stage, i) => (
+                            <li
+                                key={stage.n}
+                                className="flex items-center gap-2"
+                            >
+                                <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-border bg-card px-3 py-1.5">
+                                    <span
+                                        aria-hidden
+                                        className={`size-1.5 rounded-full ${stage.tone}`}
+                                    />
+                                    <Label className="text-muted-foreground">
+                                        {stage.n} {stage.label}
+                                    </Label>
+                                </span>
+                                {i < STAGES.length - 1 ? (
+                                    <span
+                                        aria-hidden
+                                        className="hidden h-px w-5 bg-border sm:block"
+                                    />
+                                ) : null}
+                            </li>
+                        ))}
+                    </ol>
+                </div>
 
-                <Reveal delay={0.05}>
-                    <h1 className="mt-6 text-balance font-semibold text-4xl text-foreground leading-[1.05] tracking-tight sm:text-6xl">
-                        La memoria viva de la empresa.
-                    </h1>
-                </Reveal>
+                <div className="shell relative grid items-center gap-[var(--space-2xl)] pt-[var(--space-xl)] pb-[clamp(4rem,9vw,7rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+                    <div>
+                        <h1
+                            data-intro
+                            className="max-w-[15ch] font-display text-[length:var(--text-display)] text-foreground leading-[1.02] tracking-[-0.028em]"
+                        >
+                            El conocimiento de tu empresa,{" "}
+                            <em className="lumen-verb">conectado</em>.
+                        </h1>
 
-                <Reveal delay={0.1}>
-                    <p className="mx-auto mt-6 max-w-xl text-balance text-lg text-muted-foreground leading-relaxed">
-                        No es otro chatbot. Continuum preserva el criterio y la
-                        experiencia de cada persona — no solo sus documentos.
-                    </p>
-                </Reveal>
+                        <p
+                            data-intro
+                            className="mt-[var(--space-lg)] max-w-[52ch] text-lg text-muted-foreground leading-relaxed"
+                        >
+                            Continuum construye un grafo vivo de personas,
+                            decisiones, documentos y criterio — y deja que
+                            preguntes sobre él. Un activo de la empresa, no una
+                            carpeta compartida.
+                        </p>
 
-                <Reveal delay={0.15}>
-                    <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                        <Button asChild size="lg">
-                            <Link href="/auth/sign-in">
-                                Empezar
-                                <ArrowRight />
-                            </Link>
-                        </Button>
-                        <Button asChild size="lg" variant="ghost">
-                            <a href="#como-funciona">Ver cómo funciona</a>
-                        </Button>
+                        <div
+                            data-intro
+                            className="mt-[var(--space-xl)] flex flex-wrap items-center gap-[var(--space-md)]"
+                        >
+                            <CtaButton href="/auth/sign-in">
+                                Construir mi grafo
+                            </CtaButton>
+                            <a
+                                href="#etapas"
+                                className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full border border-border px-5 font-medium text-primary text-sm outline-none transition-colors duration-[var(--dur-short)] ease-[var(--ease-out)] hover:border-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-4 active:translate-y-px"
+                            >
+                                Ver las cuatro etapas
+                                <span aria-hidden>→</span>
+                            </a>
+                        </div>
+
+                        <p data-intro className="mt-[var(--space-lg)]">
+                            <Label className="text-muted-foreground">
+                                Notion · Slack · Microsoft 365 · Revisión de
+                                documentos
+                            </Label>
+                        </p>
                     </div>
-                </Reveal>
 
-                <Reveal delay={0.2}>
-                    <p className="mt-10 font-medium text-muted-foreground text-sm">
-                        Menos búsqueda,{" "}
-                        <span className="text-foreground">
-                            más continuidad.
-                        </span>
-                    </p>
-                </Reveal>
-            </div>
+                    {/* The same renderer the product ships — a live graph, not a
+                    drawing of one. Read-only here; the section below is driveable. */}
+                    <div className="relative">
+                        <div data-intro-aside>
+                            <CeoGraph
+                                interactive={false}
+                                heightClass="h-[19rem] sm:h-[21rem]"
+                            />
+                        </div>
+
+                        <div
+                            data-intro-aside
+                            className="lumen-card -mt-[var(--space-lg)] relative mx-[var(--space-lg)] p-[var(--space-lg)]"
+                        >
+                            <Label className="text-brand-chord">
+                                Agente · Head of Sales
+                            </Label>
+                            <p className="mt-2 text-muted-foreground text-sm leading-snug">
+                                «¿Puedo cerrar este deal con 20 % de descuento?»
+                            </p>
+                            <p className="mt-2 text-foreground text-sm leading-snug">
+                                No sin aprobación — el tope sin escalar es 15 %.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </GsapIntro>
         </section>
-    );
-}
-
-function GraphMotif() {
-    return (
-        <svg
-            aria-hidden
-            className="-z-10 -translate-x-1/2 absolute top-10 left-1/2 h-[26rem] w-[52rem] text-primary/25"
-            viewBox="0 0 520 260"
-            fill="none"
-        >
-            <title>Knowledge graph</title>
-            <g stroke="currentColor" strokeWidth="1">
-                <line x1="90" y1="70" x2="200" y2="130" />
-                <line x1="200" y1="130" x2="330" y2="60" />
-                <line x1="200" y1="130" x2="300" y2="200" />
-                <line x1="330" y1="60" x2="440" y2="120" />
-                <line x1="300" y1="200" x2="440" y2="120" />
-                <line x1="90" y1="70" x2="150" y2="20" />
-            </g>
-            <g fill="currentColor">
-                <circle cx="90" cy="70" r="4" />
-                <circle cx="200" cy="130" r="6" />
-                <circle cx="330" cy="60" r="4" />
-                <circle cx="300" cy="200" r="4" />
-                <circle cx="440" cy="120" r="5" />
-                <circle cx="150" cy="20" r="3" />
-            </g>
-        </svg>
     );
 }
