@@ -1,4 +1,3 @@
-import { BrandShader } from "./brand-shader";
 import { Label, SectionHead } from "./lumen";
 import { GsapReveal } from "./motion";
 
@@ -104,7 +103,6 @@ export function LandingComparison() {
 
                 {/* The answer to all three, set apart on purpose. */}
                 <div className="lumen-card relative mt-[var(--space-lg)] overflow-hidden border-primary/40 p-[var(--space-lg)] md:p-[var(--space-2xl)]">
-                    <BrandShader variant="panel" />
                     <div className="relative grid gap-[var(--space-lg)] md:grid-cols-[16rem_minmax(0,1fr)]">
                         <div>
                             <Label className="text-primary">Continuum</Label>

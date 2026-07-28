@@ -1,4 +1,3 @@
-import { BrandShader } from "./brand-shader";
 import { Label, SectionHead } from "./lumen";
 
 type NodeType = {
@@ -41,7 +40,6 @@ export function LandingContinuity() {
             id="continuidad"
             className="relative scroll-mt-24 overflow-clip border-border border-b bg-secondary/40"
         >
-            <BrandShader variant="band" />
             <div className="relative shell pt-[clamp(3.5rem,8vw,6rem)] pb-[clamp(4rem,9vw,7rem)]">
                 <SectionHead
                     align="center"

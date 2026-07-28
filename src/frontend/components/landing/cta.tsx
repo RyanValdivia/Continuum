@@ -1,12 +1,10 @@
-import { BrandShader } from "./brand-shader";
 import { CtaButton } from "./cta-button";
 import { Label } from "./lumen";
 
 /** The closer. Names the first concrete step instead of restating the hero. */
 export function LandingCta() {
     return (
-        <section className="lumen-grid relative overflow-clip border-border border-b">
-            <BrandShader variant="field" />
+        <section className="relative overflow-clip border-border border-b">
             <div className="relative shell grid justify-items-center gap-[var(--space-lg)] pt-[clamp(4rem,10vw,7rem)] pb-[clamp(4rem,10vw,7rem)] text-center">
                 <span className="inline-flex items-center gap-2">
                     <span

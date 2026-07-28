@@ -19,7 +19,7 @@ import { LandingStages } from "./stages";
  */
 export function Landing() {
     return (
-        <div className="dark min-h-svh bg-background font-sans text-foreground">
+        <div className="dark lumen-grid min-h-svh bg-background font-sans text-foreground">
             <LandingNav />
             <main>
                 <LandingHero />

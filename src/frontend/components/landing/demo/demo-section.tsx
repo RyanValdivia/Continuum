@@ -1,4 +1,3 @@
-import { BrandShader } from "../brand-shader";
 import { LandingHowItWorks } from "../how-it-works";
 import { SectionHead } from "../lumen";
 import { CeoGraph } from "./ceo-graph";
@@ -13,7 +12,6 @@ export function LandingDemo() {
             id="grafo"
             className="relative scroll-mt-24 overflow-clip border-border border-b"
         >
-            <BrandShader variant="band" />
             <div className="relative shell pt-[clamp(3.5rem,8vw,6rem)] pb-[clamp(4rem,9vw,7rem)]">
                 <SectionHead
                     kicker="El grafo"

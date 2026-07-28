@@ -1,4 +1,3 @@
-import { BrandShader } from "./brand-shader";
 import { CtaButton } from "./cta-button";
 import { CeoGraph } from "./demo/ceo-graph";
 import { Label } from "./lumen";
@@ -19,9 +18,7 @@ const STAGES = [
  */
 export function LandingHero() {
     return (
-        <section className="lumen-grid relative overflow-clip border-border border-b">
-            <BrandShader variant="field" />
-
+        <section className="relative overflow-clip border-border border-b">
             <GsapIntro>
                 <div className="shell relative pt-[clamp(2.5rem,6vw,4rem)]">
                     {/* Stage rail — the page's spine, previewed. Full width so the

@@ -1,5 +1,5 @@
-/* Hallmark · genre: atmospheric · macrostructure: Narrative Workflow (numbered
- * stage rail), per the hum-07 reference · theme: Lumen surface + Hum structure
+/* Hallmark · genre: atmospheric · macrostructure: full-scene pinned narrative
+ * (four stages), per the hum-07 reference · theme: Lumen surface + Hum structure
  * nav: N10 floating-on-scroll morph · footer: Ft4 dense colophon
  * hero: split — rail chips + display headline + 2 pill CTAs, apparatus right
  * anchor hue: 256 azure (brand) · verb landmark: coral chord, hue 32
@@ -211,17 +211,24 @@ body {
 .lumen-grid {
     background-image:
         linear-gradient(
-            color-mix(in oklab, var(--foreground) 4%, transparent) 1px,
+            color-mix(in oklab, var(--foreground) 3%, transparent) 1px,
             transparent 1px
         ),
         linear-gradient(
             90deg,
-            color-mix(in oklab, var(--foreground) 4%, transparent) 1px,
+            color-mix(in oklab, var(--foreground) 3%, transparent) 1px,
             transparent 1px
         );
     background-size:
         48px 48px,
         48px 48px;
+}
+
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .full-scene-panel {
+        min-height: 100svh;
+        will-change: transform, opacity;
+    }
 }
 
 /* The verb landmark: accent colour plus a 1px underline that draws in once.
