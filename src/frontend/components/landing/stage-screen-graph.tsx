@@ -99,11 +99,11 @@ export function StageScreenGraph(): ReactElement {
     return (
         <svg
             data-graph-camera
+            aria-hidden="true"
             viewBox="0 0 100 100"
             className="size-full overflow-visible"
         >
             <g data-graph-cross-edges>
-
                 {CROSS_CLUSTER_EDGES.map((edge) => (
                     <GraphEdge key={edge.id} edge={edge} />
                 ))}
