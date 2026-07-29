@@ -12,11 +12,6 @@ type StageScreenProps = {
     active: boolean;
 };
 
-type StageScreenLegacyProps = {
-    index: number;
-    active: boolean;
-};
-
 function contextPath(source: SourceVisual): string {
     const bend = source.depth * 2.5;
     const controlX = (source.x + 50) / 2 + (source.y < 50 ? bend : -bend);
@@ -24,11 +19,8 @@ function contextPath(source: SourceVisual): string {
     return `M ${source.x} ${source.y} Q ${controlX} ${controlY} 50 50`;
 }
 
-export function StageScreen(
-    props: StageScreenProps | StageScreenLegacyProps,
-): ReactElement {
-    const activeStage =
-        "activeStage" in props ? props.activeStage : (props.index ?? 0);
+export function StageScreen(props: StageScreenProps): ReactElement {
+    const { activeStage } = props;
 
     return (
         <figure

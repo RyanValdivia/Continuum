@@ -166,8 +166,10 @@ export function LandingStages() {
                                     </ul>
                                 </div>
                                 <StageScreen
-                                    index={index}
-                                    active={activeScene === index}
+                                    activeStage={index as 0 | 1 | 2 | 3}
+                                    active={
+                                        activeScene === (index as 0 | 1 | 2 | 3)
+                                    }
                                 />
                             </li>
                         ))}
