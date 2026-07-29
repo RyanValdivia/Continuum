@@ -67,6 +67,37 @@ const PHASE_STATES: Record<StageIndex, PhaseState> = {
     },
 };
 
+function applyPhaseSnapshot(stage: StageIndex): void {
+    const state = PHASE_STATES[stage];
+
+    gsap.set(layer("sources"), state.sources);
+    gsap.set(layer("graph"), state.graph);
+    gsap.set(layer("decision"), state.decision);
+    gsap.set(layer("integration"), state.integration);
+
+    gsap.set('[data-decision-route="true"]', { autoAlpha: state.routeAlpha });
+    gsap.set(
+        '[data-graph-edge]:not([data-decision-route="true"]):not([data-phase-four-edge="true"])',
+        { autoAlpha: state.graphAlpha },
+    );
+
+    gsap.set('[data-phase-four-node="true"]', { autoAlpha: 0, scale: 0.35 });
+    gsap.set('[data-phase-four-edge="true"]', { autoAlpha: 0 });
+
+    gsap.set("[data-source-mark]", { y: 0, rotation: 0 });
+    gsap.set("[data-context-packet]", { x: 0, y: 0, autoAlpha: 0 });
+    gsap.set("[data-graph-camera]", { rotation: 0, scale: 1 });
+    gsap.set("[data-graph-cluster]", { rotation: 0 });
+    gsap.set(target("decision-particle"), { x: 0, y: 0, autoAlpha: 0 });
+    gsap.set(target("integration-signal"), {
+        x: 0,
+        y: 0,
+        scale: 1,
+        autoAlpha: 0,
+    });
+    gsap.set(target("integration-wave"), { scale: 1, autoAlpha: 0 });
+}
+
 function buildPhaseTransition(stage: StageIndex): gsap.core.Timeline {
     const state = PHASE_STATES[stage];
 
@@ -78,6 +109,22 @@ function buildPhaseTransition(stage: StageIndex): gsap.core.Timeline {
                 overwrite: "auto",
             },
         })
+        .to("[data-source-mark]", { y: 0, rotation: 0 }, 0)
+        .to("[data-context-packet]", { x: 0, y: 0, autoAlpha: 0 }, 0)
+        .to("[data-graph-camera]", { rotation: 0, scale: 1 }, 0)
+        .to("[data-graph-cluster]", { rotation: 0 }, 0)
+        .to(target("decision-particle"), { x: 0, y: 0, autoAlpha: 0 }, 0)
+        .to(
+            target("integration-signal"),
+            {
+                x: 0,
+                y: 0,
+                scale: 1,
+                autoAlpha: 0,
+            },
+            0,
+        )
+        .to(target("integration-wave"), { autoAlpha: 0, scale: 1 }, 0)
         .to(layer("sources"), state.sources, 0)
         .to(layer("graph"), state.graph, 0)
         .to(layer("decision"), state.decision, 0)
@@ -293,12 +340,19 @@ export function StageScreen(props: StageScreenProps): ReactElement {
             }
 
             if (!active) {
+                applyPhaseSnapshot(activeStage);
                 return;
             }
 
             transition.current = buildPhaseTransition(activeStage);
+            ambient.current = buildAmbientTimeline(activeStage);
+            ambient.current?.pause();
+
             transition.current.eventCallback("onComplete", () => {
-                ambient.current = buildAmbientTimeline(activeStage);
+                if (document.hidden || !active) {
+                    return;
+                }
+                ambient.current?.play();
             });
         },
         {
@@ -308,6 +362,7 @@ export function StageScreen(props: StageScreenProps): ReactElement {
         },
     );
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: activeStage ensures pause state re-syncs after stage rebuilds.
     useEffect(() => {
         const syncVisibility = () => {
             const paused = document.hidden || !active;
@@ -320,7 +375,7 @@ export function StageScreen(props: StageScreenProps): ReactElement {
 
         return () =>
             document.removeEventListener("visibilitychange", syncVisibility);
-    }, [active]);
+    }, [active, activeStage]);
 
     useEffect(
         () => () => {
