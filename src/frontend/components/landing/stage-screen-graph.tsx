@@ -32,7 +32,6 @@ function GraphEdge({ edge }: { edge: LandingGraphEdge }): ReactElement {
     const { source, target } = endpoints(edge);
     return (
         <line
-            key={edge.id}
             data-graph-edge={edge.id}
             data-decision-route={edge.decisionRoute ? "true" : undefined}
             data-phase-four-edge={
@@ -99,13 +98,12 @@ export function StageScreenGraph(): ReactElement {
 
     return (
         <svg
-            aria-hidden
             data-graph-camera
             viewBox="0 0 100 100"
             className="size-full overflow-visible"
         >
-            <title>Relaciones de grafo por clusters</title>
             <g data-graph-cross-edges>
+
                 {CROSS_CLUSTER_EDGES.map((edge) => (
                     <GraphEdge key={edge.id} edge={edge} />
                 ))}

@@ -75,7 +75,10 @@ function mockDocumentVisibility(initialHidden: boolean): VisibilityController {
         restore: () => {
             if (previousDescriptor) {
                 Object.defineProperty(document, "hidden", previousDescriptor);
+                return;
             }
+
+            delete (document as { hidden?: boolean }).hidden;
         },
     };
 }

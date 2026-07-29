@@ -303,11 +303,7 @@ function buildAmbientTimeline(stage: StageIndex): gsap.core.Timeline {
             { scale: 1.025, duration: 0.24, yoyo: true, repeat: 1 },
             "<",
         )
-        .to({}, { duration: 1.2 })
-        .to('[data-phase-four-node="true"], [data-phase-four-edge="true"]', {
-            autoAlpha: 0,
-            duration: 0.15,
-        });
+        .to({}, { duration: 1.2 });
 }
 
 type StageScreenProps = {
