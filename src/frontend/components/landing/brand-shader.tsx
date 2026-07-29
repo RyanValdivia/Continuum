@@ -1,8 +1,10 @@
 "use client";
 
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { cn } from "@/frontend/lib/utils";
 
 /**
@@ -19,9 +21,9 @@ const AZURE = "#4a90f7";
 const AZURE_DEEP = "#14315f";
 const TRANSPARENT = "#00000000";
 
-type Variant = "field" | "panel" | "band";
+type Variant = "field" | "panel" | "band" | "constellation";
 
-const VARIANTS: Record<
+export const BRAND_SHADER_PRESETS: Record<
     Variant,
     { scale: number; rotation: number; speed: number; opacity: string }
 > = {
@@ -33,7 +35,20 @@ const VARIANTS: Record<
     },
     panel: { scale: 0.8, rotation: 1.2, speed: 0.18, opacity: "opacity-[0.2]" },
     band: { scale: 1.5, rotation: 2.1, speed: 0.1, opacity: "opacity-[0.13]" },
+    constellation: {
+        scale: 1.24,
+        rotation: 0.72,
+        speed: 0.16,
+        opacity: "opacity-[0.28]",
+    },
 };
+
+const SHADER_PHASES = [
+    { autoAlpha: 0.78, scale: 1 },
+    { autoAlpha: 0.92, scale: 1.025 },
+    { autoAlpha: 1, scale: 1.045 },
+    { autoAlpha: 0.88, scale: 1.02 },
+] as const;
 
 function useDesktopMotion() {
     const [matches, setMatches] = useState(false);
@@ -55,21 +70,42 @@ function useDesktopMotion() {
 export function BrandShader({
     variant = "field",
     className,
+    activeStage = 0,
     desktopMotionOnly = false,
 }: {
     variant?: Variant;
+    activeStage?: 0 | 1 | 2 | 3;
     className?: string;
     desktopMotionOnly?: boolean;
 }) {
     const reduce = useReducedMotion();
     const desktopMotion = useDesktopMotion();
-    const preset = VARIANTS[variant];
+    const preset = BRAND_SHADER_PRESETS[variant];
+    const scope = useRef<HTMLDivElement>(null);
+
+    useGSAP(
+        () => {
+            if (variant !== "constellation" || reduce || !desktopMotion) return;
+
+            const target = scope.current;
+            if (!target) return;
+
+            gsap.to(target, {
+                ...SHADER_PHASES[activeStage],
+                duration: 0.65,
+                ease: "power2.inOut",
+                overwrite: "auto",
+            });
+        },
+        { scope, dependencies: [activeStage, desktopMotion, reduce, variant] },
+    );
 
     if (desktopMotionOnly && !desktopMotion) return null;
 
     return (
         <Suspense fallback={null}>
             <div
+                ref={scope}
                 aria-hidden
                 className={cn(
                     "pointer-events-none absolute inset-0 z-0",

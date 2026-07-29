@@ -120,9 +120,9 @@ export function LandingStages() {
                 className="relative overflow-clip lg:min-h-svh"
             >
                 <BrandShader
+                    activeStage={activeScene}
                     desktopMotionOnly
-                    variant="field"
-                    className="opacity-[0.2]"
+                    variant="constellation"
                 />
                 <div
                     aria-hidden

@@ -312,7 +312,7 @@ export function GsapPinnedScenes({
                             end: () =>
                                 `+=${window.innerHeight * scenes.length}`,
                             pin: true,
-                            scrub: 0.65,
+                            scrub: 0.5,
                             invalidateOnRefresh: true,
                             onEnter: () =>
                                 onSectionActiveChangeRef.current?.(true),
@@ -339,19 +339,19 @@ export function GsapPinnedScenes({
                                 scenes[index - 1],
                                 {
                                     autoAlpha: 0,
-                                    yPercent: -4,
-                                    duration: 0.25,
+                                    yPercent: -3,
+                                    duration: 0.35,
                                     ease: "power1.inOut",
                                 },
                                 index,
                             )
                             .fromTo(
                                 scenes[index],
-                                { autoAlpha: 0, yPercent: 4 },
+                                { autoAlpha: 0, yPercent: 3 },
                                 {
                                     autoAlpha: 1,
                                     yPercent: 0,
-                                    duration: 0.25,
+                                    duration: 0.35,
                                     ease: "power1.inOut",
                                     immediateRender: false,
                                 },

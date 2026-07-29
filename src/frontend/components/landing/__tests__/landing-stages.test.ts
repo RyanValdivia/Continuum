@@ -58,6 +58,7 @@ describe("LandingStages", () => {
         expect(screen).toContain('data-stage-active="false"');
         expect(screen).not.toContain("Consultar");
         expect(screen).not.toContain("Head of Sales");
+        expect(screen).not.toContain("opacity-[0.2]");
     });
 
     it("describes the complete transformation accessibly", () => {
