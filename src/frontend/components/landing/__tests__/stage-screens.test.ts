@@ -5,7 +5,11 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { StageScreen, shouldPauseAmbient } from "../stage-screens";
+import {
+    ambientRepeatPolicy,
+    StageScreen,
+    shouldPauseAmbient,
+} from "../stage-screens";
 
 type MatchMediaConfig = {
     desktop: boolean;
@@ -197,6 +201,10 @@ describe("StageScreen", () => {
                 ambientReady: true,
             }),
         ).toBe(false);
+    });
+
+    it("keeps stage-three ambient integration one-shot", () => {
+        expect(ambientRepeatPolicy(3)).toBe(0);
     });
 
     it("applies inactive desktop baseline state on first mount", async () => {

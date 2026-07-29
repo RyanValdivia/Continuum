@@ -74,6 +74,19 @@ type AmbientPauseState = {
     ambientReady: boolean;
 };
 
+export const AMBIENT_REPEAT_POLICIES = {
+    0: -1,
+    1: -1,
+    2: -1,
+    3: 0,
+} as const;
+
+export type AmbientRepeatPolicy = (typeof AMBIENT_REPEAT_POLICIES)[StageIndex];
+
+export function ambientRepeatPolicy(stage: StageIndex): AmbientRepeatPolicy {
+    return AMBIENT_REPEAT_POLICIES[stage];
+}
+
 export function shouldPauseAmbient(args: AmbientPauseState): boolean {
     return (
         args.isHidden ||
@@ -156,7 +169,10 @@ function buildPhaseTransition(stage: StageIndex): gsap.core.Timeline {
 }
 
 function buildAmbientTimeline(stage: StageIndex): gsap.core.Timeline {
-    const timeline = gsap.timeline({ repeat: -1, repeatDelay: 0.8 });
+    const timeline = gsap.timeline({
+        repeat: ambientRepeatPolicy(stage),
+        repeatDelay: 0.8,
+    });
 
     if (stage === 0) {
         const packets = gsap.utils.toArray<SVGCircleElement>(
@@ -257,6 +273,10 @@ function buildAmbientTimeline(stage: StageIndex): gsap.core.Timeline {
             .to(target("decision-focus"), { scale: 1, duration: 0.28 })
             .to(particle, { autoAlpha: 0, duration: 0.18 })
             .to({}, { duration: 1.1 });
+    }
+
+    if (stage === 3) {
+        timeline.repeat(0);
     }
 
     return timeline
