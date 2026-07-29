@@ -128,12 +128,15 @@ export function LandingStages() {
                     aria-hidden
                     className="pointer-events-none absolute inset-0 bg-background/45"
                 />
-                <div aria-hidden className="shell relative">
+                <div className="shell relative">
                     <StageScreen
                         activeStage={activeScene}
                         active={sectionActive}
                     />
-                    <ol className="grid gap-[var(--space-lg)] py-[var(--space-2xl)] lg:min-h-svh lg:py-0">
+                    <ol
+                        aria-hidden="true"
+                        className="grid gap-[var(--space-lg)] py-[var(--space-2xl)] lg:min-h-svh lg:py-0"
+                    >
                         {STAGES.map((stage) => (
                             <li
                                 key={stage.n}

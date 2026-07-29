@@ -7,9 +7,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import {
     ambientRepeatPolicy,
-    StageScreen,
     shouldPauseAmbient,
-} from "../stage-screens";
+} from "../stage-screen-motion";
+import { StageScreen } from "../stage-screens";
 
 type MatchMediaConfig = {
     desktop: boolean;
@@ -253,9 +253,71 @@ describe("StageScreen", () => {
             );
 
             expect(phaseFourNode?.style.opacity).toBe("1");
+            expect(phaseFourEdges).toHaveLength(3);
             for (const edge of phaseFourEdges) {
                 expect(edge.style.opacity).toBe("1");
             }
+
+            const integrationSignal = container.querySelector<HTMLElement>(
+                "[data-integration-signal]",
+            );
+            const integrationWave = container.querySelector<HTMLElement>(
+                "[data-integration-wave]",
+            );
+
+            expect(integrationSignal?.style.opacity).toBe("0");
+            expect(integrationWave?.style.opacity).toBe("0");
+        } finally {
+            await unmount();
+        }
+    });
+
+    it("shows the completed phase-four snapshot when stage three is inactive", async () => {
+        const { container, unmount } = await mountStageScreen(
+            { activeStage: 3, active: false },
+            { desktop: true, reduceMotion: false },
+        );
+
+        try {
+            const phaseFourNode = container.querySelector<SVGGraphicsElement>(
+                '[data-phase-four-node="true"]',
+            );
+            const phaseFourEdges = container.querySelectorAll<SVGLineElement>(
+                '[data-phase-four-edge="true"]',
+            );
+
+            expect(phaseFourNode?.style.opacity).toBe("1");
+            expect(phaseFourEdges).toHaveLength(3);
+            for (const edge of phaseFourEdges) {
+                expect(edge.style.opacity).toBe("1");
+            }
+
+            const integrationSignal = container.querySelector<HTMLElement>(
+                "[data-integration-signal]",
+            );
+            const integrationWave = container.querySelector<HTMLElement>(
+                "[data-integration-wave]",
+            );
+
+            expect(integrationSignal?.style.opacity).toBe("0");
+            expect(integrationWave?.style.opacity).toBe("0");
+        } finally {
+            await unmount();
+        }
+    });
+
+    it("keeps the phase-four snapshot hidden for earlier stages when inactive", async () => {
+        const { container, unmount } = await mountStageScreen(
+            { activeStage: 1, active: false },
+            { desktop: true, reduceMotion: false },
+        );
+
+        try {
+            const phaseFourNode = container.querySelector<SVGGraphicsElement>(
+                '[data-phase-four-node="true"]',
+            );
+
+            expect(phaseFourNode?.style.opacity).toBe("0");
         } finally {
             await unmount();
         }

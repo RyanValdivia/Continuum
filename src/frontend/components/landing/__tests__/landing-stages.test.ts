@@ -1,8 +1,21 @@
+/** @vitest-environment happy-dom */
+
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 import { LandingStages } from "../stages";
+
+// happy-dom does not implement requestAnimationFrame. Importing "../stages"
+// registers GSAP's ScrollTrigger plugin, whose background ticker schedules a
+// deferred rAF call; without this polyfill it throws after teardown.
+if (typeof globalThis.requestAnimationFrame === "undefined") {
+    globalThis.requestAnimationFrame = (callback: FrameRequestCallback) =>
+        setTimeout(() => callback(Date.now()), 16) as unknown as number;
+    globalThis.cancelAnimationFrame = (handle: number) => {
+        clearTimeout(handle);
+    };
+}
 
 const STAGE_COPY = [
     [
@@ -119,5 +132,57 @@ describe("LandingStages", () => {
         ]) {
             expect(screen).toContain(summary);
         }
+    });
+
+    describe("accessibility structure", () => {
+        function hasHiddenAncestor(element: Element | null): boolean {
+            let node = element?.parentElement ?? null;
+            while (node) {
+                if (node.getAttribute("aria-hidden") === "true") return true;
+                node = node.parentElement;
+            }
+            return false;
+        }
+
+        const container = document.createElement("div");
+        container.innerHTML = screen;
+
+        it("keeps the stage progress rail outside any aria-hidden ancestor", () => {
+            const progress = container.querySelector(
+                '[aria-label="Progreso de las etapas"]',
+            );
+
+            expect(progress).not.toBeNull();
+            expect(hasHiddenAncestor(progress)).toBe(false);
+        });
+
+        it("keeps the progress rail's aria-current step available", () => {
+            const current = container.querySelector('[aria-current="step"]');
+
+            expect(current).not.toBeNull();
+            expect(hasHiddenAncestor(current)).toBe(false);
+        });
+
+        it("keeps the constellation figcaption outside any aria-hidden ancestor", () => {
+            const figcaption = container.querySelector(
+                "[data-constellation-narrative] figcaption",
+            );
+
+            expect(figcaption).not.toBeNull();
+            expect(hasHiddenAncestor(figcaption)).toBe(false);
+        });
+
+        it("keeps the decorative visual copy and sr-only stage list intact", () => {
+            const srOnlyList = container.querySelector(
+                '[aria-label="Todas las etapas"]',
+            );
+            expect(srOnlyList).not.toBeNull();
+            expect(srOnlyList?.className).toContain("sr-only");
+
+            const visibleCopyList =
+                container.querySelectorAll("[data-full-scene]")[0]
+                    ?.parentElement;
+            expect(visibleCopyList?.getAttribute("aria-hidden")).toBe("true");
+        });
     });
 });
