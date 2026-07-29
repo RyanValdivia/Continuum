@@ -3,79 +3,42 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { StageScreen } from "../stage-screens";
 
-const MOTION_CONTRACT = [
-    {
-        index: 0,
-        kind: "sources",
-        items: { source: 4, connector: 4, core: 1 },
-    },
-    {
-        index: 1,
-        kind: "graph",
-        items: { node: 4, edge: 1, core: 1 },
-    },
-    {
-        index: 2,
-        kind: "agent",
-        items: { question: 1, answer: 1, source: 2 },
-    },
-    {
-        index: 3,
-        kind: "freshness",
-        items: { source: 3, status: 3, core: 1 },
-    },
-] as const;
-
-function countAttribute(markup: string, attribute: string): number {
+function count(markup: string, attribute: string): number {
     return markup.match(new RegExp(attribute, "g"))?.length ?? 0;
 }
 
 describe("StageScreen", () => {
-    it.each([
-        [0, ["Notion", "Slack", "Microsoft 365", "Documentos", "Continuum"]],
-        [1, ["Persona", "Decisión", "Documento", "Criterio", "Grafo"]],
-        [
-            2,
-            [
-                "Head of Sales",
-                "¿Puedo cerrar este deal con 20 % de descuento?",
-                "15 %",
-                "Fuentes",
-            ],
-        ],
-        [
-            3,
-            ["Slack", "Notion", "Microsoft 365", "Actualizado", "Grafo al día"],
-        ],
-    ])("renders required accessible content for stage %s", (index, content) => {
-        const screen = renderToStaticMarkup(
-            createElement(StageScreen, { index, active: true }),
-        );
+    const screen = renderToStaticMarkup(
+        createElement(StageScreen, { activeStage: 0, active: true }),
+    );
 
-        expect(screen).toContain("<figure");
+    it("renders one continuous constellation", () => {
+        expect(screen).toContain("data-constellation-narrative");
+        expect(screen).toContain('data-stage-active="true"');
         expect(screen).toMatch(/<figure[^>]*><figcaption/);
-
-        for (const text of content) {
-            expect(screen).toContain(text);
-        }
+        expect(count(screen, "data-source-mark=")).toBe(14);
+        expect(count(screen, "data-context-path=")).toBe(14);
+        expect(count(screen, "data-context-packet=")).toBe(14);
+        expect(screen).toContain("data-graph-camera");
     });
 
-    it.each(MOTION_CONTRACT)("renders scoped motion targets for $kind", ({
-        index,
-        kind,
-        items,
-    }) => {
-        const screen = renderToStaticMarkup(
-            createElement(StageScreen, { index, active: true }),
-        );
+    it("exposes all four narrative layers", () => {
+        for (const layer of ["sources", "graph", "decision", "integration"]) {
+            expect(screen).toContain(`data-constellation-layer="${layer}"`);
+        }
+        expect(screen).toContain("data-decision-focus");
+        expect(screen).toContain("data-integration-signal");
+    });
 
-        expect(screen).toContain(`data-stage-motion="${kind}"`);
-        expect(screen).toContain('data-stage-active="true"');
-
-        for (const [item, count] of Object.entries(items)) {
-            expect(countAttribute(screen, `data-stage-item="${item}"`)).toBe(
-                count,
-            );
+    it("removes the old chat and freshness cards", () => {
+        for (const oldContent of [
+            "Head of Sales",
+            "¿Puedo cerrar este deal",
+            "Respuesta",
+            "Grafo al día",
+            "Actualizado",
+        ]) {
+            expect(screen).not.toContain(oldContent);
         }
     });
 });
