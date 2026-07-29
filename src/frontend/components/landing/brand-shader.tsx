@@ -17,6 +17,13 @@ const NeuroNoise = dynamic(
     { ssr: false },
 );
 
+/**
+ * Shared by the shader and the scrim over it, so the two fade as one layer
+ * instead of one of them outlining the other.
+ */
+export const SCENE_EDGE_FADE =
+    "[mask-image:linear-gradient(to_bottom,transparent,black_16%,black_90%,transparent)]";
+
 const AZURE = "#4a90f7";
 const AZURE_DEEP = "#14315f";
 const TRANSPARENT = "#00000000";
@@ -43,12 +50,30 @@ export const BRAND_SHADER_PRESETS: Record<
     },
 };
 
-const SHADER_PHASES = [
-    { autoAlpha: 0.78, scale: 1 },
-    { autoAlpha: 0.92, scale: 1.025 },
-    { autoAlpha: 1, scale: 1.045 },
-    { autoAlpha: 0.88, scale: 1.02 },
-] as const;
+/**
+ * The constellation preset's resting alpha, mirrored by its `opacity` class so
+ * the first paint matches what GSAP animates to.
+ */
+const CONSTELLATION_BASE_ALPHA = 0.28;
+
+/**
+ * Per-stage intensity as a fraction of the base alpha. GSAP writes an inline
+ * `opacity`, which outranks the Tailwind opacity utility — so these ratios have
+ * to be resolved against the base before they reach a tween, or stage one alone
+ * would render the shader at 0.78 instead of 0.22.
+ */
+const SHADER_PHASE_INTENSITIES = [0.78, 0.92, 1, 0.88] as const;
+const SHADER_PHASE_SCALES = [1, 1.025, 1.045, 1.02] as const;
+
+export function constellationPhase(stage: 0 | 1 | 2 | 3): {
+    autoAlpha: number;
+    scale: number;
+} {
+    return {
+        autoAlpha: CONSTELLATION_BASE_ALPHA * SHADER_PHASE_INTENSITIES[stage],
+        scale: SHADER_PHASE_SCALES[stage],
+    };
+}
 
 function useDesktopMotion() {
     const [matches, setMatches] = useState(false);
@@ -91,7 +116,7 @@ export function BrandShader({
             if (!target) return;
 
             gsap.to(target, {
-                ...SHADER_PHASES[activeStage],
+                ...constellationPhase(activeStage),
                 duration: 0.65,
                 ease: "power2.inOut",
                 overwrite: "auto",
@@ -110,6 +135,11 @@ export function BrandShader({
                 className={cn(
                     "pointer-events-none absolute inset-0 z-0",
                     preset.opacity,
+                    // The scene block starts mid-section, so an unmasked
+                    // shader draws a hard horizontal edge right under the
+                    // section head. Fading it in and out turns that edge into
+                    // an approach.
+                    variant === "constellation" && SCENE_EDGE_FADE,
                     className,
                 )}
             >

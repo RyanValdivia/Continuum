@@ -4,7 +4,7 @@ import {
     LANDING_GRAPH_EDGES,
     LANDING_GRAPH_NODES,
     LANDING_SOURCES,
-    PHASE_FOUR_NODE_ID,
+    PHASE_FOUR_NODE_IDS,
 } from "../stage-screen-data";
 
 const APPROVED_PROVIDERS = [
@@ -37,9 +37,9 @@ describe("landing constellation data", () => {
         );
 
         expect(new Set(ids).size).toBe(ids.length);
-        expect(LANDING_GRAPH_NODES).toHaveLength(32);
+        expect(LANDING_GRAPH_NODES).toHaveLength(35);
         expect(LANDING_GRAPH_EDGES.length).toBeGreaterThanOrEqual(44);
-        expect(LANDING_GRAPH_EDGES.length).toBeLessThanOrEqual(56);
+        expect(LANDING_GRAPH_EDGES.length).toBeLessThanOrEqual(62);
         expect([...clusters].sort()).toEqual([...GRAPH_CLUSTERS].sort());
     });
 
@@ -68,39 +68,52 @@ describe("landing constellation data", () => {
         expect(routeClusters).toEqual(new Set(GRAPH_CLUSTERS));
     });
 
-    it("integrates the phase-four node through hub and cross-cluster edges", () => {
+    it("integrates every phase-four node through hub and cross-cluster edges", () => {
         const nodes = new Map(
             LANDING_GRAPH_NODES.map((node) => [node.id, node] as const),
         );
-        const newNode = nodes.get(PHASE_FOUR_NODE_ID);
-        const edges = LANDING_GRAPH_EDGES.filter(
-            (edge) => edge.introducedInPhase === 4,
-        );
-        const connected = edges.filter(
-            (edge) =>
-                edge.source === PHASE_FOUR_NODE_ID ||
-                edge.target === PHASE_FOUR_NODE_ID,
-        );
 
-        expect(newNode?.introducedInPhase).toBe(4);
-        expect(connected).toHaveLength(3);
+        for (const id of PHASE_FOUR_NODE_IDS) {
+            const newNode = nodes.get(id);
+            const connected = LANDING_GRAPH_EDGES.filter(
+                (edge) =>
+                    edge.introducedInPhase === 4 &&
+                    (edge.source === id || edge.target === id),
+            );
+            const partnerOf = (edge: { source: string; target: string }) =>
+                nodes.get(edge.source === id ? edge.target : edge.source);
+
+            expect(newNode?.introducedInPhase).toBe(4);
+            expect(connected.length).toBeGreaterThanOrEqual(2);
+            expect(
+                connected.some((edge) => partnerOf(edge)?.hub === true),
+            ).toBe(true);
+            expect(
+                connected.some(
+                    (edge) => partnerOf(edge)?.cluster !== newNode?.cluster,
+                ),
+            ).toBe(true);
+        }
+    });
+
+    it("spreads the phase-four signals across clusters and quadrants", () => {
+        const nodes = new Map(
+            LANDING_GRAPH_NODES.map((node) => [node.id, node] as const),
+        );
+        const signals = PHASE_FOUR_NODE_IDS.map((id) => nodes.get(id));
+
+        expect(signals.every(Boolean)).toBe(true);
+        // One per cluster and one per quadrant, so the loop grows the graph
+        // somewhere different on every pass.
+        expect(new Set(signals.map((node) => node?.cluster)).size).toBe(
+            PHASE_FOUR_NODE_IDS.length,
+        );
         expect(
-            connected.some((edge) => {
-                const otherId =
-                    edge.source === PHASE_FOUR_NODE_ID
-                        ? edge.target
-                        : edge.source;
-                return nodes.get(otherId)?.hub === true;
-            }),
-        ).toBe(true);
-        expect(
-            connected.some((edge) => {
-                const otherId =
-                    edge.source === PHASE_FOUR_NODE_ID
-                        ? edge.target
-                        : edge.source;
-                return nodes.get(otherId)?.cluster !== newNode?.cluster;
-            }),
-        ).toBe(true);
+            new Set(
+                signals.map(
+                    (node) => `${(node?.x ?? 0) < 50}:${(node?.y ?? 0) < 50}`,
+                ),
+            ).size,
+        ).toBe(PHASE_FOUR_NODE_IDS.length);
     });
 });

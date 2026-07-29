@@ -29,7 +29,20 @@ export type LandingGraphEdge = {
 export type { SourceMark, SourceVisual } from "./stage-source-data";
 export { LANDING_SOURCES } from "./stage-source-data";
 
-export const PHASE_FOUR_NODE_ID = "document-new-signal";
+/**
+ * The signals that arrive during the last scene, in the order the loop admits
+ * them. One per cluster and one per corner, so a viewer watching the loop go
+ * round sees the graph growing in a different place each time rather than the
+ * same node blinking.
+ */
+export const PHASE_FOUR_NODE_IDS = [
+    "document-new-signal",
+    "person-new-signal",
+    "criterion-new-signal",
+    "decision-new-signal",
+] as const;
+
+const PHASE_FOUR_NODE_SET: ReadonlySet<string> = new Set(PHASE_FOUR_NODE_IDS);
 
 export const DECISION_ROUTE_NODE_IDS = [
     "person-founder",
@@ -165,10 +178,12 @@ export const LANDING_GRAPH_NODES: readonly LandingGraphNode[] = [
     },
     {
         id: "decision-scope",
+        // Clear of the hub's own label, which sits a third of the hub radius
+        // above its centre and runs about 13 units wide.
         cluster: "decision",
         radius: 5,
-        x: 66,
-        y: 21,
+        x: 63,
+        y: 18,
         introducedInPhase: 2,
     },
     {
@@ -228,14 +243,6 @@ export const LANDING_GRAPH_NODES: readonly LandingGraphNode[] = [
         x: 89,
         y: 88,
         introducedInPhase: 2,
-    },
-    {
-        id: PHASE_FOUR_NODE_ID,
-        cluster: "document",
-        radius: 6,
-        x: 97,
-        y: 79,
-        introducedInPhase: 4,
     },
     {
         id: "criterion-market",
@@ -303,6 +310,43 @@ export const LANDING_GRAPH_NODES: readonly LandingGraphNode[] = [
         y: 51,
         introducedInPhase: 2,
     },
+
+    // The phase-four signals come last on purpose: each cluster's hub is the
+    // first node listed for it, and the edge builder radiates that cluster from
+    // whatever it finds there. Interleaved, a signal would silently become the
+    // hub and drag its whole cluster onto itself.
+    {
+        id: "person-new-signal",
+        cluster: "person",
+        radius: 6,
+        x: 11,
+        y: 16,
+        introducedInPhase: 4,
+    },
+    {
+        id: "decision-new-signal",
+        cluster: "decision",
+        radius: 6,
+        x: 88,
+        y: 13,
+        introducedInPhase: 4,
+    },
+    {
+        id: "document-new-signal",
+        cluster: "document",
+        radius: 6,
+        x: 97,
+        y: 79,
+        introducedInPhase: 4,
+    },
+    {
+        id: "criterion-new-signal",
+        cluster: "criterion",
+        radius: 6,
+        x: 10,
+        y: 89,
+        introducedInPhase: 4,
+    },
 ];
 
 const NODE_IDS_BY_CLUSTER: Record<GraphCluster, readonly string[]> = {
@@ -328,7 +372,7 @@ const CHORD_INDEXES = [
 ] as const;
 
 function phaseForEdge(source: string, target: string): 2 | 4 {
-    return source === PHASE_FOUR_NODE_ID || target === PHASE_FOUR_NODE_ID
+    return PHASE_FOUR_NODE_SET.has(source) || PHASE_FOUR_NODE_SET.has(target)
         ? 4
         : 2;
 }
@@ -407,8 +451,26 @@ const CROSS_CLUSTER_EDGES: readonly LandingGraphEdge[] = [
     },
     {
         id: "phase-four-document-criterion",
-        source: PHASE_FOUR_NODE_ID,
+        source: "document-new-signal",
         target: "criterion-quality",
+        introducedInPhase: 4,
+    },
+    {
+        id: "phase-four-person-document",
+        source: "person-new-signal",
+        target: "document-prd",
+        introducedInPhase: 4,
+    },
+    {
+        id: "phase-four-criterion-person",
+        source: "criterion-new-signal",
+        target: "person-founder",
+        introducedInPhase: 4,
+    },
+    {
+        id: "phase-four-decision-criterion",
+        source: "decision-new-signal",
+        target: "criterion-cost",
         introducedInPhase: 4,
     },
 ];

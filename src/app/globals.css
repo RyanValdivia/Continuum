@@ -79,6 +79,10 @@ body {
 
     --page-gutter: clamp(1.25rem, 5vw, 4.5rem);
     --page-max: 78rem;
+    /* The sticky nav sits in the flow, so a section that wants the whole
+       viewport has to subtract it. Its parts: the tallest control it holds
+       (min-h-9) plus the bar's own padding (py-3) and its hairline. */
+    --nav-height: calc(2.25rem + 1.5rem + var(--rule-hair));
     --text-display: clamp(2.5rem, 6.5vw, 4.5rem);
     --text-display-s: clamp(1.875rem, 4.2vw, 3rem);
     --rule-hair: 1px;

@@ -35,9 +35,9 @@ const STAGE_COPY = [
     [
         "Decidir",
         "Antes de actuar",
-        "Cada decisión llega con su contexto",
-        "Contexto compartido",
-        "Criterios conectados",
+        "Todo el grafo converge en una decisión",
+        "Contexto completo",
+        "Decisiones defendibles",
     ],
     [
         "Mantener",
@@ -58,6 +58,7 @@ type MockBrandShaderProps = {
 const brandShaderCalls: MockBrandShaderProps[] = [];
 
 vi.mock("../brand-shader", () => ({
+    SCENE_EDGE_FADE: "scene-edge-fade",
     BrandShader: ({
         activeStage,
         variant,
@@ -127,7 +128,7 @@ describe("LandingStages", () => {
         for (const summary of [
             "Notion, Slack, Microsoft 365 y documentos aportan decisiones, conversaciones, personas y criterios a Continuum.",
             "Continuum organiza ese contexto en un grafo de personas, decisiones, documentos y criterios relacionados.",
-            "Una decisión conecta su contexto relevante: precedentes, personas, documentos y criterios.",
+            "Personas, decisiones, documentos y criterios se contraen en un solo núcleo: el contexto completo que un founder necesita para decidir.",
             "Una señal nueva se integra como nodo, crea relaciones y modifica el grafo.",
         ]) {
             expect(screen).toContain(summary);

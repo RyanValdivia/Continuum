@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { BrandShader } from "./brand-shader";
+import { BrandShader, SCENE_EDGE_FADE } from "./brand-shader";
 import { Label, SectionHead } from "./lumen";
 import { GsapPinnedScenes } from "./motion";
 import { StageScreen } from "./stage-screens";
@@ -27,7 +27,7 @@ const STAGES: Stage[] = [
         body: (
             <>
                 Notion, Slack, Microsoft 365 y documentos aportan decisiones,
-                conversaciones, personas y criterios a Continuum.
+                conversaciones, personas y criterios a Continuum.{" "}
                 <strong className="font-medium text-foreground">
                     Sin migración
                 </strong>{" "}
@@ -47,7 +47,7 @@ const STAGES: Stage[] = [
         body: (
             <>
                 Continuum organiza ese contexto en un grafo de personas,
-                decisiones, documentos y criterios relacionados.
+                decisiones, documentos y criterios relacionados.{" "}
                 <strong className="font-medium text-foreground">
                     Grafo automático
                 </strong>{" "}
@@ -63,20 +63,21 @@ const STAGES: Stage[] = [
         n: "3",
         kicker: "Decidir",
         when: "Antes de actuar",
-        title: "Cada decisión llega con su contexto",
+        title: "Todo el grafo converge en una decisión",
         body: (
             <>
-                Una decisión conecta su contexto relevante: precedentes,
-                personas, documentos y criterios.
+                Personas, decisiones, documentos y criterios se contraen en un
+                solo núcleo: el contexto completo que un founder necesita para
+                decidir.{" "}
                 <strong className="font-medium text-foreground">
-                    Contexto compartido
+                    Sin reconstruirlo
                 </strong>{" "}
-                y criterios conectados.
+                cada vez y con criterios que sostienen la decisión.
             </>
         ),
-        chips: ["Contexto compartido", "Criterios conectados"],
+        chips: ["Contexto completo", "Decisiones defendibles"],
         accessibilitySummary:
-            "Una decisión conecta su contexto relevante: precedentes, personas, documentos y criterios.",
+            "Personas, decisiones, documentos y criterios se contraen en un solo núcleo: el contexto completo que un founder necesita para decidir.",
         tone: "primary",
     },
     {
@@ -87,7 +88,7 @@ const STAGES: Stage[] = [
         body: (
             <>
                 Una señal nueva se integra como nodo, crea relaciones y modifica
-                el grafo.
+                el grafo.{" "}
                 <strong className="font-medium text-foreground">
                     Topología viva
                 </strong>{" "}
@@ -126,7 +127,7 @@ export function LandingStages() {
                 />
                 <div
                     aria-hidden
-                    className="pointer-events-none absolute inset-0 bg-background/45"
+                    className={`pointer-events-none absolute inset-0 bg-background/45 ${SCENE_EDGE_FADE}`}
                 />
                 <div className="shell relative">
                     <StageScreen

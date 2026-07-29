@@ -340,7 +340,7 @@ export function GsapPinnedScenes({
                                 {
                                     autoAlpha: 0,
                                     yPercent: -3,
-                                    duration: 0.35,
+                                    duration: 0.28,
                                     ease: "power1.inOut",
                                 },
                                 index,
@@ -351,11 +351,17 @@ export function GsapPinnedScenes({
                                 {
                                     autoAlpha: 1,
                                     yPercent: 0,
-                                    duration: 0.35,
+                                    duration: 0.28,
                                     ease: "power1.inOut",
                                     immediateRender: false,
                                 },
-                                "<",
+                                // Trails the outgoing panel rather than
+                                // matching it: a full cross-dissolve leaves two
+                                // headlines legible at once, and their differing
+                                // heights centre them a line apart. Kept short
+                                // so the copy is not still swapping while the
+                                // apparatus is already well into the new scene.
+                                "<0.12",
                             );
                     }
                 },

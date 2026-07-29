@@ -13,14 +13,14 @@ describe("StageScreenGraph", () => {
     it("renders a dense four-cluster graph", () => {
         expect(markup).toContain("data-graph-camera");
         expect(count(markup, "data-graph-cluster=")).toBe(4);
-        expect(count(markup, "data-graph-node=")).toBe(32);
-        expect(count(markup, "data-graph-edge=")).toBe(51);
+        expect(count(markup, "data-graph-node=")).toBe(35);
+        expect(count(markup, "data-graph-edge=")).toBe(57);
     });
 
     it("exposes decision and integration targets", () => {
         expect(count(markup, 'data-decision-route="true"')).toBe(4);
-        expect(count(markup, 'data-phase-four-node="true"')).toBe(1);
-        expect(count(markup, 'data-phase-four-edge="true"')).toBe(3);
+        expect(count(markup, 'data-phase-four-node="true"')).toBe(4);
+        expect(count(markup, 'data-phase-four-edge="true"')).toBe(9);
     });
 
     it("labels only meaningful hubs", () => {

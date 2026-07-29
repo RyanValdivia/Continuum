@@ -1,21 +1,15 @@
 "use client";
 
 import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
 import type { ReactElement } from "react";
 import { useEffect, useRef } from "react";
 import { LANDING_SOURCES, type SourceVisual } from "./stage-screen-data";
 import { StageScreenGraph } from "./stage-screen-graph";
 import {
-    applyPhaseFourSnapshot,
-    applyPhaseSnapshot,
-    applyTransientHiddenSnapshot,
-    buildAmbientTimeline,
+    applySettledPhase,
+    buildAmbientLoop,
     buildPhaseTransition,
-    layer,
-    PHASE_FOUR_COMPLETED,
     type StageIndex,
-    shouldPauseAmbient,
 } from "./stage-screen-motion";
 import { StageSourceMark } from "./stage-source-mark";
 
@@ -36,8 +30,6 @@ export function StageScreen(props: StageScreenProps): ReactElement {
     const root = useRef<HTMLElement>(null);
     const transition = useRef<gsap.core.Timeline | null>(null);
     const ambient = useRef<gsap.core.Timeline | null>(null);
-    const transitionComplete = useRef(false);
-    const ambientReady = useRef(false);
 
     useGSAP(
         () => {
@@ -45,50 +37,36 @@ export function StageScreen(props: StageScreenProps): ReactElement {
             ambient.current?.kill();
             transition.current = null;
             ambient.current = null;
-            transitionComplete.current = false;
-            ambientReady.current = false;
 
             const desktop = window.matchMedia("(min-width: 64rem)").matches;
             const reduceMotion = window.matchMedia(
                 "(prefers-reduced-motion: reduce)",
             ).matches;
 
+            // Without the choreography there is only ever one frame to show, so
+            // it has to be the end of the story: the last scene, played out.
             if (!desktop || reduceMotion) {
-                gsap.set(layer("sources"), { autoAlpha: 0.5, scale: 0.72 });
-                gsap.set(layer("graph"), { autoAlpha: 1, scale: 1 });
-                gsap.set(layer("decision"), { autoAlpha: 1, scale: 1 });
-                gsap.set(layer("integration"), { autoAlpha: 1, scale: 1 });
-                applyPhaseFourSnapshot(PHASE_FOUR_COMPLETED);
-                applyTransientHiddenSnapshot();
+                applySettledPhase(3);
                 return;
             }
 
             if (!active) {
-                applyPhaseSnapshot(activeStage);
+                applySettledPhase(activeStage);
                 return;
             }
 
-            transition.current = buildPhaseTransition(activeStage);
-            ambient.current = buildAmbientTimeline(activeStage);
-            ambient.current?.pause();
+            // The scene changes with the scroll; inside it the apparatus runs
+            // on its own clock. The loop only starts once the incoming state
+            // has settled, so the two never animate the same property at once.
+            const loop = buildAmbientLoop(activeStage).pause();
+            const entrance = buildPhaseTransition(activeStage);
 
-            transition.current.eventCallback("onComplete", () => {
-                transitionComplete.current = true;
-                ambientReady.current = true;
-
-                const isPaused = shouldPauseAmbient({
-                    isHidden: document.hidden,
-                    active,
-                    transitionComplete: transitionComplete.current,
-                    ambientReady: ambientReady.current,
-                });
-
-                if (isPaused) {
-                    return;
-                }
-
-                ambient.current?.play();
+            entrance.eventCallback("onComplete", () => {
+                loop.play().paused(document.hidden);
             });
+
+            transition.current = entrance;
+            ambient.current = loop;
         },
         {
             scope: root,
@@ -97,26 +75,19 @@ export function StageScreen(props: StageScreenProps): ReactElement {
         },
     );
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: activeStage ensures pause state re-syncs after stage rebuilds.
     useEffect(() => {
         const syncVisibility = () => {
-            const isAmbientPaused = shouldPauseAmbient({
-                isHidden: document.hidden,
-                active,
-                transitionComplete: transitionComplete.current,
-                ambientReady: ambientReady.current,
-            });
-
             transition.current?.paused(document.hidden);
-            ambient.current?.paused(isAmbientPaused);
+            // Only ever resumes a loop the transition already started.
+            if (ambient.current?.progress()) {
+                ambient.current.paused(document.hidden);
+            }
         };
 
-        syncVisibility();
         document.addEventListener("visibilitychange", syncVisibility);
-
         return () =>
             document.removeEventListener("visibilitychange", syncVisibility);
-    }, [active, activeStage]);
+    }, []);
 
     useEffect(() => {
         return () => {
@@ -124,8 +95,6 @@ export function StageScreen(props: StageScreenProps): ReactElement {
             ambient.current?.kill();
             transition.current = null;
             ambient.current = null;
-            transitionComplete.current = false;
-            ambientReady.current = false;
         };
     }, []);
 
@@ -157,7 +126,11 @@ export function StageScreen(props: StageScreenProps): ReactElement {
                                 <path
                                     data-context-path={source.id}
                                     d={contextPath(source)}
-                                    className="fill-none stroke-primary/35"
+                                    // Dashes make the path a direction rather
+                                    // than a line; the loop crawls the offset
+                                    // along it. See FLOW_DASH_PERIOD.
+                                    strokeDasharray="3 5"
+                                    className="fill-none stroke-primary/55"
                                     vectorEffect="non-scaling-stroke"
                                 />
                                 <circle
@@ -166,7 +139,7 @@ export function StageScreen(props: StageScreenProps): ReactElement {
                                     data-packet-y={50 - source.y}
                                     cx={source.x}
                                     cy={source.y}
-                                    r="0.65"
+                                    r="1.2"
                                     className={
                                         source.cluster === "decision" ||
                                         source.cluster === "criterion"
@@ -195,35 +168,100 @@ export function StageScreen(props: StageScreenProps): ReactElement {
                 </div>
                 <div
                     data-constellation-layer="decision"
-                    className="pointer-events-none absolute inset-0"
+                    className="pointer-events-none absolute inset-[8%]"
                 >
-                    <div
-                        data-decision-focus
-                        className="absolute left-[69%] top-[28%] grid size-32 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-brand-chord/60 text-center text-xs"
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 100 100"
+                        className="size-full overflow-visible"
                     >
-                        <span>
-                            Decisión
-                            <br />
-                            <small className="text-muted-foreground">
-                                Contexto reunido
-                            </small>
-                        </span>
-                    </div>
+                        {/* Sits on the graph's centre, where the four clusters
+                            merge. Sharing the graph's viewBox is what keeps it
+                            there across viewports. */}
+                        <g
+                            data-decision-core
+                            style={{ transformOrigin: "50px 50px" }}
+                        >
+                            <circle
+                                data-decision-core-halo
+                                cx="50"
+                                cy="50"
+                                r="14"
+                                className="fill-none stroke-brand-chord/35"
+                                vectorEffect="non-scaling-stroke"
+                            />
+                            <circle
+                                cx="50"
+                                cy="50"
+                                r="9"
+                                className="fill-brand-chord/15 stroke-brand-chord"
+                                vectorEffect="non-scaling-stroke"
+                            />
+                            <text
+                                x="50"
+                                y="51.2"
+                                textAnchor="middle"
+                                className="fill-foreground font-mono text-[3px]"
+                            >
+                                Decisión
+                            </text>
+                        </g>
+                        <g data-decision-core-caption>
+                            <text
+                                x="50"
+                                y="68.5"
+                                textAnchor="middle"
+                                className="fill-brand-chord font-mono text-[2.4px]"
+                            >
+                                Lista para founders
+                            </text>
+                            <text
+                                x="50"
+                                y="72.5"
+                                textAnchor="middle"
+                                className="fill-muted-foreground font-mono text-[2px]"
+                            >
+                                Todo el contexto en un punto
+                            </text>
+                        </g>
+                    </svg>
                 </div>
                 <div
                     data-constellation-layer="integration"
-                    className="pointer-events-none absolute inset-0"
+                    className="pointer-events-none absolute inset-[8%]"
                 >
-                    <span
-                        data-integration-signal
-                        className="absolute right-0 bottom-[18%] rounded-full border border-primary/50 bg-card px-3 py-2 text-primary text-xs"
+                    {/* Shares the graph's viewBox so an arriving signal can be
+                        flown to the exact node it becomes. */}
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 100 100"
+                        className="size-full overflow-visible"
                     >
-                        Nuevo contexto
-                    </span>
-                    <span
-                        data-integration-wave
-                        className="absolute inset-[18%] rounded-full border border-primary/35"
-                    />
+                        <g data-integration-signal>
+                            <rect
+                                x="-11"
+                                y="-2.6"
+                                width="22"
+                                height="5.2"
+                                rx="2.6"
+                                className="fill-card stroke-primary/50"
+                                vectorEffect="non-scaling-stroke"
+                            />
+                            <text
+                                y="0.9"
+                                textAnchor="middle"
+                                className="fill-primary font-mono text-[2.2px]"
+                            >
+                                Nuevo contexto
+                            </text>
+                        </g>
+                        <circle
+                            data-integration-wave
+                            r="9"
+                            className="fill-none stroke-primary/35"
+                            vectorEffect="non-scaling-stroke"
+                        />
+                    </svg>
                 </div>
             </div>
         </figure>

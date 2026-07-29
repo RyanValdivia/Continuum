@@ -28,6 +28,11 @@ export type SourceVisual = {
     rotation: number;
 };
 
+/**
+ * Coordinates are percentages of the pinned figure, which spans the full
+ * viewport height — so the top band has to clear the sticky nav (~78px, and a
+ * mark is centred on its point). Anything above ~13% renders underneath it.
+ */
 export const LANDING_SOURCES: readonly SourceVisual[] = [
     {
         id: "notion",
@@ -58,7 +63,7 @@ export const LANDING_SOURCES: readonly SourceVisual[] = [
         mark: "microsoft-365",
         cluster: "document",
         x: 49,
-        y: 4,
+        y: 15,
         depth: 3,
         rotation: -4,
     },
@@ -101,8 +106,8 @@ export const LANDING_SOURCES: readonly SourceVisual[] = [
         kind: "artifact",
         mark: "sharepoint",
         cluster: "document",
-        x: 18,
-        y: 89,
+        x: 13,
+        y: 86,
         depth: 1,
         rotation: -5,
     },
@@ -112,7 +117,7 @@ export const LANDING_SOURCES: readonly SourceVisual[] = [
         kind: "artifact",
         mark: "word",
         cluster: "document",
-        x: 2,
+        x: 6,
         y: 48,
         depth: 2,
         rotation: 8,
@@ -123,8 +128,8 @@ export const LANDING_SOURCES: readonly SourceVisual[] = [
         kind: "artifact",
         mark: "excel",
         cluster: "criterion",
-        x: 75,
-        y: 8,
+        x: 69,
+        y: 14,
         depth: 1,
         rotation: -7,
     },
@@ -145,8 +150,8 @@ export const LANDING_SOURCES: readonly SourceVisual[] = [
         kind: "artifact",
         mark: "pdf",
         cluster: "criterion",
-        x: 33,
-        y: 10,
+        x: 31,
+        y: 17,
         depth: 2,
         rotation: 7,
     },
@@ -178,8 +183,8 @@ export const LANDING_SOURCES: readonly SourceVisual[] = [
         kind: "artifact",
         mark: "agreement",
         cluster: "decision",
-        x: 38,
-        y: 94,
+        x: 42,
+        y: 90,
         depth: 3,
         rotation: -6,
     },

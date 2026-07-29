@@ -18,9 +18,11 @@ const STAGES = [
  */
 export function LandingHero() {
     return (
-        <section className="relative overflow-clip border-border border-b">
-            <GsapIntro>
-                <div className="shell relative pt-[clamp(2.5rem,6vw,4rem)]">
+        // Holds the whole viewport, minus the nav above it, so the opening view
+        // is one screen rather than a screen and a strip of the next.
+        <section className="relative grid overflow-clip border-border border-b lg:min-h-[calc(100svh-var(--nav-height))]">
+            <GsapIntro className="grid content-center">
+                <div className="shell relative pt-[clamp(2.5rem,6vw,4rem)] lg:pt-0">
                     {/* Stage rail — the page's spine, previewed. Full width so the
                     four chips never wrap into a dangling connector. */}
                     <ol
@@ -52,7 +54,7 @@ export function LandingHero() {
                     </ol>
                 </div>
 
-                <div className="shell relative grid items-center gap-[var(--space-2xl)] pt-[var(--space-xl)] pb-[clamp(4rem,9vw,7rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+                <div className="shell relative grid items-center gap-[var(--space-2xl)] pt-[var(--space-xl)] pb-[clamp(4rem,9vw,7rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:pb-[var(--space-2xl)]">
                     <div>
                         <h1
                             data-intro
@@ -106,20 +108,31 @@ export function LandingHero() {
                             />
                         </div>
 
-                        <div
+                        {/* The two CTAs on the left ask for a decision. This one
+                            asks for nothing — it names what is further down, so
+                            the graph above reads as a promise the page keeps
+                            rather than an illustration. */}
+                        <a
                             data-intro-aside
-                            className="lumen-card -mt-[var(--space-lg)] relative mx-[var(--space-lg)] p-[var(--space-lg)]"
+                            href="#etapas"
+                            className="group mt-[var(--space-lg)] flex items-center justify-between gap-[var(--space-lg)] rounded-[var(--radius-card)] border border-border px-[var(--space-lg)] py-[var(--space-md)] outline-none transition-colors duration-[var(--dur-short)] ease-[var(--ease-out)] hover:border-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-4"
                         >
-                            <Label className="text-brand-chord">
-                                Agente · Head of Sales
-                            </Label>
-                            <p className="mt-2 text-muted-foreground text-sm leading-snug">
-                                «¿Puedo cerrar este deal con 20 % de descuento?»
-                            </p>
-                            <p className="mt-2 text-foreground text-sm leading-snug">
-                                No sin aprobación — el tope sin escalar es 15 %.
-                            </p>
-                        </div>
+                            <span className="min-w-0">
+                                <Label className="text-primary">
+                                    Sigue bajando
+                                </Label>
+                                <span className="mt-1 block text-muted-foreground text-sm leading-snug">
+                                    Cómo se construye este grafo, y cómo
+                                    sostiene una decisión.
+                                </span>
+                            </span>
+                            <span
+                                aria-hidden
+                                className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-primary transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] group-hover:translate-y-0.5"
+                            >
+                                ↓
+                            </span>
+                        </a>
                     </div>
                 </div>
             </GsapIntro>
