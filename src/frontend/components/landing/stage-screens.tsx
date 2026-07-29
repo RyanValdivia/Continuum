@@ -67,6 +67,22 @@ const PHASE_STATES: Record<StageIndex, PhaseState> = {
     },
 };
 
+type AmbientPauseState = {
+    isHidden: boolean;
+    active: boolean;
+    transitionComplete: boolean;
+    ambientReady: boolean;
+};
+
+export function shouldPauseAmbient(args: AmbientPauseState): boolean {
+    return (
+        args.isHidden ||
+        !args.active ||
+        !args.transitionComplete ||
+        !args.ambientReady
+    );
+}
+
 function applyPhaseSnapshot(stage: StageIndex): void {
     const state = PHASE_STATES[stage];
 
@@ -311,6 +327,8 @@ export function StageScreen(props: StageScreenProps): ReactElement {
     const root = useRef<HTMLElement>(null);
     const transition = useRef<gsap.core.Timeline | null>(null);
     const ambient = useRef<gsap.core.Timeline | null>(null);
+    const transitionComplete = useRef(false);
+    const ambientReady = useRef(false);
 
     useGSAP(
         () => {
@@ -318,6 +336,8 @@ export function StageScreen(props: StageScreenProps): ReactElement {
             ambient.current?.kill();
             transition.current = null;
             ambient.current = null;
+            transitionComplete.current = false;
+            ambientReady.current = false;
 
             const desktop = window.matchMedia("(min-width: 64rem)").matches;
             const reduceMotion = window.matchMedia(
@@ -349,9 +369,20 @@ export function StageScreen(props: StageScreenProps): ReactElement {
             ambient.current?.pause();
 
             transition.current.eventCallback("onComplete", () => {
-                if (document.hidden || !active) {
+                transitionComplete.current = true;
+                ambientReady.current = true;
+
+                const isPaused = shouldPauseAmbient({
+                    isHidden: document.hidden,
+                    active,
+                    transitionComplete: transitionComplete.current,
+                    ambientReady: ambientReady.current,
+                });
+
+                if (isPaused) {
                     return;
                 }
+
                 ambient.current?.play();
             });
         },
@@ -365,9 +396,15 @@ export function StageScreen(props: StageScreenProps): ReactElement {
     // biome-ignore lint/correctness/useExhaustiveDependencies: activeStage ensures pause state re-syncs after stage rebuilds.
     useEffect(() => {
         const syncVisibility = () => {
-            const paused = document.hidden || !active;
-            transition.current?.paused(paused);
-            ambient.current?.paused(paused);
+            const isAmbientPaused = shouldPauseAmbient({
+                isHidden: document.hidden,
+                active,
+                transitionComplete: transitionComplete.current,
+                ambientReady: ambientReady.current,
+            });
+
+            transition.current?.paused(document.hidden);
+            ambient.current?.paused(isAmbientPaused);
         };
 
         syncVisibility();
@@ -377,15 +414,16 @@ export function StageScreen(props: StageScreenProps): ReactElement {
             document.removeEventListener("visibilitychange", syncVisibility);
     }, [active, activeStage]);
 
-    useEffect(
-        () => () => {
+    useEffect(() => {
+        return () => {
             transition.current?.kill();
             ambient.current?.kill();
             transition.current = null;
             ambient.current = null;
-        },
-        [],
-    );
+            transitionComplete.current = false;
+            ambientReady.current = false;
+        };
+    }, []);
 
     return (
         <figure

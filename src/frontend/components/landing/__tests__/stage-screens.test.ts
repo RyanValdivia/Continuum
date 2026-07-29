@@ -1,15 +1,20 @@
 /** @vitest-environment happy-dom */
 
-import { createElement } from "react";
-import { act } from "react-dom/test-utils";
+import { gsap } from "gsap";
+import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
-import { StageScreen } from "../stage-screens";
+import { describe, expect, it, vi } from "vitest";
+import { StageScreen, shouldPauseAmbient } from "../stage-screens";
 
 type MatchMediaConfig = {
     desktop: boolean;
     reduceMotion: boolean;
+};
+
+type VisibilityController = {
+    setHidden: (hidden: boolean) => void;
+    restore: () => void;
 };
 
 function count(markup: string, attribute: string): number {
@@ -47,6 +52,31 @@ function mockMatchMedia(config: MatchMediaConfig): () => void {
             configurable: true,
             value: previousMatchMedia,
         });
+    };
+}
+
+function mockDocumentVisibility(initialHidden: boolean): VisibilityController {
+    const previousDescriptor = Object.getOwnPropertyDescriptor(
+        document,
+        "hidden",
+    );
+
+    const setHidden = (hidden: boolean): void => {
+        Object.defineProperty(document, "hidden", {
+            configurable: true,
+            value: hidden,
+        });
+    };
+
+    setHidden(initialHidden);
+
+    return {
+        setHidden,
+        restore: () => {
+            if (previousDescriptor) {
+                Object.defineProperty(document, "hidden", previousDescriptor);
+            }
+        },
     };
 }
 
@@ -131,6 +161,41 @@ describe("StageScreen", () => {
         expect(screen).toContain("data-continuum-core");
     });
 
+    it("exposes pause decision helper states", () => {
+        expect(
+            shouldPauseAmbient({
+                isHidden: true,
+                active: true,
+                transitionComplete: false,
+                ambientReady: false,
+            }),
+        ).toBe(true);
+        expect(
+            shouldPauseAmbient({
+                isHidden: false,
+                active: false,
+                transitionComplete: true,
+                ambientReady: true,
+            }),
+        ).toBe(true);
+        expect(
+            shouldPauseAmbient({
+                isHidden: false,
+                active: true,
+                transitionComplete: false,
+                ambientReady: true,
+            }),
+        ).toBe(true);
+        expect(
+            shouldPauseAmbient({
+                isHidden: false,
+                active: true,
+                transitionComplete: true,
+                ambientReady: true,
+            }),
+        ).toBe(false);
+    });
+
     it("applies inactive desktop baseline state on first mount", async () => {
         const { container, unmount } = await mountStageScreen(
             { activeStage: 0, active: false },
@@ -181,6 +246,58 @@ describe("StageScreen", () => {
                 expect(edge.style.opacity).toBe("1");
             }
         } finally {
+            await unmount();
+        }
+    });
+
+    it("keeps ambient paused until transition completion when visibility toggles", async () => {
+        const visibility = mockDocumentVisibility(true);
+        const eventCallbackSpy = vi.spyOn(
+            gsap.core.Timeline.prototype,
+            "eventCallback",
+        );
+        const playSpy = vi.spyOn(gsap.core.Timeline.prototype, "play");
+
+        const { unmount } = await mountStageScreen(
+            { activeStage: 1, active: true },
+            { desktop: true, reduceMotion: false },
+        );
+
+        try {
+            let onComplete: (() => void) | undefined;
+            for (const call of eventCallbackSpy.mock.calls as unknown as Array<
+                [string, unknown, ...unknown[]]
+            >) {
+                const [name, callback] = call;
+                if (name === "onComplete" && typeof callback === "function") {
+                    onComplete = callback as () => void;
+                    break;
+                }
+            }
+
+            expect(onComplete).toBeTypeOf("function");
+            expect(playSpy).toHaveBeenCalledTimes(0);
+
+            visibility.setHidden(false);
+            document.dispatchEvent(new Event("visibilitychange"));
+
+            expect(
+                shouldPauseAmbient({
+                    isHidden: false,
+                    active: true,
+                    transitionComplete: false,
+                    ambientReady: false,
+                }),
+            ).toBe(true);
+            expect(playSpy).toHaveBeenCalledTimes(0);
+
+            onComplete?.();
+
+            expect(playSpy).toHaveBeenCalledTimes(1);
+        } finally {
+            visibility.restore();
+            eventCallbackSpy.mockRestore();
+            playSpy.mockRestore();
             await unmount();
         }
     });

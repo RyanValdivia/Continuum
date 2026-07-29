@@ -75,3 +75,28 @@
 
 ### commit
 - 423febb
+
+
+## fix round 2
+
+### applied fixes
+- Added `ambientReady` and `transitionComplete` refs, initialized to `false` on every stage/active rebuild and cleared on teardown.
+- Added a pure visibility decision helper `shouldPauseAmbient` used by ambient synchronization.
+- Changed visibility synchronization so ambient pauses when document is hidden, section inactive, transition is not complete, or ambient is not ready.
+- Transition `onComplete` now marks ambient readiness and plays ambient only when conditions are clear (`document` visible and section active).
+- Kept inactive/mobile/reduced-motion branches as pause-only paths: no ambient timelines are created and ambient readiness stays false.
+- Added focused runtime coverage proving visibility toggling pauses ambient and transition while transition is incomplete via runtime spies and pure helper assertions.
+- Replaced deprecated test import by using `act` and `createElement` from React.
+
+### verification round 2
+- `pnpm test -- src/frontend/components/landing/__tests__/stage-screens.test.ts src/frontend/components/landing/__tests__/stage-screen-graph.test.ts src/frontend/components/landing/__tests__/landing-stages.test.ts`
+  - Result: pass (`46 passed`, `311` tests)
+- `pnpm exec biome check src/frontend/components/landing/stage-screens.tsx src/frontend/components/landing/__tests__/stage-screens.test.ts`
+  - Result: clean
+- `pnpm typecheck`
+  - Result: clean
+- `git diff --check`
+  - Result: clean
+
+### commit
+- c9630d9
