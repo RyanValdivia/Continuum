@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import { LandingStages } from "../stages";
 
 const STAGE_COPY = [
@@ -34,6 +35,42 @@ const STAGE_COPY = [
     ],
 ] as const;
 
+type MockBrandShaderProps = {
+    activeStage?: 0 | 1 | 2 | 3;
+    variant?: "field" | "panel" | "band" | "constellation";
+    className?: string;
+    desktopMotionOnly?: boolean;
+};
+
+const brandShaderCalls: MockBrandShaderProps[] = [];
+
+vi.mock("../brand-shader", () => ({
+    BrandShader: ({
+        activeStage,
+        variant,
+        className,
+        ...props
+    }: MockBrandShaderProps) => {
+        const tracked: MockBrandShaderProps = {
+            activeStage,
+            variant,
+            ...(className !== undefined ? { className } : {}),
+            ...props,
+        };
+
+        brandShaderCalls.push(tracked);
+
+        return createElement("div", {
+            "data-brand-shader": "",
+            "data-active-stage": `${activeStage}`,
+            "data-variant": variant,
+            ...(className !== undefined
+                ? ({ "data-class-name": className } as const)
+                : {}),
+        });
+    },
+}));
+
 describe("LandingStages", () => {
     const screen = renderToStaticMarkup(createElement(LandingStages));
 
@@ -58,7 +95,19 @@ describe("LandingStages", () => {
         expect(screen).toContain('data-stage-active="false"');
         expect(screen).not.toContain("Consultar");
         expect(screen).not.toContain("Head of Sales");
-        expect(screen).not.toContain("opacity-[0.2]");
+    });
+
+    it("passes constellation settings to BrandShader without class overrides", () => {
+        expect(brandShaderCalls).toHaveLength(1);
+
+        const shaderProps = brandShaderCalls[0] ?? {};
+
+        expect(shaderProps.variant).toBe("constellation");
+        expect(shaderProps.activeStage).toBe(0);
+        expect(shaderProps.className).toBeUndefined();
+        expect(screen).toContain('data-variant="constellation"');
+        expect(screen).toContain('data-active-stage="0"');
+        expect(screen).not.toContain("data-class-name");
     });
 
     it("describes the complete transformation accessibly", () => {
