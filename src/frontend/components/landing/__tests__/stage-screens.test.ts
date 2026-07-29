@@ -41,4 +41,14 @@ describe("StageScreen", () => {
             expect(screen).not.toContain(oldContent);
         }
     });
+
+    it("exposes complete GSAP choreography targets", () => {
+        expect(count(screen, "data-graph-cluster=")).toBe(4);
+        expect(count(screen, 'data-decision-route="true"')).toBe(4);
+        expect(count(screen, 'data-phase-four-node="true"')).toBe(1);
+        expect(count(screen, 'data-phase-four-edge="true"')).toBe(3);
+        expect(screen).toContain("data-decision-particle");
+        expect(screen).toContain("data-integration-wave");
+        expect(screen).toContain("data-continuum-core");
+    });
 });

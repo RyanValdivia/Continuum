@@ -34,9 +34,9 @@ function GraphEdge({ edge }: { edge: LandingGraphEdge }): ReactElement {
         <line
             key={edge.id}
             data-graph-edge={edge.id}
-            data-decision-route={edge.decisionRoute || undefined}
+            data-decision-route={edge.decisionRoute ? "true" : undefined}
             data-phase-four-edge={
-                edge.introducedInPhase === 4 ? true : undefined
+                edge.introducedInPhase === 4 ? "true" : undefined
             }
             x1={source.x}
             y1={source.y}
@@ -53,7 +53,7 @@ function GraphNode({ node }: { node: LandingGraphNode }): ReactElement {
         <g
             data-graph-node={node.id}
             data-phase-four-node={
-                node.id === PHASE_FOUR_NODE_ID ? true : undefined
+                node.id === PHASE_FOUR_NODE_ID ? "true" : undefined
             }
         >
             <circle
