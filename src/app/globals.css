@@ -238,7 +238,8 @@ body {
     .full-scene-panel {
         position: relative;
         inset: auto;
-        min-height: 100svh;
+        min-height: auto;
+        padding-block: var(--space-xl);
     }
     .full-scene-progress {
         display: none;
@@ -379,19 +380,23 @@ body {
 
 /* A global motion kill-switch has to outrank every utility that sets a
    duration, so !important is load-bearing here rather than a shortcut. */
-/* biome-ignore-all lint/complexity/noImportantStyles: reduced-motion override */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
+        /* biome-ignore lint/complexity/noImportantStyles: reduced-motion override */
         animation-duration: 150ms !important;
+        /* biome-ignore lint/complexity/noImportantStyles: reduced-motion override */
         animation-iteration-count: 1 !important;
+        /* biome-ignore lint/complexity/noImportantStyles: reduced-motion override */
         transition-duration: 150ms !important;
+        /* biome-ignore lint/complexity/noImportantStyles: reduced-motion override */
         scroll-behavior: auto !important;
     }
     .mark-pulse,
     .star-burst,
     .lumen-verb::after {
+        /* biome-ignore lint/complexity/noImportantStyles: reduced-motion override */
         animation: none !important;
     }
 }

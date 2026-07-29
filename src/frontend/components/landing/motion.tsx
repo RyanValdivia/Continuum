@@ -237,21 +237,25 @@ export function GsapDrift({
 
 type GsapPinnedScenesProps = PropsWithChildren<{
     className?: string;
-    onSceneChange: (index: number) => void;
+    onSceneChange: (index: 0 | 1 | 2 | 3) => void;
+    onSectionActiveChange?: (active: boolean) => void;
 }>;
 
 export function GsapPinnedScenes({
     className,
+    onSectionActiveChange,
     onSceneChange,
     children,
 }: GsapPinnedScenesProps) {
     const root = useRef<HTMLDivElement>(null);
-    const activeScene = useRef(0);
+    const activeScene = useRef<0 | 1 | 2 | 3>(0);
     const onSceneChangeRef = useRef(onSceneChange);
+    const onSectionActiveChangeRef = useRef(onSectionActiveChange);
 
     useLayoutEffect(() => {
         onSceneChangeRef.current = onSceneChange;
-    }, [onSceneChange]);
+        onSectionActiveChangeRef.current = onSectionActiveChange;
+    }, [onSceneChange, onSectionActiveChange]);
 
     useGSAP(
         () => {
@@ -278,6 +282,7 @@ export function GsapPinnedScenes({
                         if (progress) gsap.set(progress, { clearProps: "all" });
                         activeScene.current = 0;
                         onSceneChangeRef.current(0);
+                        onSectionActiveChangeRef.current?.(false);
                         return;
                     }
 
@@ -296,7 +301,7 @@ export function GsapPinnedScenes({
                             const next = getActiveSceneIndex(
                                 timeline.progress(),
                                 scenes.length,
-                            );
+                            ) as 0 | 1 | 2 | 3;
                             if (next === activeScene.current) return;
                             activeScene.current = next;
                             onSceneChangeRef.current(next);
@@ -309,6 +314,14 @@ export function GsapPinnedScenes({
                             pin: true,
                             scrub: 0.65,
                             invalidateOnRefresh: true,
+                            onEnter: () =>
+                                onSectionActiveChangeRef.current?.(true),
+                            onEnterBack: () =>
+                                onSectionActiveChangeRef.current?.(true),
+                            onLeave: () =>
+                                onSectionActiveChangeRef.current?.(false),
+                            onLeaveBack: () =>
+                                onSectionActiveChangeRef.current?.(false),
                         },
                     });
 

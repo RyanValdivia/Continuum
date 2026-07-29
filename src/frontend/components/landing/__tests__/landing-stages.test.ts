@@ -3,57 +3,71 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { LandingStages } from "../stages";
 
-describe("LandingStages", () => {
-    it("keeps every stage available to assistive technology", () => {
-        const screen = renderToStaticMarkup(createElement(LandingStages));
+const STAGE_COPY = [
+    [
+        "Conectar",
+        "Día uno",
+        "Conecta lo que tu equipo ya sabe",
+        "Sin migración",
+        "Contexto desde el origen",
+    ],
+    [
+        "Mapear",
+        "En segundo plano",
+        "El contexto encuentra sus relaciones",
+        "Grafo automático",
+        "Relaciones vivas",
+    ],
+    [
+        "Decidir",
+        "Antes de actuar",
+        "Cada decisión llega con su contexto",
+        "Contexto compartido",
+        "Criterios conectados",
+    ],
+    [
+        "Mantener",
+        "Continuo",
+        "Cada señal hace evolucionar el grafo",
+        "Sync continuo",
+        "Topología viva",
+    ],
+] as const;
 
+describe("LandingStages", () => {
+    const screen = renderToStaticMarkup(createElement(LandingStages));
+
+    it("keeps four revised stages available to assistive technology", () => {
         expect(screen).toContain("Cómo funciona");
-        expect(screen).toContain("Cuatro etapas, de la fuente a la ruta.");
-        expect(screen).toContain(
-            "Las mismas cuatro, siempre en el mismo orden. Continuum sostiene la estructura para que tú no tengas que recordarla.",
-        );
+        expect(screen).toContain('aria-label="Todas las etapas"');
         expect(screen.match(/<h2(?:\s|>)/g)).toHaveLength(1);
         expect(screen.match(/<h3(?:\s|>)/g)).toHaveLength(8);
-        expect(screen).toContain('aria-hidden="true" class="shell relative"');
-        expect(screen).toContain('aria-label="Todas las etapas"');
-        expect(screen.match(/data-stage-active="true"/g)).toHaveLength(1);
-        expect(screen.match(/data-stage-active="false"/g)).toHaveLength(3);
 
         const accessibleScenes = screen.slice(
             screen.indexOf('aria-label="Todas las etapas"'),
         );
+        for (const stage of STAGE_COPY) {
+            for (const content of stage)
+                expect(accessibleScenes).toContain(content);
+        }
+    });
 
-        for (const content of [
-            "Conectar",
-            "Día uno",
-            "Enchufa las fuentes que ya usas",
-            "Notion, Slack, Microsoft 365 y la revisión de documentos entran",
-            "Notion, Slack, Microsoft 365 y Documentos convergen en Continuum.",
-            "4 fuentes",
-            "Sin migración",
-            "Mapear",
-            "En segundo plano",
-            "El grafo se construye solo",
-            "Cada página, hilo y documento se resuelve contra la persona",
-            "Persona, Decisión, Documento y Criterio están relacionados por el Grafo.",
-            "4 tipos de nodo",
-            "Automático",
-            "Consultar",
-            "Cuando haga falta",
-            "Un agente por puesto",
-            "Cada puesto tiene un agente que responde con el criterio",
-            "Head of Sales pregunta si puede cerrar con 20 % de descuento. Sin aprobación, el tope es 15 %. Las fuentes son Política comercial en Notion y Aprobaciones de descuento en Slack.",
-            "Agente por puesto",
-            "Con contexto",
-            "Mantener",
-            "Continuo",
-            "El grafo no envejece",
-            "Cada sync trae lo nuevo y lo vuelve a atar a la persona",
-            "Slack, Notion y Microsoft 365 están actualizados; el Grafo está al día.",
-            "Sync continuo",
-            "Sin mantenimiento manual",
+    it("mounts one persistent apparatus instead of four cards", () => {
+        expect(screen.match(/data-constellation-narrative/g)).toHaveLength(1);
+        expect(screen.match(/data-full-scene/g)).toHaveLength(4);
+        expect(screen).toContain('data-stage-active="false"');
+        expect(screen).not.toContain("Consultar");
+        expect(screen).not.toContain("Head of Sales");
+    });
+
+    it("describes the complete transformation accessibly", () => {
+        for (const summary of [
+            "Notion, Slack, Microsoft 365 y documentos aportan decisiones, conversaciones, personas y criterios a Continuum.",
+            "Continuum organiza ese contexto en un grafo de personas, decisiones, documentos y criterios relacionados.",
+            "Una decisión conecta su contexto relevante: precedentes, personas, documentos y criterios.",
+            "Una señal nueva se integra como nodo, crea relaciones y modifica el grafo.",
         ]) {
-            expect(accessibleScenes).toContain(content);
+            expect(screen).toContain(summary);
         }
     });
 });

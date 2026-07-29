@@ -23,87 +23,87 @@ const STAGES: Stage[] = [
         n: "1",
         kicker: "Conectar",
         when: "Día uno",
-        title: "Enchufa las fuentes que ya usas",
+        title: "Conecta lo que tu equipo ya sabe",
         body: (
             <>
-                Notion, Slack, Microsoft 365 y la revisión de documentos entran
-                tal como están.{" "}
+                Notion, Slack, Microsoft 365 y documentos aportan decisiones,
+                conversaciones, personas y criterios a Continuum.
                 <strong className="font-medium text-foreground">
-                    Nadie migra nada
+                    Sin migración
                 </strong>{" "}
-                ni cambia de herramienta: el equipo sigue trabajando donde
-                trabaja.
+                y contexto desde el origen.
             </>
         ),
-        chips: ["4 fuentes", "Sin migración"],
+        chips: ["Sin migración", "Contexto desde el origen"],
         accessibilitySummary:
-            "Notion, Slack, Microsoft 365 y Documentos convergen en Continuum.",
+            "Notion, Slack, Microsoft 365 y documentos aportan decisiones, conversaciones, personas y criterios a Continuum.",
         tone: "primary",
     },
     {
         n: "2",
         kicker: "Mapear",
         when: "En segundo plano",
-        title: "El grafo se construye solo",
+        title: "El contexto encuentra sus relaciones",
         body: (
             <>
-                Cada página, hilo y documento se resuelve contra la persona y el
-                proyecto que le corresponden.{" "}
+                Continuum organiza ese contexto en un grafo de personas,
+                decisiones, documentos y criterios relacionados.
                 <strong className="font-medium text-foreground">
-                    Lo que se guarda son las relaciones
-                </strong>
-                , no una copia más del archivo.
+                    Grafo automático
+                </strong>{" "}
+                y relaciones vivas.
             </>
         ),
-        chips: ["4 tipos de nodo", "Automático"],
+        chips: ["Grafo automático", "Relaciones vivas"],
         accessibilitySummary:
-            "Persona, Decisión, Documento y Criterio están relacionados por el Grafo.",
+            "Continuum organiza ese contexto en un grafo de personas, decisiones, documentos y criterios relacionados.",
         tone: "chord",
     },
     {
         n: "3",
-        kicker: "Consultar",
-        when: "Cuando haga falta",
-        title: "Un agente por puesto",
+        kicker: "Decidir",
+        when: "Antes de actuar",
+        title: "Cada decisión llega con su contexto",
         body: (
             <>
-                Cada puesto tiene un agente que responde con el criterio de
-                quien lo ocupa —{" "}
+                Una decisión conecta su contexto relevante: precedentes,
+                personas, documentos y criterios.
                 <strong className="font-medium text-foreground">
-                    no con el primer documento que encuentra
-                </strong>
-                .
+                    Contexto compartido
+                </strong>{" "}
+                y criterios conectados.
             </>
         ),
-        chips: ["Agente por puesto", "Con contexto"],
+        chips: ["Contexto compartido", "Criterios conectados"],
         accessibilitySummary:
-            "Head of Sales pregunta si puede cerrar con 20 % de descuento. Sin aprobación, el tope es 15 %. Las fuentes son Política comercial en Notion y Aprobaciones de descuento en Slack.",
+            "Una decisión conecta su contexto relevante: precedentes, personas, documentos y criterios.",
         tone: "primary",
     },
     {
         n: "4",
         kicker: "Mantener",
         when: "Continuo",
-        title: "El grafo no envejece",
+        title: "Cada señal hace evolucionar el grafo",
         body: (
             <>
-                Cada sync trae lo nuevo y lo vuelve a atar a la persona y al
-                proyecto correctos, así que{" "}
+                Una señal nueva se integra como nodo, crea relaciones y modifica
+                el grafo.
                 <strong className="font-medium text-foreground">
-                    lo que respondes hoy sigue siendo cierto mañana
-                </strong>
-                .
+                    Topología viva
+                </strong>{" "}
+                con sync continuo.
             </>
         ),
-        chips: ["Sync continuo", "Sin mantenimiento manual"],
+        chips: ["Sync continuo", "Topología viva"],
         accessibilitySummary:
-            "Slack, Notion y Microsoft 365 están actualizados; el Grafo está al día.",
+            "Una señal nueva se integra como nodo, crea relaciones y modifica el grafo.",
         tone: "chord",
     },
 ];
 
 export function LandingStages() {
-    const [activeScene, setActiveScene] = useState(0);
+    const [activeScene, setActiveScene] = useState<0 | 1 | 2 | 3>(0);
+    const [sectionActive, setSectionActive] = useState(false);
 
     return (
         <section id="etapas" className="scroll-mt-24 border-border border-b">
@@ -116,6 +116,7 @@ export function LandingStages() {
             </div>
             <GsapPinnedScenes
                 onSceneChange={setActiveScene}
+                onSectionActiveChange={setSectionActive}
                 className="relative overflow-clip lg:min-h-svh"
             >
                 <BrandShader
@@ -128,12 +129,16 @@ export function LandingStages() {
                     className="pointer-events-none absolute inset-0 bg-background/45"
                 />
                 <div aria-hidden className="shell relative">
+                    <StageScreen
+                        activeStage={activeScene}
+                        active={sectionActive}
+                    />
                     <ol className="grid gap-[var(--space-lg)] py-[var(--space-2xl)] lg:min-h-svh lg:py-0">
-                        {STAGES.map((stage, index) => (
+                        {STAGES.map((stage) => (
                             <li
                                 key={stage.n}
                                 data-full-scene
-                                className="full-scene-panel grid min-w-0 gap-[var(--space-xl)] lg:absolute lg:inset-0 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start lg:py-[var(--space-3xl)]"
+                                className="full-scene-panel grid min-w-0 content-center gap-[var(--space-xl)] py-[var(--space-xl)] lg:absolute lg:inset-0 lg:w-[42%] lg:py-[var(--space-2xl)]"
                             >
                                 <div className="min-w-0">
                                     <Label
@@ -165,12 +170,6 @@ export function LandingStages() {
                                         ))}
                                     </ul>
                                 </div>
-                                <StageScreen
-                                    activeStage={index as 0 | 1 | 2 | 3}
-                                    active={
-                                        activeScene === (index as 0 | 1 | 2 | 3)
-                                    }
-                                />
                             </li>
                         ))}
                     </ol>
