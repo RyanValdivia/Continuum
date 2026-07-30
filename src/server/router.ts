@@ -15,6 +15,9 @@ import { notionRouter } from "@/core/notion/server/api/router";
 import { onboardingRouter } from "@/core/onboarding/server/api/router";
 import { planeRouter } from "@/core/plane/server/api/router";
 import { projectRouter } from "@/core/project/server/api/router";
+// recruitmentRouter: legacy — no longer linked from the app UI, kept mounted
+// only so its type-coupled client (@/core/recruitment/client/hooks.ts) and
+// the standalone /apply/[token] page keep compiling and working.
 import { recruitmentRouter } from "@/core/recruitment/server/api/router";
 import { slackRouter } from "@/core/slack/server/api/router";
 import { auth } from "./auth/auth";
